@@ -172,35 +172,41 @@ public class Visuals
 		}
 	}
 
-	public void DrawArtros(double[][] ArtroPos, String[] ArtroWill, int[] ArtroSpecies, int[] ArtroLife, double[] ArtroSize, Color[] color)
+	public void DrawArtros(double[][] ArtroPos, String[] ArtroWill, int[] ArtroSpecies, int[] ArtroLife, int[] ArtroSize, Color[] color)
 	{
-		for (int a = 0; a <= ArtroPos.length - 1; a += 1)
+		if (ArtroPos != null)
 		{
-			if (0 < ArtroLife[a])
+			for (int a = 0; a <= ArtroPos.length - 1; a += 1)
 			{
-				int[] DrawingPos = Uts.ConvertToDrawingCoords(ArtroPos[a], CanvasPos, CanvasSize, CanvasDim);
-				if (ArtroWill[a].equals("fight"))
+				if (0 < ArtroLife[a])
 				{
-					DP.DrawCircle(DrawingPos, (int) (ArtroSize[ArtroSpecies[a]]), true, ColorPalette[4], ColorPalette[6]);
+					int[] DrawingPos = Uts.ConvertToDrawingCoords(ArtroPos[a], CanvasPos, CanvasSize, CanvasDim);
+					if (ArtroWill[a].equals("fight"))
+					{
+						DP.DrawCircle(DrawingPos, ArtroSize[ArtroSpecies[a]], true, ColorPalette[4], ColorPalette[6]);
+					}
+					else
+					{
+						DP.DrawCircle(DrawingPos, ArtroSize[ArtroSpecies[a]], true, ColorPalette[4], color[ArtroSpecies[a]]);
+					}
+					//DP.DrawText(DrawingPos, ArtroWill[a], "Center", 0, "Bold", 10, ColorPalette[4]);
 				}
-				else
-				{
-					DP.DrawCircle(DrawingPos, (int) (ArtroSize[ArtroSpecies[a]]), true, ColorPalette[4], color[ArtroSpecies[a]]);
-				}
-				//DP.DrawText(DrawingPos, ArtroWill[a], "Center", 0, "Bold", 10, ColorPalette[4]);
 			}
+			//int[] DrawingPos = Uts.ConvertToDrawingCoords(ArtroPos[0], CanvasPos, CanvasSize, CanvasDim);
+			//DP.DrawCircle(DrawingPos, (int) (1.3 * ArtroSize[ArtroSpecies[0]]), true, ColorPalette[4], Color.yellow);
 		}
-		int[] DrawingPos = Uts.ConvertToDrawingCoords(ArtroPos[0], CanvasPos, CanvasSize, CanvasDim);
-		DP.DrawCircle(DrawingPos, (int) (1.3 * ArtroSize[ArtroSpecies[0]]), true, ColorPalette[4], Color.yellow);
 	}
 	
 	public void DrawFood(double[][] FoodPos, int[] FoodType, boolean[] FoodStatus, double[] FoodSize, Color[] color)
 	{
-		for (int f = 0; f <= FoodPos.length - 1; f += 1)
+		if (FoodPos != null)
 		{
-			if (FoodStatus[f])
+			for (int f = 0; f <= FoodPos.length - 1; f += 1)
 			{
-				DP.DrawCircle(Uts.ConvertToDrawingCoords(FoodPos[f], CanvasPos, CanvasSize, CanvasDim), (int) (FoodSize[FoodType[f]]), true, ColorPalette[4], color[FoodType[f]]);
+				if (FoodStatus[f])
+				{
+					DP.DrawCircle(Uts.ConvertToDrawingCoords(FoodPos[f], CanvasPos, CanvasSize, CanvasDim), (int) (FoodSize[FoodType[f]]), true, ColorPalette[4], color[FoodType[f]]);
+				}
 			}
 		}
 	}

@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.Arrays;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -45,53 +46,54 @@ public class Evolução extends JFrame
 	/* Artros */
 	public int NumberOfArtros;
 	public int NumberOfSpecies;
-    public int[] ArtroLife;				// [true = alive]
-    public double[][] ArtroPos;				// [x, y]
-    public int[] ArtroSpecies;				// [species]
-    public double[] ArtroSatiation;			// [satiation]
-    public String[] ArtroWill;				// [will]
-    public double[] ArtroSexWish;			// [sex wish]
-    public int[] ArtroAge;					// [age]
-    public int[] ArtroDir;					// [direction of movement]
-    public double[] ArtroMut;				// [chance of mutation]
-    
-    public double[][] ArtroInitialPos;		// [species][x, y]
-    public double[][] ArtroDispersion;		// [species][dispersion in x, dispersion in y]
-    public double[] ArtroSize;				// [size]
-    public double[] ArtroStep;				// [step]
-    public int[] ArtroStomach;				// [stomach size]
-    public double[] ArtroVision;			// [vision range]
-    public double[][] ArtroChoice;			// [species][0: eat, 1: mate, 2: fight, 3: flee, 4: group, 5: wander]
-    public boolean[] ArtroKeepChoice;		// [keep choice]
-    public int[] ArtroSexApp;				// [sex appetite]
-    public int[] ArtroSexAge;				// [sexual age]
-    public int[] ArtroMaxAge;				// [maximum age]
-    public int[] ArtroFoodValue;			// [food value]
-    public Color[] ArtroColor;				// [color]
+    public int[] ArtroLife;					// [length = NumberOfArtros][current life, 0 < Life = alive]
+    public double[][] ArtroPos;				// [length = NumberOfArtros][x, y]
+    public int[] ArtroSpecies;				// [length = NumberOfArtros][species]
+    public double[][] ArtroChoice;			// [length = NumberOfArtros][species][0: eat, 1: mate, 2: fight, 3: flee, 4: group, 5: wander]
+    public boolean[] ArtroKeepChoice;		// [length = NumberOfArtros][keep choice]
+    public int[] ArtroSatiation;			// [length = NumberOfArtros][satiation]
+    public String[] ArtroWill;				// [length = NumberOfArtros][will]
+    public int[] ArtroSexWish;				// [length = NumberOfArtros][sex wish]
+    public int[] ArtroAge;					// [length = NumberOfArtros][age]
+    public int[] ArtroDir;					// [length = NumberOfArtros][direction of movement]
 
     /* Species */
-    public int[] SpeciesLife;				// Amount of life
-    public double[][] SpeciesChoices;		// [0: eat, 1: mate, 2: fight, 3: flee, 4: group, 5: wander]
-    public int[] SpeciesMaxPop;				// [maximum population reached by each species]
+    public double[][] ArtroInitialPos;		// [length = species][species][x, y]
+    public double[][] ArtroDispersion;		// [length = species][species][dispersion in x, dispersion in y]
+    public int[] SpeciesLife;				// [length = species][Amount of life]
+    public int[] ArtroSize;					// [length = species][size]
+    public int[] ArtroStep;					// [length = species][step]
+    public int[] ArtroStomach;				// [length = species][stomach size]
+    public int[] ArtroVision;				// [length = species][vision range]
+    public double[][] SpeciesChoices;		// [length = species][0: eat, 1: mate, 2: fight, 3: flee, 4: group, 5: wander]
+    public int[] ArtroSexApp;				// [length = species][sex appetite]
+    public int[] ArtroSexAge;				// [length = species][sexual age]
+    public int[] ArtroMaxAge;				// [length = species][maximum age]
+    public int[] ArtroFoodValue;			// [length = species][food value]
+    public double[] ArtroMut;				// [length = species][chance of mutation]
+    public Color[] ArtroColor;				// [length = species][color]
+
+    /* Records */
+    public int[] SpeciesMaxPop;				// [length = species][maximum population reached by each species]
     public double[][][] SpeciesChoicesHist;	// history of the chance of choices [choice][round][species]
     public int[][] SpeciesPopHist;			// history of the population with time [round][species]
     	
 	/* Food */
     public int NumberOfFood;  
 	public int NumberOfFoodTypes;                           
-    public boolean[] FoodStatus;             // [true = exists]
-    public int[] FoodType;                	 // [food type]
-    public double[][] FoodPos;               // [x, y]
-	public int[] FoodRespawn;         		 // [respawn]
+    public boolean[] FoodStatus;			// [true = exists]
+    public int[] FoodType;					// [food type]
+    public double[][] FoodPos;				// [x, y]
+	public int[] FoodRespawn;				// [respawn]
     
-    public double[] FoodSize;              	 // [food size]
-    public double[][] FoodInitialPos;       // [x, y]
-    public double[][] FoodDispersion;       // [dispersion in x, dispersion in y]
-    public int[] FoodValue;                  // [value]
-	public int[] FoodRespawnRate;            // [respawn rate]
-    public Color[] FoodColor;                // [color]
-    public int[][] FoodHist; 				 // [history of the population with time]
-    public int[] MaxFood;                    // [maximum food amount ever reached by each food type]
+    public double[] FoodSize;				// [food size]
+    public double[][] FoodInitialPos;		// [x, y]
+    public double[][] FoodDispersion;		// [dispersion in x, dispersion in y]
+    public int[] FoodValue;					// [value]
+	public int[] FoodRespawnRate;			// [respawn rate]
+    public Color[] FoodColor;				// [color]
+    public int[][] FoodHist;				// [history of the population with time]
+    public int[] MaxFood;					// [maximum food amount ever reached by each food type]
 	
 	/* Global variables */
 	int round = 0, delay = 10;
@@ -133,10 +135,10 @@ public class Evolução extends JFrame
 		ArtroInitialPos = Uts.ObjectToDoubleArray(object[2]);
 		ArtroDispersion = Uts.ObjectToDoubleArray(object[3]);
 	    SpeciesLife = Uts.ObjectToIntVec(object[4]);	   
-	    ArtroSize = Uts.ObjectToDoubleVec(object[5]);	   
-	    ArtroStep = Uts.ObjectToDoubleVec(object[6]);
+	    ArtroSize = Uts.ObjectToIntVec(object[5]);	   
+	    ArtroStep = Uts.ObjectToIntVec(object[6]);
 	    ArtroStomach = Uts.ObjectToIntVec(object[7]);
-	    ArtroVision = Uts.ObjectToDoubleVec(object[8]);
+	    ArtroVision = Uts.ObjectToIntVec(object[8]);
 	    SpeciesChoices = Uts.ObjectToDoubleArray(object[9]);
 	    ArtroSexApp = Uts.ObjectToIntVec(object[10]);
 	    ArtroSexAge = Uts.ObjectToIntVec(object[11]);
@@ -145,17 +147,17 @@ public class Evolução extends JFrame
 	    ArtroMut = Uts.ObjectToDoubleVec(object[14]);
 	    ArtroColor = Uts.ObjectToColorVec(object[15]);
 	    NumberOfSpecies = ArtroSize.length;    
-	    SpeciesMaxPop = new int[NumberOfSpecies];                  		// [maximum population of all times]
-		ArtroLife = new int[NumberOfArtros];                // [true = alive]
-	    ArtroPos = new double[NumberOfArtros][2];              // [x, y]
-	    ArtroSpecies = new int[NumberOfArtros];                     // [species]
-	    ArtroChoice = new double[NumberOfArtros][SpeciesChoices[0].length];           // [chance to follow food][chance to reproduce][chance to wander][chance to fight]
-	    ArtroKeepChoice = new boolean[NumberOfArtros];			// keep the current choice while the conditions last
-	    ArtroSatiation = new double[NumberOfArtros];             // [satiation]
-	    ArtroWill = new String[NumberOfArtros];                  // [will]
-	    ArtroSexWish = new double[NumberOfArtros];               // [sex wish]
-	    ArtroAge = new int[NumberOfArtros];                         // [age]
-	    ArtroDir = new int[NumberOfArtros];                         // [direction of movement]
+	    SpeciesMaxPop = new int[NumberOfSpecies];                  			// [maximum population of all times]
+		ArtroLife = new int[NumberOfArtros];                				// [true = alive]
+	    ArtroPos = new double[NumberOfArtros][2];              				// [x, y]
+	    ArtroSpecies = new int[NumberOfArtros];                     		// [species]
+	    ArtroChoice = new double[NumberOfArtros][SpeciesChoices[0].length];	// [chance to follow food][chance to reproduce][chance to wander][chance to fight]
+	    ArtroKeepChoice = new boolean[NumberOfArtros];						// keep the current choice while the conditions last
+	    ArtroSatiation = new int[NumberOfArtros];							// [satiation]
+	    ArtroWill = new String[NumberOfArtros];								// [will]
+	    ArtroSexWish = new int[NumberOfArtros];								// [sex wish]
+	    ArtroAge = new int[NumberOfArtros];									// [age]
+	    ArtroDir = new int[NumberOfArtros];									// [direction of movement]
 		for (int a = 0; a <= NumberOfArtros - 1; a += 1)
 	    {	
 			int species = a % NumberOfSpecies;
@@ -187,7 +189,7 @@ public class Evolução extends JFrame
 		FoodPos = new double[NumberOfFood][2];                 // [x, y]
 		MaxFood = new int[NumberOfFoodTypes];                 		// [maximum population of all times]
 		
-		SpeciesChoicesHist = new double[ArtroChoice.length][][];
+		SpeciesChoicesHist = new double[SpeciesChoices[0].length][][];
 	    for (int f = 0; f <= NumberOfFood - 1; f += 1)
 	    {
 	    	int type = (int) (Math.random()*NumberOfFoodTypes);
@@ -199,7 +201,7 @@ public class Evolução extends JFrame
 	    ProgramIsRunning = true;
 	}
 	
-	public void CreateArtro(int a, int Life, double[] Pos, int species, double size, double step, double vision, double[] choice, String will, int sexwish, int sexapp, int satiation, int stomach, int age, int sexage, int foodvalue, int dir, double mut)
+	public void CreateArtro(int a, int Life, double[] Pos, int species, int size, int step, int vision, double[] choice, String will, int sexwish, int sexapp, int satiation, int stomach, int age, int sexage, int foodvalue, int dir, double mut)
 	{
 	    ArtroLife[a] = Life;
         ArtroPos[a] = Pos;
@@ -769,8 +771,8 @@ public class Evolução extends JFrame
                                 ArtroAge = Uts.IncreaseVecSize(ArtroAge);
                                 ArtroSexAge = Uts.IncreaseVecSize(ArtroSexAge);
                                 ArtroDir = Uts.IncreaseVecSize(ArtroDir);
-                                CreateArtro(NumberOfArtros - 1, SpeciesLife[species], Pos, species, ArtroSize[species], ArtroStep[species], ArtroVision[species], Choices, "mate", InitialSexWish, ArtroSexApp[species], InitialSatiation, ArtroStomach[species], InitialAge, ArtroSexAge[species], ArtroFoodValue[species], dir, ArtroMut[species]);
                                 NumberOfArtros += 1;  
+                                CreateArtro(NumberOfArtros - 1, SpeciesLife[species], Pos, species, ArtroSize[species], ArtroStep[species], ArtroVision[species], Choices, "mate", InitialSexWish, ArtroSexApp[species], InitialSatiation, ArtroStomach[species], InitialAge, ArtroSexAge[species], ArtroFoodValue[species], dir, ArtroMut[species]);
                             }
                             ArtroSexWish[a1] = 0;
                     	    ArtroSexWish[a2] = 0;            	
@@ -803,12 +805,12 @@ public class Evolução extends JFrame
 						            {
 						            	ArtroSatiation[a1] = ArtroStomach[ArtroSpecies[a1]];
 						            }
-						        	ArtroLife[a2] = 0;
+						            ArtroDies(a2);
 					        	}
 					        	else
 					        	{
 					        		ArtroLife[a2] += -ArtroLife[a1];
-					        		ArtroLife[a1] = 0;
+					        		ArtroDies(a1);
 					        	}
 					        }
 						}
@@ -839,7 +841,7 @@ public class Evolução extends JFrame
 	    	}
 	        if (ArtroSatiation[a] <= 0)
 	        {
-	            ArtroLife[a] = 0;
+	        	ArtroDies(a);
 	        }
 	    }
 	}
@@ -899,7 +901,6 @@ public class Evolução extends JFrame
 				//ArtroDir[a] = (int) (4*Math.random());
 			}
 	    }
-		System.out.println(ArtroWill[0]);
 	}
 	
 	public void ArtrosAge()
@@ -909,9 +910,25 @@ public class Evolução extends JFrame
 	        ArtroAge[a] += 1;
 	        if (ArtroMaxAge[ArtroSpecies[a]] < ArtroAge[a])
 	        {
-	        	ArtroLife[a] = 0;
+	        	//ArtroDies(a);
 	        }
 	    }
+	}
+	
+	public void ArtroDies(int id)
+	{
+		ArtroLife = Uts.RemoveElemFromArray(id, ArtroLife) ;
+		ArtroPos = Uts.RemoveElemFromArray(id, ArtroPos) ;
+		ArtroSpecies = Uts.RemoveElemFromArray(id, ArtroSpecies) ;
+		ArtroChoice = Uts.RemoveElemFromArray(id, ArtroChoice) ;
+		ArtroKeepChoice = Uts.RemoveElemFromArray(id, ArtroKeepChoice) ;
+		ArtroSatiation = Uts.RemoveElemFromArray(id, ArtroSatiation) ;
+		ArtroWill = Uts.RemoveElemFromArray(id, ArtroWill) ;
+		ArtroSexWish = Uts.RemoveElemFromArray(id, ArtroSexWish) ;
+		ArtroAge = Uts.RemoveElemFromArray(id, ArtroAge) ;
+		ArtroDir = Uts.RemoveElemFromArray(id, ArtroDir) ;
+		
+		NumberOfArtros -= 1;
 	}
 
 	/* Food actions */
@@ -996,8 +1013,8 @@ public class Evolução extends JFrame
 			}
         }
 		SpeciesPopHist = Uts.AddElemToArrayUpTo(SpeciesPopHist, ArtrosPop, maxlength);	
-		double[][] ChoicesHist = new double[ArtroChoice[0].length][NumberOfSpecies];
-		for (int c = 0; c <= ArtroChoice[0].length - 1; c += 1)
+		double[][] ChoicesHist = new double[SpeciesChoices[0].length][NumberOfSpecies];
+		for (int c = 0; c <= SpeciesChoices[0].length - 1; c += 1)
 		{
 			for (int s = 0; s <= NumberOfSpecies - 1; s += 1)
 	        {
@@ -1027,6 +1044,7 @@ public class Evolução extends JFrame
 		{
 			if (round % delay == 0)
 			{
+				long startTime = System.nanoTime();
 				ArtrosThink();
 				ArtrosAct();
 		        ArtrosEat();
@@ -1036,6 +1054,7 @@ public class Evolução extends JFrame
 		        ArtrosFight();
 		        RespawnFood();
 		        ArtrosAge();
+		        //System.out.println("elapsed time = " + (System.nanoTime() - startTime));
 		        if (round % (10 * delay) == 0)
 				{
 			        Records(100);
@@ -1048,7 +1067,7 @@ public class Evolução extends JFrame
         {
     		int MaxArtrosPopEver = Uts.FindMax(SpeciesMaxPop);
     		DP.DrawMenu(new int[] {CanvasPos[0] - 225, CanvasPos[1] + 320}, "Center", 330, 480, 2, new Color[] {ColorPalette[25], ColorPalette[7]}, ColorPalette[9]);
-    		for (int c = 0; c <= ArtroChoice[0].length - 1; c += 1)
+    		for (int c = 0; c <= SpeciesChoices[0].length - 1; c += 1)
     		{
         		V.DrawVarGraph(new int[] {CanvasPos[0] - 350 + 150 * (int) (c / 3), CanvasPos[1] + 220 + 150 * (c % 3)}, "Tendência de " + ChoiceNames[c], SpeciesChoicesHist[c], 1, ArtroColor);
     		}
@@ -1063,6 +1082,7 @@ public class Evolução extends JFrame
     	        V.DrawVarGraph(new int[] {CanvasPos[0] - 200,  CanvasPos[1] + 520}, "Comida", FoodHist, MaxFoodAmountEver, FoodColor);
             }*/
         }
+        //System.out.println(ArtroLife.length + " " + Arrays.toString(ArtroLife));
         round += 1;
 		repaint();
 	}

@@ -18,6 +18,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Arrays;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -412,6 +413,180 @@ public abstract class Uts
 		}
 	}
 
+	public static boolean[] RemoveElemFromArray(int id, boolean[] Array)
+	{
+		if (Array.length == 1)
+		{
+			return null ;
+		}
+		else
+		{
+			boolean[] result = new boolean[Array.length - 1] ;
+			
+			if (id == 0)
+			{
+				System.arraycopy(Array, 1, result, 0, Array.length - 1) ;
+			}
+			else if (id == Array.length - 1)
+			{
+				System.arraycopy(Array, 0, result, 0, Array.length - 1) ;
+			}
+			else
+			{
+				System.arraycopy(Array, 0, result, 0, id) ;
+				System.arraycopy(Array, id + 1, result, id, Array.length - id - 1) ;
+			}		
+			
+			return result  ;
+		}
+	}
+	
+	public static String[] RemoveElemFromArray(int id, String[] Array)
+	{
+		if (Array.length == 1)
+		{
+			return null ;
+		}
+		else
+		{
+			String[] result = new String[Array.length - 1] ;
+	
+			if (id == 0)
+			{
+				System.arraycopy(Array, 1, result, 0, Array.length - 1) ;
+			}
+			else if (id == Array.length - 1)
+			{
+				System.arraycopy(Array, 0, result, 0, Array.length - 1) ;
+			}
+			else
+			{
+				System.arraycopy(Array, 0, result, 0, id) ;
+				System.arraycopy(Array, id + 1, result, id, Array.length - id - 1) ;
+			}
+			
+			return result ;
+		}
+	}
+	
+	public static int[] RemoveElemFromArray(int id, int[] Array)
+	{
+		//System.out.println("id " + id + " Array = " + Arrays.toString(Array)) ;
+		if (Array.length == 1)
+		{
+			return null ;
+		}
+		else
+		{
+			int[] result = new int[Array.length - 1] ;
+	
+			if (id == 0)
+			{
+				//System.out.println("opção 1") ;
+				System.arraycopy(Array, 1, result, 0, Array.length - 1) ;
+			}
+			else if (id == Array.length - 1)
+			{
+				//System.out.println("opção 2") ;
+				System.arraycopy(Array, 0, result, 0, Array.length - 1) ;
+			}
+			else
+			{
+				//System.out.println("opção 3") ;
+				System.arraycopy(Array, 0, result, 0, id) ;
+				System.arraycopy(Array, id + 1, result, id, Array.length - id - 1) ;
+			}
+
+			//System.out.println("result = " + Arrays.toString(result)) ;
+			return result ;
+		}
+	}
+	
+	public static double[] RemoveElemFromArray(int id, double[] Array)
+	{
+		if (Array.length == 1)
+		{
+			return null ;
+		}
+		else
+		{
+			double[] result = new double[Array.length - 1] ;
+	
+			if (id == 0)
+			{
+				System.arraycopy(Array, 1, result, 0, Array.length - 1) ;
+			}
+			else if (id == Array.length - 1)
+			{
+				System.arraycopy(Array, 0, result, 0, Array.length - 1) ;
+			}
+			else
+			{
+				System.arraycopy(Array, 0, result, 0, id) ;
+				System.arraycopy(Array, id + 1, result, id, Array.length - id - 1) ;
+			}
+			
+			return result ;
+		}
+	}
+	
+	public static int[][] RemoveElemFromArray(int id, int[][] Array)
+	{
+		if (Array.length == 1)
+		{
+			return null ;
+		}
+		else
+		{
+			int[][] result = new int[Array.length - 1][] ;
+	
+			if (id == 0)
+			{
+				System.arraycopy(Array, 1, result, 0, Array.length - 1) ;
+			}
+			else if (id == Array.length - 1)
+			{
+				System.arraycopy(Array, 0, result, 0, Array.length - 1) ;
+			}
+			else
+			{
+				System.arraycopy(Array, 0, result, 0, id) ;
+				System.arraycopy(Array, id + 1, result, id, Array.length - id - 1) ;
+			}
+			
+			return result ;
+		}
+	}
+	
+	public static double[][] RemoveElemFromArray(int id, double[][] Array)
+	{
+		if (Array.length == 1)
+		{
+			return null ;
+		}
+		else
+		{
+			double[][] result = new double[Array.length - 1][] ;
+	
+			if (id == 0)
+			{
+				System.arraycopy(Array, 1, result, 0, Array.length - 1) ;
+			}
+			else if (id == Array.length - 1)
+			{
+				System.arraycopy(Array, 0, result, 0, Array.length - 1) ;
+			}
+			else
+			{
+				System.arraycopy(Array, 0, result, 0, id) ;
+				System.arraycopy(Array, id + 1, result, id, Array.length - id - 1) ;
+			}
+			
+			return result ;
+		}
+	}
+	
+	
 	public static int FindMin(int[] Vector)
 	{
 		int Min = Vector[0];
