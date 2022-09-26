@@ -1218,6 +1218,18 @@ public abstract class Uts
 		return NewButton;
 	}
 
+	public static boolean PosIsInRect(double[] Pos, double[] RectTopLeft, double L, double H)
+	{
+		if (RectTopLeft[0] <= Pos[0] & RectTopLeft[1] <= Pos[1] & Pos[0] <= RectTopLeft[0] + L & Pos[1] <= RectTopLeft[1] + H)
+		{
+			return true;
+		} 
+		else
+		{
+			return false;
+		}
+	}
+	
 	public boolean MouseIsInside(int[] MousePos, int[] RectPos, int L, int H)
 	{
 		if (RectPos[0] <= MousePos[0] & RectPos[1] <= MousePos[1] & MousePos[0] <= RectPos[0] + L & MousePos[1] <= RectPos[1] + H)

@@ -25,8 +25,8 @@ public class Evolução extends JFrame
 	 */
 	private static final long serialVersionUID = 1L;
 	Container cp;
-	int[] SuperFrameSize = new int[] {1350, 700};
-	int[] PanelSize = new int[] {1350, 700};
+	int[] SuperFrameSize = new int[] {1250, 680};
+	int[] PanelSize = new int[] {1250, 680};
 	int[] MousePos = new int[2];
     int[] ScreenTopLeft = new int[] {0, 0};				// Initial coordinates from the top left of the canvas window
     int[] CanvasPos = new int[] {450, 50}, CanvasSize = new int[] {550, 550}, CanvasDim = new int[] {550, 550};
@@ -56,6 +56,7 @@ public class Evolução extends JFrame
     public int[] ArtroSexWish;				// [length = NumberOfArtros][sex wish]
     public int[] ArtroAge;					// [length = NumberOfArtros][age]
     public int[] ArtroDir;					// [length = NumberOfArtros][direction of movement]
+    public int[] ArtroQuadrant;				// [length = NumberOfArtros][quadrant in which the artro is]
 
     /* Species */
     public double[][] ArtroInitialPos;		// [length = species][species][x, y]
@@ -100,6 +101,9 @@ public class Evolução extends JFrame
 	Color[] ColorPalette;
 	String[] ChoiceNames = new String[] {"comer", "reproduzir", "caçar", "fugir", "agrupar", "passear"};
 	boolean ShowGraphs = true, ShowLegend, ShowCanvas, ProgramIsRunning;
+	int[][] ArtrosInQuadrant;			// list of the artros that are in each quadrant
+	int[][] FoodInQuadrant;				// list of the food that are in each quadrant
+	int NumberOfQuadrants = 25;
     String view;
 	String LegendTitle;
 	double LegendMin, LegendMax;
@@ -158,6 +162,7 @@ public class Evolução extends JFrame
 	    ArtroSexWish = new int[NumberOfArtros];								// [sex wish]
 	    ArtroAge = new int[NumberOfArtros];									// [age]
 	    ArtroDir = new int[NumberOfArtros];									// [direction of movement]
+	    ArtroQuadrant = new int[NumberOfArtros];							// [quadrant the artro is in]
 		for (int a = 0; a <= NumberOfArtros - 1; a += 1)
 	    {	
 			int species = a % NumberOfSpecies;
@@ -172,7 +177,8 @@ public class Evolução extends JFrame
 				Choices[i] = var;
 			}
 			int Age = (int) (Math.random()*ArtroMaxAge[species]);
-	        CreateArtro(a, SpeciesLife[species], Pos, species, ArtroSize[species], ArtroStep[species], ArtroVision[species], Choices, "mate", SexWish, ArtroSexApp[species], Satiation, ArtroStomach[species], Age, ArtroSexAge[species], ArtroFoodValue[species], dir, ArtroMut[species]);
+			int Quadrant = FindQuadrant(Pos);
+	        CreateArtro(a, SpeciesLife[species], Pos, species, ArtroSize[species], ArtroStep[species], ArtroVision[species], Choices, "mate", SexWish, ArtroSexApp[species], Satiation, ArtroStomach[species], Age, ArtroSexAge[species], ArtroFoodValue[species], dir, ArtroMut[species], Quadrant);
 	    }
 
 	    NumberOfFood = Integer.parseInt(String.valueOf(object[NumArtroPar + 1]));
@@ -188,6 +194,9 @@ public class Evolução extends JFrame
 		FoodType = new int[NumberOfFood];                     		// [food type]
 		FoodPos = new double[NumberOfFood][2];                 // [x, y]
 		MaxFood = new int[NumberOfFoodTypes];                 		// [maximum population of all times]
+
+		ArtrosInQuadrant = new int[NumberOfQuadrants][];
+		FoodInQuadrant = new int[NumberOfQuadrants][];
 		
 		SpeciesChoicesHist = new double[SpeciesChoices[0].length][][];
 	    for (int f = 0; f <= NumberOfFood - 1; f += 1)
@@ -197,11 +206,32 @@ public class Evolução extends JFrame
 			Pos = new double[] {SpaceLimits[0][0] + Math.random()*SpaceSize[0], SpaceLimits[0][0] + Math.random()*SpaceSize[0]};
 	    	CreateFood(f, true, Pos, type, FoodValue[type], FoodRespawn[f]);
 	    }
+    	
+	    for (int q = 0; q <= NumberOfQuadrants - 1; q += 1)
+    	{
+	    	for (int a = 0; a <= NumberOfArtros - 1; a += 1)
+    	    {
+		    	if (q == ArtroQuadrant[a])
+				{
+    	    		ArtrosInQuadrant[q] = Uts.AddElemToVec(ArtrosInQuadrant[q], a);
+				}
+    	    }
+    	}
+    	for (int q = 0; q <= NumberOfQuadrants - 1; q += 1)
+    	{
+    		for (int f = 0; f <= NumberOfFood - 1; f += 1)
+    	    {
+    			if (q == FindQuadrant(FoodPos[f]))
+    			{
+    	    		FoodInQuadrant[q] = Uts.AddElemToVec(FoodInQuadrant[q], f);
+    			}
+    	    }
+    	}
 	    ShowCanvas = true;
 	    ProgramIsRunning = true;
 	}
 	
-	public void CreateArtro(int a, int Life, double[] Pos, int species, int size, int step, int vision, double[] choice, String will, int sexwish, int sexapp, int satiation, int stomach, int age, int sexage, int foodvalue, int dir, double mut)
+	public void CreateArtro(int a, int Life, double[] Pos, int species, int size, int step, int vision, double[] choice, String will, int sexwish, int sexapp, int satiation, int stomach, int age, int sexage, int foodvalue, int dir, double mut, int quad)
 	{
 	    ArtroLife[a] = Life;
         ArtroPos[a] = Pos;
@@ -220,6 +250,7 @@ public class Evolução extends JFrame
         ArtroMut[ArtroSpecies[a]] = mut;
         ArtroAge[a] = age;
         ArtroDir[a] = dir;
+        ArtroQuadrant[a] = quad;
 	}
 	
 	public void CreateFood(int f, boolean status, double[] Pos, int type, int value, int respawn)
@@ -233,18 +264,18 @@ public class Evolução extends JFrame
 	
 	public boolean ArtroIsAbleToMate(int a)
 	{
-	    if ((0 < ArtroLife[a]) & ArtroSexWish[a] == ArtroSexApp[ArtroSpecies[a]] & ArtroSexAge[ArtroSpecies[a]] <= ArtroAge[a])
+	    if (ArtroSexWish[a] == ArtroSexApp[ArtroSpecies[a]] & ArtroSexAge[ArtroSpecies[a]] <= ArtroAge[a])
 	    {
 	        return true;
 	    }
 	    return false;
 	}
 	
-	public int ClosestFood(double[] artroPos, double artroVision)
+	public int ClosestFood(double[] artroPos, int artroQuad, double artroVision)
 	{
 	    int closestFood = -1;
 	    double MinFoodDist = Uts.dist(artroPos, FoodPos[0]);
-	    for (int f = 0; f <= NumberOfFood - 1; f += 1)
+	    /*for (int f = 0; f <= NumberOfFood - 1; f += 1)
         {
             double FoodDist = Uts.dist(artroPos, FoodPos[f]);
             if (FoodStatus[f] & FoodDist < MinFoodDist & FoodDist <= artroVision)
@@ -252,7 +283,20 @@ public class Evolução extends JFrame
                 closestFood = f;
                 MinFoodDist = FoodDist;
             }
-        }
+        }*/
+	    if (FoodInQuadrant[artroQuad] != null)
+	    {
+		    for (int f = 0; f <= FoodInQuadrant[artroQuad].length - 1; f += 1)
+	        {
+		    	int foodid = FoodInQuadrant[artroQuad][f];
+		    	double FoodDist = Uts.dist(artroPos, FoodPos[foodid]);
+	            if (FoodStatus[foodid] & FoodDist < MinFoodDist & FoodDist <= artroVision)
+	            {
+	                closestFood = foodid;
+	                MinFoodDist = FoodDist;
+	            }
+	        }
+	    }
         return closestFood;
 	}
 	
@@ -260,7 +304,7 @@ public class Evolução extends JFrame
 	{
 	    int closestMate = -1;
 	    double MinMateDist = artroVision;
-	    for (int a = 0; a <= NumberOfArtros - 1; a += 1)
+	    /*for (int a = 0; a <= NumberOfArtros - 1; a += 1)
         {
 	    	if (0 < ArtroLife[a])
 	    	{
@@ -270,7 +314,19 @@ public class Evolução extends JFrame
 	                closestMate = a;
 	            }
 	    	}
-        }
+        }*/
+	    if (ArtrosInQuadrant[ArtroQuadrant[artroID]] != null)
+	    {
+		    for (int a = 0; a <= ArtrosInQuadrant[ArtroQuadrant[artroID]].length - 1; a += 1)
+	        {
+		    	int mateid = ArtrosInQuadrant[ArtroQuadrant[artroID]][a];
+		    	double MateDist = Uts.dist(artroPos, ArtroPos[mateid]);
+	            if (mateid != artroID & ArtroSpecies[mateid] == artroSpecies & MateDist < MinMateDist & MateDist <= artroVision)
+	            {
+	                closestMate = mateid;
+	            }
+	        }
+	    }
         return closestMate;
 	}
 	
@@ -278,7 +334,7 @@ public class Evolução extends JFrame
 	{
 	    int closestOpponent = -1;
 	    double MinFightDist = artroVision;
-	    for (int a = 0; a <= NumberOfArtros - 1; a += 1)
+	    /*for (int a = 0; a <= NumberOfArtros - 1; a += 1)
         {
 	    	if (0 < ArtroLife[a])
 	    	{
@@ -289,23 +345,43 @@ public class Evolução extends JFrame
 	                MinFightDist = FightDist;
 	            }
 	    	}
-        }
+        }*/
+	    if (ArtrosInQuadrant[ArtroQuadrant[artroID]] != null)
+	    {
+		    for (int a = 0; a <= ArtrosInQuadrant[ArtroQuadrant[artroID]].length - 1; a += 1)
+	        {
+		    	int opponentid = ArtrosInQuadrant[ArtroQuadrant[artroID]][a];
+		    	double opponentDist = Uts.dist(artroPos, ArtroPos[opponentid]);
+	            if (opponentid != artroID & ArtroSpecies[opponentid] == artroSpecies & opponentDist < MinFightDist & opponentDist <= artroVision)
+	            {
+	                closestOpponent = opponentid;
+	            }
+	        }
+	    }
         return closestOpponent;
 	}
 
 	public int NumberOfCloseFriends(int artroID, int artroSpecies, double[] artroPos, double artroVision)
 	{
 	    int NumCloseFriends = 0;
-	    for (int a = 0; a <= NumberOfArtros - 1; a += 1)
+	    /*for (int a = 0; a <= NumberOfArtros - 1; a += 1)
         {
-	    	if (0 < ArtroLife[a])
-	    	{
-	            if (a != artroID & ArtroSpecies[a] == artroSpecies & Uts.dist(artroPos, ArtroPos[a]) <= artroVision)
+	    	if (a != artroID & ArtroSpecies[a] == artroSpecies & Uts.dist(artroPos, ArtroPos[a]) <= artroVision)
+            {
+                NumCloseFriends += 1;
+            }
+        }*/
+	    if (ArtrosInQuadrant[ArtroQuadrant[artroID]] != null)
+	    {
+		    for (int a = 0; a <= ArtrosInQuadrant[ArtroQuadrant[artroID]].length - 1; a += 1)
+	        {
+		    	int friendid = ArtrosInQuadrant[ArtroQuadrant[artroID]][a];
+		    	if (friendid != artroID & ArtroSpecies[friendid] == artroSpecies & Uts.dist(artroPos, ArtroPos[friendid]) <= artroVision)
 	            {
-	                NumCloseFriends += 1;
-	            }
-	    	}
-        }
+		    		NumCloseFriends += 1 ;
+	            }	    	
+	        }
+	    }
         return NumCloseFriends;
 	}
 	
@@ -452,6 +528,11 @@ public class Evolução extends JFrame
 	        {
 	            ArtroPos[a][1] += -ArtroStep[ArtroSpecies[a]];    // move down
 	        }
+	        
+	        if (Math.random() <= 0.01)
+	        {
+            	ArtroDir[a] = (int) (4*Math.random());
+	        }
 	    }
 	}
 	
@@ -546,6 +627,89 @@ public class Evolução extends JFrame
 	    }
 	}
 
+	
+	public int FindQuadrant(double[] pos)
+	{
+		int NumberOfXQuadrants = (int) Math.sqrt(NumberOfQuadrants) ;
+		double[][] QuadrantTopLeft = new double[NumberOfQuadrants][2] ;
+		double QuadrantSize =  CanvasSize[0] / NumberOfXQuadrants ;
+		
+		for (int qx = 0; qx <= NumberOfXQuadrants - 1; qx += 1)
+		{
+			for (int qy = 0; qy <= NumberOfXQuadrants - 1; qy += 1)
+			{
+				QuadrantTopLeft[qx * NumberOfXQuadrants + qy] = new double[] {qx * QuadrantSize, qy * QuadrantSize} ;
+			}
+		}
+		
+		for (int q = 0; q <= NumberOfQuadrants - 1; q += 1)
+		{
+			if (Uts.PosIsInRect(pos, QuadrantTopLeft[q], QuadrantSize, QuadrantSize))
+			{
+				return q ;
+			}
+		}
+		
+		return -1 ;
+	}
+	
+	public int FindFoodInRange(int a)
+	{
+		if (FoodInQuadrant[ArtroQuadrant[a]] != null)
+		{
+			for (int i = 0; i <= FoodInQuadrant[ArtroQuadrant[a]].length - 1; i += 1)
+			{
+				int f = FoodInQuadrant[ArtroQuadrant[a]][i];
+				if (FoodStatus[f] & Uts.dist(ArtroPos[a], FoodPos[f]) <= (ArtroSize[ArtroSpecies[a]] + FoodSize[FoodType[f]])/2.0)
+				{
+					return f ;
+				}
+			}
+		}
+		return -1 ;
+	}
+	
+	public int[] FindFoodInVision(int a)
+	{
+		int[] FoodInRange = null ;
+		for (int f = 0; f <= NumberOfFood - 1; f += 1)
+		{
+			if (FoodStatus[f] & Uts.dist(ArtroPos[a], FoodPos[f]) <= ArtroVision[a])
+			{
+				FoodInRange = Uts.AddElemToVec(FoodInRange, f) ;
+			}
+		}
+		
+		return FoodInRange ;
+	}
+	
+	public void UpdateArtrosQuadrant()
+	{
+		for (int a = 0; a <= NumberOfArtros - 1; a += 1)
+	    {
+			int newQuadrant = FindQuadrant(ArtroPos[a]) ;
+			if (ArtroQuadrant[a] != newQuadrant)
+			{
+	    		int artroid = Uts.FirstIndex(ArtrosInQuadrant[ArtroQuadrant[a]], a) ;
+                ArtrosInQuadrant[ArtroQuadrant[a]] = Uts.RemoveElemFromArray(artroid, ArtrosInQuadrant[ArtroQuadrant[a]]) ;
+				ArtroQuadrant[a] = newQuadrant ;
+                ArtrosInQuadrant[newQuadrant] = Uts.AddElemToVec(ArtrosInQuadrant[newQuadrant], a) ;				
+			}
+	    }
+	}
+	
+	public boolean ArtroIsHungry(int a)
+	{
+		if (ArtroSatiation[a] < 0.8*ArtroStomach[ArtroSpecies[a]])
+		{
+			return true ;
+		}
+		else
+		{
+			return false ;
+		}
+	}
+	
 	/* Artos actions */
 	public void ArtrosAct()
 	{
@@ -555,7 +719,7 @@ public class Evolução extends JFrame
 	        {
 	            if (ArtroWill[a].equals("eat"))                  // Move towards food
 	            {
-	                int closestFood = ClosestFood(ArtroPos[a], ArtroVision[ArtroSpecies[a]]);
+	                int closestFood = ClosestFood(ArtroPos[a], ArtroQuadrant[a], ArtroVision[ArtroSpecies[a]]);
 	                if (-1 < closestFood)
 	                {
 	                    MoveTowards(a, FoodPos[closestFood]);
@@ -643,81 +807,30 @@ public class Evolução extends JFrame
 	    }
 	}
 
+	
 	public void ArtrosEat()
 	{
 	    for (int a = 0; a <= NumberOfArtros - 1; a += 1)
 	    {
-	    	if (0 < ArtroLife[a])
-	    	{
-	    		if (ArtroWill[a].equals("eat") & ArtroSatiation[a] < ArtroStomach[ArtroSpecies[a]])
+	    	if (ArtroWill[a].equals("eat"))
+    		{
+	    		int f = FindFoodInRange(a);
+	    		if (-1 < f)
 	    		{
-	    			for (int f = 0; f <= NumberOfFood - 1; f += 1)
-	    			{
-	    				if (FoodStatus[f] & Uts.dist(ArtroPos[a], FoodPos[f]) <= (ArtroSize[ArtroSpecies[a]] + FoodSize[FoodType[f]])/2.0)
-	    				{
-	    				    FoodStatus[f] = false;
-	    				    ArtroSatiation[a] += FoodValue[FoodType[f]];
-	    				    if (ArtroStomach[ArtroSpecies[a]] < ArtroSatiation[a])
-	    				    {
-	    				    	ArtroSatiation[a] = ArtroStomach[ArtroSpecies[a]];
-	    				    }
-	    				}
-	    			}
+		    		FoodStatus[f] = false;
+		    		int quadrant = FindQuadrant(FoodPos[f]) ;
+		    		int foodid = Uts.FirstIndex(FoodInQuadrant[quadrant], f) ;
+	                FoodInQuadrant[quadrant] = Uts.RemoveElemFromArray(foodid, FoodInQuadrant[quadrant]) ;
+				    ArtroSatiation[a] += FoodValue[FoodType[f]];
+				    if (ArtroStomach[ArtroSpecies[a]] < ArtroSatiation[a])
+				    {
+				    	ArtroSatiation[a] = ArtroStomach[ArtroSpecies[a]];
+				    }
 	    		}
-	    	}
+    		}
 	    }
 	}
 	
-	public void ArtrosMate()
-	{
-	    for (int a1 = 0; a1 <= NumberOfArtros - 1; a1 += 1)
-	    {
-	       if (ArtroIsAbleToMate(a1))
-	       {
-                for (int a2 = 0; a2 <= NumberOfArtros - 1; a2 += 1)
-                {
-                    if (a1 != a2 & ArtroIsAbleToMate(a2) & ArtroSpecies[a1] == ArtroSpecies[a2] & Uts.dist(ArtroPos[a1], ArtroPos[a2]) <= (ArtroSize[ArtroSpecies[a1]] + ArtroSize[ArtroSpecies[a2]])/2.0)
-	                {
-                	    ArtroLife = Uts.IncreaseVecSize(ArtroLife);
-                        ArtroPos = Uts.IncreaseArraySize(ArtroPos);
-                        ArtroSpecies = Uts.IncreaseVecSize(ArtroSpecies);
-                        ArtroSize = Uts.IncreaseVecSize(ArtroSize);
-                        ArtroStep = Uts.IncreaseVecSize(ArtroStep);
-                        ArtroSatiation = Uts.IncreaseVecSize(ArtroSatiation);
-                        ArtroStomach = Uts.IncreaseVecSize(ArtroStomach);
-                        ArtroChoice = Uts.IncreaseArraySize(ArtroChoice);
-                        ArtroKeepChoice = Uts.IncreaseVecSize(ArtroKeepChoice);
-                        ArtroWill = Uts.IncreaseVecSize(ArtroWill);
-                        ArtroSexWish = Uts.IncreaseVecSize(ArtroSexWish);
-                        ArtroSexApp = Uts.IncreaseVecSize(ArtroSexApp);
-                        ArtroAge = Uts.IncreaseVecSize(ArtroAge);
-                        ArtroSexAge = Uts.IncreaseVecSize(ArtroSexAge);
-                        ArtroDir = Uts.IncreaseVecSize(ArtroDir);
-                        NumberOfArtros += 1;
-                        double[] Pos = new double[] {(ArtroPos[a1][0] + ArtroPos[a2][0])/2, (ArtroPos[a1][1] + ArtroPos[a2][1])/2};
-            			int species = ArtroSpecies[a1];
-            			int InitialSexWish = 0;
-            			double random = Math.random();
-            			int InitialSatiation = (int) (random*ArtroSatiation[a1] + (1 - random)*ArtroSatiation[a2]);
-            			double[] Choices = new double[ArtroChoice[species].length];
-            			int dir = (int) (4*Math.random());
-            			for (int i = 0; i <= ArtroChoice[species].length - 1; i += 1)
-            			{
-            				Choices[i] = (ArtroChoice[a1][i] + ArtroChoice[a2][i])/2.0;
-            			}
-            			if (Uts.chance(ArtroMut[species]))
-            			{
-            				Choices[2] = Math.min(1, Math.max(0, (1.0 + Uts.Random(2))*Choices[2]));
-            			}
-            			int InitialAge = 0;
-                        CreateArtro(NumberOfArtros - 1, SpeciesLife[species], Pos, species, ArtroSize[species], ArtroStep[species], ArtroVision[species], Choices, "mate", InitialSexWish, ArtroSexApp[species], InitialSatiation, ArtroStomach[species], InitialAge, ArtroSexAge[species], ArtroFoodValue[species], dir, ArtroMut[species]);
-                	    ArtroSexWish[a1] = 0;
-                	    ArtroSexWish[a2] = 0;
-	                }
-                }
-	       }
-	    }
-	}
 
 	public void ArtrosMate2()
 	{
@@ -752,7 +865,8 @@ public class Evolução extends JFrame
                         	if (Uts.ArrayContains(ArtroLife, 0))	// If there is a dead artro, new artro is born in that place
                         	{
                         		int a12 = Uts.FirstIndex(ArtroLife, 0);
-                                CreateArtro(a12, SpeciesLife[species], Pos, species, ArtroSize[species], ArtroStep[species], ArtroVision[species], Choices, "mate", InitialSexWish, ArtroSexApp[species], InitialSatiation, ArtroStomach[species], InitialAge, ArtroSexAge[species], ArtroFoodValue[species], dir, ArtroMut[species]);
+                                CreateArtro(a12, SpeciesLife[species], Pos, species, ArtroSize[species], ArtroStep[species], ArtroVision[species], Choices, "mate", InitialSexWish, ArtroSexApp[species], InitialSatiation, ArtroStomach[species], InitialAge, ArtroSexAge[species], ArtroFoodValue[species], dir, ArtroMut[species], FindQuadrant(Pos));
+                        	System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                         	}
                         	else	// new artro is created increasing the artro vector
                         	{
@@ -771,8 +885,10 @@ public class Evolução extends JFrame
                                 ArtroAge = Uts.IncreaseVecSize(ArtroAge);
                                 ArtroSexAge = Uts.IncreaseVecSize(ArtroSexAge);
                                 ArtroDir = Uts.IncreaseVecSize(ArtroDir);
-                                NumberOfArtros += 1;  
-                                CreateArtro(NumberOfArtros - 1, SpeciesLife[species], Pos, species, ArtroSize[species], ArtroStep[species], ArtroVision[species], Choices, "mate", InitialSexWish, ArtroSexApp[species], InitialSatiation, ArtroStomach[species], InitialAge, ArtroSexAge[species], ArtroFoodValue[species], dir, ArtroMut[species]);
+                                ArtroQuadrant = Uts.IncreaseVecSize(ArtroQuadrant);
+                                NumberOfArtros += 1;
+                                CreateArtro(NumberOfArtros - 1, SpeciesLife[species], Pos, species, ArtroSize[species], ArtroStep[species], ArtroVision[species], Choices, "mate", InitialSexWish, ArtroSexApp[species], InitialSatiation, ArtroStomach[species], InitialAge, ArtroSexAge[species], ArtroFoodValue[species], dir, ArtroMut[species], FindQuadrant(Pos));
+                                ArtrosInQuadrant[ArtroQuadrant[NumberOfArtros - 1]] = Uts.AddElemToVec(ArtrosInQuadrant[ArtroQuadrant[NumberOfArtros - 1]], NumberOfArtros - 1) ;	
                             }
                             ArtroSexWish[a1] = 0;
                     	    ArtroSexWish[a2] = 0;            	
@@ -783,42 +899,38 @@ public class Evolução extends JFrame
 	    }
 	}
 	
+	
 	public void ArtrosFight()
 	{
 		for (int a1 = 0; a1 <= NumberOfArtros - 1; a1 += 1)
 		{
-			if (0 < ArtroLife[a1])
+			if (ArtroWill[a1].equals("fight"))
 			{
-				if (ArtroWill[a1].equals("fight"))
+				for (int a2 = 0; a2 <= NumberOfArtros - 1; a2 += 1)
 				{
-					for (int a2 = 0; a2 <= NumberOfArtros - 1; a2 += 1)
-					{
-						if (0 < ArtroLife[a2])
-						{
-					        if (a1 != a2 & ArtroSpecies[a1] != ArtroSpecies[a2] & Uts.dist(ArtroPos[a1], ArtroPos[a2]) <= (ArtroSize[ArtroSpecies[a1]] + ArtroSize[ArtroSpecies[a2]])/2.0)
-					        {
-					        	if (ArtroLife[a2] < ArtroLife[a1])
-					        	{
-						        	ArtroSatiation[a1] += ArtroFoodValue[ArtroSpecies[a2]];
-						        	ArtroLife[a1] += -ArtroLife[a2];
-						            if (ArtroStomach[ArtroSpecies[a1]] < ArtroSatiation[a1])
-						            {
-						            	ArtroSatiation[a1] = ArtroStomach[ArtroSpecies[a1]];
-						            }
-						            ArtroDies(a2);
-					        	}
-					        	else
-					        	{
-					        		ArtroLife[a2] += -ArtroLife[a1];
-					        		ArtroDies(a1);
-					        	}
-					        }
-						}
-					}
+					if (a1 != a2 & ArtroSpecies[a1] != ArtroSpecies[a2] & Uts.dist(ArtroPos[a1], ArtroPos[a2]) <= (ArtroSize[ArtroSpecies[a1]] + ArtroSize[ArtroSpecies[a2]])/2.0)
+			        {
+			        	if (ArtroLife[a2] < ArtroLife[a1])
+			        	{
+				        	ArtroSatiation[a1] += ArtroFoodValue[ArtroSpecies[a2]];
+				        	ArtroLife[a1] += -ArtroLife[a2];
+				            if (ArtroStomach[ArtroSpecies[a1]] < ArtroSatiation[a1])
+				            {
+				            	ArtroSatiation[a1] = ArtroStomach[ArtroSpecies[a1]];
+				            }
+				            ArtroDies(a2);
+			        	}
+			        	else
+			        	{
+			        		ArtroLife[a2] += -ArtroLife[a1];
+			        		ArtroDies(a1);
+			        	}
+			        }
 				}
-        	}
+			}
 	    }
 	}
+	
 	
 	public void ArtrosLust()
 	{
@@ -831,14 +943,12 @@ public class Evolução extends JFrame
 	    }
 	}
 	
+	
 	public void ArtrosStarve()
 	{
 	    for (int a = 0; a <= NumberOfArtros - 1; a += 1)
 	    {
-	    	if (0 < ArtroLife[a])
-	    	{
-		        ArtroSatiation[a] += -1;
-	    	}
+	    	ArtroSatiation[a] += -1;
 	        if (ArtroSatiation[a] <= 0)
 	        {
 	        	ArtroDies(a);
@@ -850,56 +960,55 @@ public class Evolução extends JFrame
 	{
 		for (int a = 0; a <= NumberOfArtros - 1; a += 1)
 	    {
-			if (0 < ArtroLife[a])
+			int closestOpponent = ClosestOpponent(a, ArtroSpecies[a], ArtroPos[a], ArtroVision[ArtroSpecies[a]]) ;
+			
+			if (ArtroWill[a].equals("fight") & closestOpponent == -1)
+            {
+	            ArtroKeepChoice[a] = true;
+            }
+            if (ArtroWill[a].equals("flee") & closestOpponent == -1)
+            {
+	            ArtroKeepChoice[a] = true;
+            }
+            
+			if ((ArtroKeepChoice[a] & Uts.chance(1 - ArtroChoice[a][2] * GroupFightBonus(a))) & -1 < closestOpponent)		// Artro decides to flee
+	        {
+				ArtroWill[a] = "flee";
+	        }
+	       	else if ((!ArtroKeepChoice[a] & Uts.chance(ArtroChoice[a][0])) & ArtroIsHungry(a) & closestOpponent == -1)		// Artro decides to eat food
+	        {
+	            ArtroWill[a] = "eat";
+	            ArtroKeepChoice[a] = false;
+	        }
+	        else if ((!ArtroKeepChoice[a] & Uts.chance(ArtroChoice[a][1])) & ArtroIsAbleToMate(a))							// Artro decides to mate (bang)
+	        {
+	            ArtroWill[a] = "mate";
+	            ArtroKeepChoice[a] = false;
+	        }
+	        else if ((ArtroKeepChoice[a] & Uts.chance(ArtroChoice[a][2] * GroupFightBonus(a))) & -1 < closestOpponent)
+	        {
+	            ArtroWill[a] = "fight";                                             										// Artro decides to fight
+	        }
+	        else if ((!ArtroKeepChoice[a] & Uts.chance(ArtroChoice[a][4])))
+	        {
+	            ArtroWill[a] = "group";                                             										// Artro decides to group
+	            ArtroKeepChoice[a] = false;
+	        }
+	        else if ((!ArtroKeepChoice[a] & Uts.chance(ArtroChoice[a][5])))
+	        {
+	            ArtroWill[a] = "wander";                                             										// Artro decides to wander
+	            ArtroKeepChoice[a] = false;
+	        }
+	        else
+	        {
+	            ArtroWill[a] = "exist";                                             										// Artro decides to just exist (do nothing)
+	            ArtroKeepChoice[a] = false;
+	        }	
+			/*if (!ArtroWill[a].equals("wander") & !ArtroWill[a].equals("exist") & ((ArtroWill[a].equals("eat") & -1 < ClosestFood(ArtroPos[a], ArtroVision[ArtroSpecies[a]])) | (ArtroWill[a].equals("fight") & -1 < ClosestOpponent) | ArtroWill[a].equals("flee")))
 			{
-	            if (ArtroWill[a].equals("fight") & ClosestOpponent(a, ArtroSpecies[a], ArtroPos[a], ArtroVision[ArtroSpecies[a]]) == -1)
-	            {
-		            ArtroKeepChoice[a] = true;
-	            }
-	            if (ArtroWill[a].equals("flee") & ClosestOpponent(a, ArtroSpecies[a], ArtroPos[a], ArtroVision[ArtroSpecies[a]]) == -1)
-	            {
-		            ArtroKeepChoice[a] = true;
-	            }
-	            
-				if ((ArtroKeepChoice[a] & Uts.chance(1 - ArtroChoice[a][2] * GroupFightBonus(a))) & -1 < ClosestOpponent(a, ArtroSpecies[a], ArtroPos[a], ArtroVision[ArtroSpecies[a]]))
-		        {
-					ArtroWill[a] = "flee";                                             								// Artro decides to flee
-		        }
-		       	else if ((!ArtroKeepChoice[a] & Uts.chance(ArtroChoice[a][0])) & ArtroSatiation[a] < 0.8*ArtroStomach[ArtroSpecies[a]] & ClosestOpponent(a, ArtroSpecies[a], ArtroPos[a], ArtroVision[ArtroSpecies[a]]) == -1)		// Artro decides to eat food
-		        {
-		            ArtroWill[a] = "eat";
-		            ArtroKeepChoice[a] = false;
-		        }
-		        else if ((!ArtroKeepChoice[a] & Uts.chance(ArtroChoice[a][1])) & ArtroIsAbleToMate(a))										// Artro decides to mate (bang)
-		        {
-		            ArtroWill[a] = "mate";
-		            ArtroKeepChoice[a] = false;
-		        }
-		        else if ((ArtroKeepChoice[a] & Uts.chance(ArtroChoice[a][2] * GroupFightBonus(a))) & -1 < ClosestOpponent(a, ArtroSpecies[a], ArtroPos[a], ArtroVision[ArtroSpecies[a]]))
-		        {
-		            ArtroWill[a] = "fight";                                             							// Artro decides to fight
-		        }
-		        else if ((!ArtroKeepChoice[a] & Uts.chance(ArtroChoice[a][4])))
-		        {
-		            ArtroWill[a] = "group";                                             							// Artro decides to group
-		            ArtroKeepChoice[a] = false;
-		        }
-		        else if ((!ArtroKeepChoice[a] & Uts.chance(ArtroChoice[a][5])))
-		        {
-		            ArtroWill[a] = "wander";                                             							// Artro decides to wander
-		            ArtroKeepChoice[a] = false;
-		        }
-		        else
-		        {
-		            ArtroWill[a] = "exist";                                             							// Artro decides to just exist (do nothing)
-		            ArtroKeepChoice[a] = false;
-		        }	
-				/*if (!ArtroWill[a].equals("wander") & !ArtroWill[a].equals("exist") & ((ArtroWill[a].equals("eat") & -1 < ClosestFood(ArtroPos[a], ArtroVision[ArtroSpecies[a]])) | (ArtroWill[a].equals("fight") & -1 < ClosestOpponent(a, ArtroSpecies[a], ArtroPos[a], ArtroVision[ArtroSpecies[a]])) | ArtroWill[a].equals("flee")))
-				{
-					ArtroDir[a] = (int) (4*Math.random());
-				}*/
-				//ArtroDir[a] = (int) (4*Math.random());
-			}
+				ArtroDir[a] = (int) (4*Math.random());
+			}*/
+			//ArtroDir[a] = (int) (4*Math.random());
 	    }
 	}
 	
@@ -910,13 +1019,30 @@ public class Evolução extends JFrame
 	        ArtroAge[a] += 1;
 	        if (ArtroMaxAge[ArtroSpecies[a]] < ArtroAge[a])
 	        {
-	        	//ArtroDies(a);
+	        	ArtroDies(a);
 	        }
 	    }
 	}
 	
+	
 	public void ArtroDies(int id)
-	{
+	{		
+		int artroid = Uts.FirstIndex(ArtrosInQuadrant[ArtroQuadrant[id]], id) ;
+        ArtrosInQuadrant[ArtroQuadrant[id]] = Uts.RemoveElemFromArray(artroid, ArtrosInQuadrant[ArtroQuadrant[id]]) ;
+        for (int q = 0; q <= ArtrosInQuadrant.length - 1; q += 1)
+        {
+        	if (ArtrosInQuadrant[q] != null)
+        	{
+        		for (int qa = 0; qa <= ArtrosInQuadrant[q].length - 1; qa += 1)
+        		{
+        			if (id <= ArtrosInQuadrant[q][qa])
+        			{
+        				ArtrosInQuadrant[q][qa] -= 1 ;
+        			}
+        		}
+        	}
+        }
+        
 		ArtroLife = Uts.RemoveElemFromArray(id, ArtroLife) ;
 		ArtroPos = Uts.RemoveElemFromArray(id, ArtroPos) ;
 		ArtroSpecies = Uts.RemoveElemFromArray(id, ArtroSpecies) ;
@@ -927,11 +1053,13 @@ public class Evolução extends JFrame
 		ArtroSexWish = Uts.RemoveElemFromArray(id, ArtroSexWish) ;
 		ArtroAge = Uts.RemoveElemFromArray(id, ArtroAge) ;
 		ArtroDir = Uts.RemoveElemFromArray(id, ArtroDir) ;
+		ArtroQuadrant = Uts.RemoveElemFromArray(id, ArtroQuadrant) ;
 		
 		NumberOfArtros -= 1;
 	}
 
 	/* Food actions */
+	
 	public void RespawnFood()
 	{
 	    for (int f = 0; f <= NumberOfFood - 1; f += 1)
@@ -944,6 +1072,8 @@ public class Evolução extends JFrame
 	    			//FoodPos[f] = Ut.RandomPosAroundPoint(new double[] {SpaceLimits[0][0] + FoodInitialPos[FoodType[f]][0]*SpaceSize[0], SpaceLimits[0][0] + FoodInitialPos[FoodType[f]][1]*SpaceSize[0]}, new double[] {FoodDispersion[FoodType[f]][0]*SpaceSize[0], FoodDispersion[FoodType[f]][1]*SpaceSize[1]});
 	    			FoodPos[f] = new double[] {SpaceLimits[0][0] + Math.random()*SpaceSize[0], SpaceLimits[0][0] + Math.random()*SpaceSize[0]};
 	                FoodRespawn[f] = FoodRespawnRate[FoodType[f]];
+	                int quadrant = FindQuadrant(FoodPos[f]) ;
+	                FoodInQuadrant[quadrant] = Uts.AddElemToVec(FoodInQuadrant[quadrant], f) ;
 	            }
 	            else
 	            {
@@ -1033,6 +1163,7 @@ public class Evolução extends JFrame
 		FoodHist = Uts.AddElemToArrayUpTo(FoodHist, FoodPop, maxlength);
 	}
 
+	
 	public void RunProgram()
 	{
 		//DP.DrawAxis(new int[] {CanvasPos[0], CanvasPos[1] + CanvasSize[1]}, CanvasSize[0] + 20, CanvasDim);
@@ -1047,13 +1178,14 @@ public class Evolução extends JFrame
 				long startTime = System.nanoTime();
 				ArtrosThink();
 				ArtrosAct();
+				UpdateArtrosQuadrant();
 		        ArtrosEat();
 		        ArtrosStarve();
 		        ArtrosLust();
 		        ArtrosMate2();
 		        ArtrosFight();
-		        RespawnFood();
 		        ArtrosAge();
+		        RespawnFood();
 		        //System.out.println("elapsed time = " + (System.nanoTime() - startTime));
 		        if (round % (10 * delay) == 0)
 				{
@@ -1063,6 +1195,20 @@ public class Evolução extends JFrame
 		}
         V.DrawFood(FoodPos, FoodType, FoodStatus, FoodSize, FoodColor);
         V.DrawArtros(ArtroPos, ArtroWill, ArtroSpecies, ArtroLife, ArtroSize, ArtroColor);  
+        
+        
+        /* Draw cool stuff */
+		//DP.DrawCircle(Uts.ConvertToDrawingCoords(ArtroPos[0], CanvasPos, CanvasSize, CanvasDim), 2*ArtroVision[0], false, Color.red, null) ;
+		/*int[] FoodInRange = FindFoodInVision(0) ;
+		if (FoodInRange != null)
+		{
+			for (int i = 0; i <= FoodInRange.length - 1; i += 1)
+			{
+				DP.DrawCircle(Uts.ConvertToDrawingCoords(FoodPos[FoodInRange[i]], CanvasPos, CanvasSize, CanvasDim), (int) (FoodSize[FoodType[FoodInRange[i]]]), true, ColorPalette[4], Color.yellow);
+			}
+		}*/
+		
+		
         if (ShowGraphs)
         {
     		int MaxArtrosPopEver = Uts.FindMax(SpeciesMaxPop);
@@ -1082,7 +1228,8 @@ public class Evolução extends JFrame
     	        V.DrawVarGraph(new int[] {CanvasPos[0] - 200,  CanvasPos[1] + 520}, "Comida", FoodHist, MaxFoodAmountEver, FoodColor);
             }*/
         }
-        //System.out.println(ArtroLife.length + " " + Arrays.toString(ArtroLife));
+        //System.out.println(ArtroSatiation[0]);
+        //System.out.println(Arrays.deepToString(ArtrosInQuadrant));
         round += 1;
 		repaint();
 	}

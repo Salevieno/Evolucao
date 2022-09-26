@@ -189,7 +189,7 @@ public class Visuals
 					{
 						DP.DrawCircle(DrawingPos, ArtroSize[ArtroSpecies[a]], true, ColorPalette[4], color[ArtroSpecies[a]]);
 					}
-					//DP.DrawText(DrawingPos, ArtroWill[a], "Center", 0, "Bold", 10, ColorPalette[4]);
+					//DP.DrawText(DrawingPos, ArtroWill[a], "Center", 0, "Bold", 10, ColorPalette[5]);
 				}
 			}
 			//int[] DrawingPos = Uts.ConvertToDrawingCoords(ArtroPos[0], CanvasPos, CanvasSize, CanvasDim);
@@ -205,6 +205,7 @@ public class Visuals
 			{
 				if (FoodStatus[f])
 				{
+					//DP.DrawText(Uts.ConvertToDrawingCoords(FoodPos[f], CanvasPos, CanvasSize, CanvasDim), String.valueOf(f), "Center", 0, "None", 13, Color.black);
 					DP.DrawCircle(Uts.ConvertToDrawingCoords(FoodPos[f], CanvasPos, CanvasSize, CanvasDim), (int) (FoodSize[FoodType[f]]), true, ColorPalette[4], color[FoodType[f]]);
 				}
 			}
