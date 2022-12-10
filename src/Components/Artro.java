@@ -1,12 +1,11 @@
 package Components;
 
-import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
 
 import Graphics.Canva;
 import Graphics.DrawingOnAPanel;
-import Main.Evolution2;
+import Main.Evolution;
 import Main.UtilS;
 
 public class Artro
@@ -21,9 +20,9 @@ public class Artro
 	private ArtroChoices will ;
 	private int sexWill ;
 	private Directions direction ;
-	private int quadrant ;
+	private Quadrant quadrant ;
 	
-	public Artro(int life,
+	public Artro(Canva canva, int life,
 			 Point pos,
 			 int age,
 			 Species species,
@@ -32,7 +31,7 @@ public class Artro
 			 int satiation,
 			 ArtroChoices will,
 			 int sexWill,
-			 Directions direction, int quadrant
+			 Directions direction
 			)
 	{
 		this.life = life ;
@@ -45,7 +44,7 @@ public class Artro
 		this.will = will ;
 		this.sexWill = sexWill ;
 		this.direction = direction ;
-		this.quadrant = quadrant ;
+		this.quadrant = canva.FindQuadrant(pos) ;
 	}
 	
 	public int getLife() {return life ;}
@@ -58,7 +57,7 @@ public class Artro
 	public ArtroChoices getWill() {return will ;}
 	public int getSexWill() {return sexWill ;}
 	public Directions getDirection() {return direction ;}
-	public int getQuadrant() {return quadrant ;}
+	public Quadrant getQuadrant() {return quadrant ;}
 	
 	/*public Artro GenericArtro()
 	{
@@ -118,27 +117,36 @@ public class Artro
 		return acceptedDirections ;
 	}
 	
+	public Food FindFoodInRange(ArrayList<Food> foodInQuadrant, int range)
+	{
+		if (0 < foodInQuadrant.size())
+		{
+			for (Food food : foodInQuadrant)
+			{
+				if (UtilS.dist(pos, food.getPos()) <= range)
+				{
+					return food ;
+				}
+			}
+		}
+		
+		return null ;
+	}
+	
 	public void Dies()
 	{
 		life = 0 ;
 	}
 	
-	public void Eats()
+	public void Eats(Food food)
 	{
-		if (will.equals(ArtroChoices.eat))
+		if (food != null)
 		{
-    		int f = FindFoodInRange(a);
-    		if (f != null)
-    		{
-	    		int quadrant = FindQuadrant(FoodPos[f]) ;
-	    		int foodid = UtilS.FirstIndex(FoodInQuadrant[quadrant], f) ;
-                FoodInQuadrant[quadrant] = UtilS.RemoveElemFromArray(foodid, FoodInQuadrant[quadrant]) ;
-			    satiation += FoodValue[FoodType[f]];
-			    if (species.getStomach() < satiation)
-			    {
-			    	satiation = species.getStomach() ;
-			    }
-    		}
+		    satiation += food.getType().getValue() ;
+		    if (species.getStomach() < satiation)
+		    {
+		    	satiation = species.getStomach() ;
+		    }
 		}
 	}
 	
@@ -162,24 +170,19 @@ public class Artro
 	
 	public void UpdateQuadrant(Canva canva)
 	{
-		// find the current quadrant
-		int currentQuadrant = canva.QuadrantPosIsIn(pos) ;
+		// find the quadrant the artro is currently in
+		Quadrant newQuadrant = canva.FindQuadrant(pos) ;
 		
-		// update quadrant
-		if (quadrant != currentQuadrant)
+		// if the registered quadrant is not the current quadrant
+		if (quadrant != newQuadrant)
 		{
-    		//int artroid = UtilS.FirstIndex(ArtrosInQuadrant[quadrant], a) ;
-            //ArtrosInQuadrant[quadrant] = UtilS.RemoveElemFromArray(artroid, ArtrosInQuadrant[quadrant]) ;
-            quadrant = currentQuadrant ;
-            //ArtrosInQuadrant[currentQuadrant] = UtilS.AddElemToVec(ArtrosInQuadrant[currentQuadrant], a) ;				
+            quadrant = newQuadrant ;	// update quadrant				
 		}
 	}
 	
-	
-	
 	public void Thinks()
 	{
-		Artro closestOpponent = Evolution2.FindClosestOpponent(this) ;
+		Artro closestOpponent = Evolution.FindClosestOpponent(this) ;
 		
 		/*if (will.equals("fight") & closestOpponent == -1)
         {
@@ -195,7 +198,6 @@ public class Artro
 			will = "flee";
         }
        	else*/ 
-		System.out.println(UtilS.chance(choice[0]) + " " + IsHungry());
 		if ((!keepChoice & UtilS.chance(choice[0])) & IsHungry() & closestOpponent == null)		// Artro decides to eat food
         {
             will = ArtroChoices.eat;
@@ -214,17 +216,17 @@ public class Artro
         {
             will = "group";                                             										// Artro decides to group
             keepChoice = false;
-        }
+        }*/
         else if ((!keepChoice & UtilS.chance(choice[5])))
         {
-            will = "wander";                                             										// Artro decides to wander
+            will = ArtroChoices.wander;                                             										// Artro decides to wander
             keepChoice = false;
         }
         else
         {
-            will = "exist";                                             										// Artro decides to just exist (do nothing)
+            will = ArtroChoices.exist;                                             										// Artro decides to just exist (do nothing)
             keepChoice = false;
-        }	*/
+        }	
 	}
 	
 	public void Move(Canva canva)
@@ -232,7 +234,7 @@ public class Artro
 		ArrayList<Directions> acceptedDirections = AcceptedDiretions(canva) ;
 		if (!acceptedDirections.contains(direction))
 		{
-			direction = RandomDirection() ;
+			direction = acceptedDirections.get( (int) (acceptedDirections.size() * Math.random()) ) ;
 		}
 		
 		if (direction.equals(Directions.right))
@@ -253,16 +255,77 @@ public class Artro
         }
 	}
 	
+	public void MoveTowards(Point targetPos)
+	{
+	    for (int step = 0; step <= species.getStep() - 1; step += 1)
+	    {
+		    double distx = Math.abs(pos.x - targetPos.x);
+		    double disty = Math.abs(pos.y - targetPos.y);
+		    if (disty < distx)
+	        {
+	            if (pos.x < targetPos.x)       				// Point is to the right of artro
+	            {
+	                pos.x += species.getStep() ;     	// move right
+	            }
+	            else
+	            {
+	            	pos.x += -species.getStep();    	// move left
+	            }
+	        }
+	        else                                
+	        {
+	            if (pos.y < targetPos.y)       				// Point is above artro
+	            {
+	                pos.y += species.getStep();     	// move up
+	            }
+	            else
+	            {
+	                pos.y += -species.getStep();    	// move down
+	            }
+	        }
+	    }
+	}
+	
+	public void Acts(Canva canva)
+	{
+		switch(will)
+		{
+			case eat:
+			{
+				Food food = FindFoodInRange(quadrant.getFoodInside(), species.getVision()) ;
+				if (food != null)
+				{
+					MoveTowards(food.getPos()) ;
+				}
+				else
+				{
+					Move(canva) ;
+				}
+			}
+			case wander:
+				if (UtilS.chance(0.1))
+				{
+					direction = RandomDirection() ;
+				}
+				Move(canva) ;
+			case exist:
+				
+			default:
+				Move(canva) ;
+		}
+		Move(canva) ;
+	}
+	
 	public void Display(Canva canva, DrawingOnAPanel DP)
 	{
 		Point drawingPos = UtilS.ConvertToDrawingCoords(pos, canva.getPos(), canva.getSize(), canva.getDimension()) ;
 		if (will.equals(ArtroChoices.fight))
 		{
-			DP.DrawCircle(drawingPos, species.getSize(), Evolution2.colorPalette[4], Evolution2.colorPalette[6]) ;
+			DP.DrawCircle(drawingPos, species.getSize(), Evolution.colorPalette[4], Evolution.colorPalette[6]) ;
 		}
 		else
 		{
-			DP.DrawCircle(drawingPos, species.getSize(), Evolution2.colorPalette[4], species.getColor()) ;
+			DP.DrawCircle(drawingPos, species.getSize(), Evolution.colorPalette[4], species.getColor()) ;
 		}
 	}
 }

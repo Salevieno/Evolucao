@@ -5,7 +5,7 @@ import java.awt.Graphics;
 
 import javax.swing.JPanel;
 
-import Main.Evolution2;
+import Main.Evolution;
 
 public class MyJPanel extends JPanel
 {

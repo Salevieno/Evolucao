@@ -2,63 +2,89 @@ package Graphics;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.util.ArrayList;
 
-import Main.Evolution2;
-import Main.UtilS;
+import Components.Quadrant;
+import Main.Evolution;
 
 public class Canva
 {
 	Point pos ;
 	Dimension size ;
 	Dimension dim ;
-	Point[] quadrants ;
+	Quadrant[][] quadrants ;
 	
 	public Canva(Point pos, Dimension size, Dimension dim, int numberQuadrants)
 	{
 		this.pos = pos ;
 		this.size = size ;
 		this.dim = dim ;
-		quadrants = new Point[numberQuadrants] ;
+		quadrants = new Quadrant[numberQuadrants][numberQuadrants] ;
 		InitializeQuadrants() ;
 	}
 	
 	public Point getPos() {return pos ;}
 	public Dimension getSize() {return size ;}
 	public Dimension getDimension() {return dim ;}
-	public Point[] getQuadrants() {return quadrants ;}
+	public Quadrant[][] getQuadrants() {return quadrants ;}
+	
+	public ArrayList<Quadrant> getQuadrantsAsList()
+	{
+		ArrayList<Quadrant> quad = new ArrayList<>() ;
+		for (int row = 0; row <= quadrants.length - 1; row += 1)
+		{
+			for (int col = 0; col <= quadrants[row].length - 1; col += 1)
+			{
+				quad.add(quadrants[row][col]) ;
+			}
+		}
+		return quad ;
+	}
 	
 	public void InitializeQuadrants()
 	{
-		int numberXQuadrants = (int) Math.sqrt(quadrants.length) ;
-		Point[] quadrantTopLeft = new Point[quadrants.length] ;
-		int quadrantSize =  size.width / numberXQuadrants ;
-		for (int qx = 0; qx <= numberXQuadrants - 1; qx += 1)
+		int numberRows = quadrants.length ;
+		int numberCols = quadrants.length ;
+		Dimension quadSize = new Dimension(size.width / numberRows, size.width / numberCols) ;
+		for (int row = 0; row <= numberRows - 1; row += 1)
 		{
-			for (int qy = 0; qy <= numberXQuadrants - 1; qy += 1)
+			for (int col = 0; col <= numberCols - 1; col += 1)
 			{
-				quadrantTopLeft[qx * numberXQuadrants + qy] = new Point(qx * quadrantSize, qy * quadrantSize) ;
+				quadrants[row][col] = new Quadrant(new Point(row * quadSize.width, col * quadSize.height), quadSize) ;
 			}
 		}
 	}
 	
-	public int QuadrantPosIsIn(Point pos)
+	public Quadrant FindQuadrant(Point pos)
 	{
-		int numberXQuadrants = (int) Math.sqrt(quadrants.length) ;
-		int quadrantSize = size.width / numberXQuadrants ;
-		for (int q = 0; q <= quadrants.length - 1; q += 1)
+		for (int row = 0; row <= quadrants.length - 1; row += 1)
 		{
-			if (UtilS.IsInsideRect(pos, quadrants[q], new Dimension(quadrantSize, quadrantSize)))
+			for (int col = 0; col <= quadrants[row].length - 1; col += 1)
 			{
-				return q ;
+				if (quadrants[row][col].ContainsPoint(pos))
+				{
+					return quadrants[row][col] ;
+				}
 			}
 		}
 		
-		System.out.println("Position outside of all quadrants!");
-		return -1 ;
+		System.out.println("Position " + pos + " outside of all quadrants!");
+		return null ;
 	}
 	
 	public void Display(DrawingOnAPanel DP)
 	{
-		DP.DrawRect(pos, "TopLeft", size, 2, Evolution2.colorPalette[4], Evolution2.colorPalette[5]) ;
+		DP.DrawRect(pos, "TopLeft", size, 2, Evolution.colorPalette[4], Evolution.colorPalette[5]) ;
+	}
+	
+	public void DisplayQuadrants(DrawingOnAPanel DP)
+	{
+		for (int row = 0; row <= quadrants.length - 1; row += 1)
+		{
+			for (int col = 0; col <= quadrants[row].length - 1; col += 1)
+			{
+				quadrants[row][col].Display(pos, DP) ;
+			}
+		}
 	}
 }

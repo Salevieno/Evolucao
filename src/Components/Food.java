@@ -4,7 +4,7 @@ import java.awt.Point;
 
 import Graphics.Canva;
 import Graphics.DrawingOnAPanel;
-import Main.Evolution2;
+import Main.Evolution;
 import Main.UtilS;
 
 public class Food
@@ -24,7 +24,7 @@ public class Food
 	public void Display(Canva canva, DrawingOnAPanel DP)
 	{
 		Point drawingPos = UtilS.ConvertToDrawingCoords(pos, canva.getPos(), canva.getSize(), canva.getDimension());
-		DP.DrawCircle(drawingPos, type.getSize(), Evolution2.colorPalette[4], type.getColor());
+		DP.DrawCircle(drawingPos, type.getSize(), Evolution.colorPalette[4], type.getColor());
 		/*if (FoodStatus[f])
 		{
 			//DP.DrawText(Uts.ConvertToDrawingCoords(FoodPos[f], CanvasPos, CanvasSize, CanvasDim), String.valueOf(f), "Center", 0, "None", 13, Color.black);

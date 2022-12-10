@@ -51,6 +51,14 @@ public abstract class UtilS
 	public static double dist(Point Point1, Point Point2)
 	{
 		return Math.sqrt(Math.pow(Point2.x - Point1.x, 2) + Math.pow(Point2.y - Point1.y, 2));
+	}	
+
+	public static Point RandomPosAroundPoint(Point center, Dimension range)
+	{
+		// returns a point within a rectangle centered on the Point center with size 2 * range
+		int x = (int) (center.x + range.width * (Math.random() - Math.random())) ;
+		int y = (int) (center.y + range.height * (Math.random() - Math.random())) ;
+		return new Point(x, y) ;
 	}
 	
 	
@@ -804,10 +812,10 @@ public abstract class UtilS
 		return input;
 	}
 	
-	public static double[] RandomPosAroundPoint(double[] Point, double[] Dispersion)
+	/*public static double[] RandomPosAroundPoint(double[] Point, double[] Dispersion)
 	{
 		return new double[] {Point[0] + Dispersion[0]*(Math.random() - Math.random()), Point[1] + Dispersion[1]*(Math.random() - Math.random())};
-	}
+	}*/
 	
 	public static double Random(double n)
 	{

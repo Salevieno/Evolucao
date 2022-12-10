@@ -13,6 +13,6 @@ public class MainEvolution extends JFrame
 
 	public static void main (String[] args) 
 	{
-		new Evolution2() ;	// Open menus		
+		new Evolution() ;	// Open menus		
 	}
 }
