@@ -2,10 +2,11 @@ package Output;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Toolkit;
 
 import Graphics.DrawingOnAPanel;
-import Main.Uts;
+import Main.UtilS;
 
 public class Visuals
 {
@@ -23,7 +24,7 @@ public class Visuals
         
 	public Visuals(DrawingOnAPanel DP, int[] CanvasPos, int[] CanvasSize, int[] CanvasDim, int[] DrawingPos)
 	{
-		ColorPalette = Uts.ColorPalette(2);
+		ColorPalette = UtilS.ColorPalette(2);
 		this.DP = DP;
 	    this.CanvasPos = CanvasPos;
 	    this.CanvasSize = CanvasSize;
@@ -44,10 +45,10 @@ public class Visuals
 		int[] RectSize = new int[] {50, 20};
 		int FontSize = 13;
 		DP.DrawText(new int[] {Pos[0], Pos[1]}, "Mouse Pos:", "Center", 0, "Plain", FontSize, ColorPalette[4]);
-		DP.DrawRect(new int[] {Pos[0] + 65, Pos[1]}, RectSize[0], RectSize[1], "Center", 0, 2, false, ColorPalette[4], null);
-		DP.DrawText(new int[] {Pos[0] + 65, Pos[1]}, String.valueOf(Uts.Round(MousePos[0], 1)), "Center", 0, "Plain", FontSize, ColorPalette[4]);
-		DP.DrawRect(new int[] {Pos[0] + 125, Pos[1]}, RectSize[0], RectSize[1], "Center", 0, 2, false, ColorPalette[4], null);
-		DP.DrawText(new int[] {Pos[0] + 125, Pos[1]}, String.valueOf(Uts.Round(MousePos[1], 1)), "Center", 0, "Plain", FontSize, ColorPalette[4]);
+		//DP.DrawRect(new int[] {Pos[0] + 65, Pos[1]}, RectSize[0], RectSize[1], "Center", 0, 2, false, ColorPalette[4], null);
+		DP.DrawText(new int[] {Pos[0] + 65, Pos[1]}, String.valueOf(UtilS.Round(MousePos[0], 1)), "Center", 0, "Plain", FontSize, ColorPalette[4]);
+		//DP.DrawRect(new int[] {Pos[0] + 125, Pos[1]}, RectSize[0], RectSize[1], "Center", 0, 2, false, ColorPalette[4], null);
+		DP.DrawText(new int[] {Pos[0] + 125, Pos[1]}, String.valueOf(UtilS.Round(MousePos[1], 1)), "Center", 0, "Plain", FontSize, ColorPalette[4]);
 	}
 	
 	public void DrawList(int SelectedMember, String[] PropName, String Title, String Label, int[][] Input, String ArrayType)
@@ -82,7 +83,7 @@ public class Visuals
 			DP.DrawText(new int[] {Pos[0] + sx/2, Pos[1] + (i + 1)*sy + sy/2}, Label + " " + String.valueOf(i), "Center", 0, "Bold", FontSize, TextColor);
 			for (int prop = 0; prop <= Input[0].length - 1; prop += 1)
 			{
-				DP.DrawText(new int[] {(int) (Pos[0] + (prop + 1)*sx + sx/2), Pos[1] + (i + 1)*sy + sy/2}, String.valueOf(Uts.Round(Input[i][prop], 1)), "Center", 0, "Bold", FontSize, TextColor);			
+				DP.DrawText(new int[] {(int) (Pos[0] + (prop + 1)*sx + sx/2), Pos[1] + (i + 1)*sy + sy/2}, String.valueOf(UtilS.Round(Input[i][prop], 1)), "Center", 0, "Bold", FontSize, TextColor);			
 			}
 		}
 	}
@@ -119,7 +120,7 @@ public class Visuals
 			DP.DrawText(new int[] {Pos[0] + sx/2, Pos[1] + (i + 1)*sy + sy/2}, Label + " " + String.valueOf(i), "Center", 0, "Bold", FontSize, TextColor);
 			for (int prop = 0; prop <= Input[0].length - 1; prop += 1)
 			{
-				DP.DrawText(new int[] {(int) (Pos[0] + (prop + 1)*sx + sx/2), Pos[1] + (i + 1)*sy + sy/2}, String.valueOf(Uts.Round(Input[i][prop], 1)), "Center", 0, "Bold", FontSize, TextColor);			
+				DP.DrawText(new int[] {(int) (Pos[0] + (prop + 1)*sx + sx/2), Pos[1] + (i + 1)*sy + sy/2}, String.valueOf(UtilS.Round(Input[i][prop], 1)), "Center", 0, "Bold", FontSize, TextColor);			
 			}
 		}
 	}
@@ -143,16 +144,16 @@ public class Visuals
 		for (int i = 0; i <= NumCat - 1; i += 1)
 		{
 			double value = (MaxValue - MinValue)*i/(NumCat - 1) + MinValue;
-			Color color = Uts.FindColor(value, MinValue, MaxValue, ColorSystem);
+			Color color = UtilS.FindColor(value, MinValue, MaxValue, ColorSystem);
 			int[] InitPos = new int[] {(int) (Pos[0] + 2*(i % NumColumns)*sx + sx/2), (int) (Pos[1] + (i / NumColumns)*sy + sy/2)};
 			DP.DrawLine(InitPos, new int[] {InitPos[0] + BarLength, InitPos[1]}, 2, color);
-			DP.DrawText(new int[] {InitPos[0] + BarLength/2, InitPos[1] + FontSize/2 + 5}, String.valueOf(Uts.Round(value, 2)), "Center", 0, "Plain", FontSize, color);
+			DP.DrawText(new int[] {InitPos[0] + BarLength/2, InitPos[1] + FontSize/2 + 5}, String.valueOf(UtilS.Round(value, 2)), "Center", 0, "Plain", FontSize, color);
 		}
 	}
 	
 	public void DrawCanvas()
 	{
-		DP.DrawRect(CanvasPos, CanvasSize[0], CanvasSize[1], "BotLeft", 0, 2, false, ColorPalette[4], ColorPalette[5]);
+		//DP.DrawRect(CanvasPos, CanvasSize[0], CanvasSize[1], "BotLeft", 0, 2, false, ColorPalette[4], ColorPalette[5]);
 	}
 
 	public void DrawGrid(int[] CanvasDim, int PointSize)
@@ -161,40 +162,40 @@ public class Visuals
 		int[] GridFactor = new int[] {1 + (CanvasDim[0]/10)/NPointsMax[0], 1 + (CanvasDim[1]/10)/NPointsMax[1]};
 		int[] NPoints = new int[] {(int) (CanvasDim[0]/(10*GridFactor[0])), (int) (CanvasDim[1]/(10*GridFactor[1]))};
 		double[] PointsDist = new double[] {CanvasSize[0]/(double)(NPoints[0]), CanvasSize[1]/(double)(NPoints[1])};
-		NPoints = Uts.CalculateNumberOfGridPoints(CanvasDim, CanvasDim, CanvasDim);
+		NPoints = UtilS.CalculateNumberOfGridPoints(CanvasDim, CanvasDim, CanvasDim);
 		for (int i = 0; i <= NPoints[0]; i += 1)
 		{	
 			for (int j = 0; j <= NPoints[1]; j += 1)
 			{	
-				int[] Pos = new int[] {(int) (CanvasPos[0] + i*PointsDist[0]), (int) (CanvasPos[1] + j*PointsDist[1])};
-				DP.DrawCircle(Pos, PointSize, true, ColorPalette[4], ColorPalette[4]);
+				Point Pos = new Point((int) (CanvasPos[0] + i*PointsDist[0]), (int) (CanvasPos[1] + j*PointsDist[1])) ;
+				DP.DrawCircle(Pos, PointSize, ColorPalette[4], ColorPalette[4]);
 			}
 		}
 	}
 
 	public void DrawArtros(double[][] ArtroPos, String[] ArtroWill, int[] ArtroSpecies, int[] ArtroLife, int[] ArtroSize, Color[] color)
 	{
-		if (ArtroPos != null)
+		/*if (ArtroPos != null)
 		{
 			for (int a = 0; a <= ArtroPos.length - 1; a += 1)
 			{
 				if (0 < ArtroLife[a])
 				{
-					int[] DrawingPos = Uts.ConvertToDrawingCoords(ArtroPos[a], CanvasPos, CanvasSize, CanvasDim);
+					int[] DrawingPos = UtilS.ConvertToDrawingCoords(ArtroPos[a], CanvasPos, CanvasSize, CanvasDim);
 					if (ArtroWill[a].equals("fight"))
 					{
-						DP.DrawCircle(DrawingPos, ArtroSize[ArtroSpecies[a]], true, ColorPalette[4], ColorPalette[6]);
+						DP.DrawCircle(DrawingPos, ArtroSize[ArtroSpecies[a]], ColorPalette[4], ColorPalette[6]);
 					}
 					else
 					{
-						DP.DrawCircle(DrawingPos, ArtroSize[ArtroSpecies[a]], true, ColorPalette[4], color[ArtroSpecies[a]]);
+						DP.DrawCircle(DrawingPos, ArtroSize[ArtroSpecies[a]], ColorPalette[4], color[ArtroSpecies[a]]);
 					}
 					//DP.DrawText(DrawingPos, ArtroWill[a], "Center", 0, "Bold", 10, ColorPalette[5]);
 				}
 			}
 			//int[] DrawingPos = Uts.ConvertToDrawingCoords(ArtroPos[0], CanvasPos, CanvasSize, CanvasDim);
 			//DP.DrawCircle(DrawingPos, (int) (1.3 * ArtroSize[ArtroSpecies[0]]), true, ColorPalette[4], Color.yellow);
-		}
+		}*/
 	}
 	
 	public void DrawFood(double[][] FoodPos, int[] FoodType, boolean[] FoodStatus, double[] FoodSize, Color[] color)
@@ -206,7 +207,7 @@ public class Visuals
 				if (FoodStatus[f])
 				{
 					//DP.DrawText(Uts.ConvertToDrawingCoords(FoodPos[f], CanvasPos, CanvasSize, CanvasDim), String.valueOf(f), "Center", 0, "None", 13, Color.black);
-					DP.DrawCircle(Uts.ConvertToDrawingCoords(FoodPos[f], CanvasPos, CanvasSize, CanvasDim), (int) (FoodSize[FoodType[f]]), true, ColorPalette[4], color[FoodType[f]]);
+					//DP.DrawCircle(UtilS.ConvertToDrawingCoords(FoodPos[f], CanvasPos, CanvasSize, CanvasDim), (int) (FoodSize[FoodType[f]]), true, ColorPalette[4], color[FoodType[f]]);
 				}
 			}
 		}

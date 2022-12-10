@@ -2,14 +2,19 @@ package Graphics;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
 
-import Main.Uts;
+import Components.Artro;
+import Components.Food;
+import Main.UtilS;
 
 public class DrawingOnAPanel
 {
@@ -22,7 +27,7 @@ public class DrawingOnAPanel
 	public DrawingOnAPanel(Graphics g)
 	{
 		G = (Graphics2D) g;
-		ColorPalette = Uts.ColorPalette(2);
+		ColorPalette = UtilS.ColorPalette(2);
 	}	
 	public void paint(Graphics g) 
     { 
@@ -32,6 +37,85 @@ public class DrawingOnAPanel
 	{
 		
 	}   
+	
+	
+	// primitive functions
+	public void DrawText(Point Pos, String Alignment, double angle, String Text, Font font, Color color)
+	{
+		// Rectangle by default starts at the left bottom
+		//int TextL = UtilG.TextL(Text, font, G), TextH = UtilG.TextH(font.getSize()) ;
+		//int[] offset = UtilG.OffsetFromPos(Alignment, TextL, TextH) ;
+		int[] offset = new int[2] ;
+		AffineTransform backup = G.getTransform() ;		
+		G.setColor(color) ;
+		G.setFont(font) ;
+		G.setTransform(AffineTransform.getRotateInstance(-angle * Math.PI / 180, Pos.x, Pos.y)) ;	// Rotate text
+		G.drawString(Text, Pos.x + offset[0], Pos.y + offset[1]) ;
+        G.setTransform(backup) ;
+    }
+	
+	public void DrawCircle(Point pos, int diam, Color contourColor, Color fillColor)
+    {
+    	G.setColor(contourColor);
+    	G.drawOval(pos.x - diam / 2, pos.y - diam / 2, diam, diam);
+    	if (fillColor != null)
+    	{
+        	G.setColor(fillColor);
+        	G.fillOval(pos.x - diam / 2, pos.y - diam / 2, diam, diam);
+    	}
+    }
+	
+	// composed functions
+	public void DrawArtros(ArrayList<Artro> artros, Canva canva)
+	{
+		if (artros != null)
+		{
+			for (int i = 0; i <= artros.size() - 1; i += 1)
+			{
+				Point drawingPos = UtilS.ConvertToDrawingCoords(artros.get(i).getPos(), canva.getPos(), canva.getSize(), canva.getDimension());
+				if (artros.get(i).getWill().equals("fight"))
+				{
+					DrawCircle(drawingPos, artros.get(i).getSpecies().getSize(), ColorPalette[4], ColorPalette[6]);
+				}
+				else
+				{
+					System.out.println(drawingPos);
+					DrawCircle(drawingPos, artros.get(i).getSpecies().getSize(), ColorPalette[4], artros.get(i).getSpecies().getColor());
+				}
+				//DP.DrawText(DrawingPos, ArtroWill[a], "Center", 0, "Bold", 10, ColorPalette[5]);
+			}
+			//int[] DrawingPos = Uts.ConvertToDrawingCoords(ArtroPos[0], CanvasPos, CanvasSize, CanvasDim);
+			//DP.DrawCircle(DrawingPos, (int) (1.3 * ArtroSize[ArtroSpecies[0]]), true, ColorPalette[4], Color.yellow);
+		}
+	}
+	
+	public void DrawFood(ArrayList<Food> food, Canva canva)
+	{
+		if (food != null)
+		{
+			for (int i = 0; i <= food.size() - 1; i += 1)
+			{
+				Point drawingPos = UtilS.ConvertToDrawingCoords(food.get(i).getPos(), canva.getPos(), canva.getSize(), canva.getDimension());
+				DrawCircle(drawingPos, food.get(i).getType().getSize(), ColorPalette[4], food.get(i).getType().getColor());
+				/*if (FoodStatus[f])
+				{
+					//DP.DrawText(Uts.ConvertToDrawingCoords(FoodPos[f], CanvasPos, CanvasSize, CanvasDim), String.valueOf(f), "Center", 0, "None", 13, Color.black);
+					//DP.DrawCircle(UtilS.ConvertToDrawingCoords(FoodPos[f], CanvasPos, CanvasSize, CanvasDim), (int) (FoodSize[FoodType[f]]), true, ColorPalette[4], color[FoodType[f]]);
+				}*/
+			}
+		}
+	}
+	
+	//****************************************
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	// Primitive functions
 	public void DrawImage(Image File, int[] Pos, float angle, float[] Scale, String Alignment)
@@ -64,8 +148,8 @@ public class DrawingOnAPanel
 	}
     public void DrawText(int[] Pos, String Text, String Alignment, float angle, String Style, int size, Color color)
     {
-		float TextL = Uts.TextL(Text, TextFont, size, G), TextH = Uts.TextH(size);
-    	int[] Offset = Uts.OffsetFromPos(Alignment, (int)TextL, (int)TextH);
+		float TextL = UtilS.TextL(Text, TextFont, size, G), TextH = UtilS.TextH(size);
+    	int[] Offset = UtilS.OffsetFromPos(Alignment, (int)TextL, (int)TextH);
 		AffineTransform a = null;	// Rotate rectangle
 		AffineTransform backup = G.getTransform();
 		if (Alignment.equals("Left"))
@@ -98,7 +182,7 @@ public class DrawingOnAPanel
     }
     public void DrawFitText(int[] Pos, String Text, String Alignment, float angle, String Style, int sy, int length, int size, Color color)
 	{
-		String[] FitText = Uts.FitText(Text, length);
+		String[] FitText = UtilS.FitText(Text, length);
 		for (int i = 0; i <= FitText.length - 1; i += 1)
 		{
 			DrawText(new int[] {Pos[0], Pos[1] + i*sy}, FitText[i], Alignment, angle, Style, size, color);						
@@ -121,49 +205,30 @@ public class DrawingOnAPanel
     	G.drawLine(PosInit[0], PosInit[1], PosFinal[0], PosFinal[1]);
     	G.setStroke(new BasicStroke(stdStroke));
     }
-    public void DrawRect(int[] Pos, int l, int h, String Alignment, float angle, int Thickness, boolean fill, Color ContourColor, Color FillColor)
-    {
-    	int[] Offset = new int[2];
-		AffineTransform Tx = new AffineTransform();
-		Tx.translate(0, 22);    // Translation to correct positions
-		//AffineTransform a = null;	// Rotate rectangle
-		AffineTransform backup = G.getTransform();
-		G.setStroke(new BasicStroke(Thickness));
-    	if (Alignment.equals("Left"))
-    	{
-    	     Tx.translate(Pos[0], Pos[1]);    // S3: final translation
-    	     Tx.rotate(-angle*Math.PI/180.0);                  // S2: rotate around anchor
-    	     Tx.translate(-Pos[0], -Pos[1]);  // S1: translate anchor to origin
-			//a = AffineTransform.getRotateInstance(angle*Math.PI/180.0, Pos[0], Pos[1]);	// Rotate rectangle
-    		Offset = new int[] {0, 0};
-    	}
-    	else if (Alignment.equals("Center"))
-    	{
-			//a = AffineTransform.getRotateInstance(-angle*Math.PI/180.0, Pos[0], Pos[1]);	// Rotate rectangle
-    		Offset = new int[] {l/2, h/2};
-    	}
-    	else if (Alignment.equals("Right"))
-    	{
-			//a = AffineTransform.getRotateInstance(-angle*Math.PI/180.0, Pos[0], Pos[1] + h/2);	// Rotate rectangle
-    		Offset = new int[] {l, 0};
-    	}
-    	if (0 < Math.abs(angle))
-    	{
-    		G.setTransform(Tx);
-    	}
-    	if (fill)
-    	{
-    		G.setColor(FillColor);
-        	G.fillRect(Pos[0] - Offset[0], Pos[1] - Offset[1], l, h);
-    	}
-    	G.setColor(ContourColor);
-    	G.drawRect(Pos[0] - Offset[0], Pos[1] - Offset[1], l, h);
-        G.setTransform(backup);
-		G.setStroke(new BasicStroke(1));
-    }
+    public void DrawRect(Point pos, String alignment, Dimension size, int stroke, Color color, Color contourColor)
+	{
+		// Rectangle by default starts at the top left
+		//int[] offset = UtilG.OffsetFromPos(Alignment, size) ;
+    	int[] offset = new int[2] ;	// draws at the top left
+    	Point corner = new Point (pos.x + offset[0], pos.y + offset[1]) ;
+		G.setStroke(new BasicStroke(stroke)) ;
+		if (color != null)
+		{
+			G.setColor(color) ;
+			G.fillRect(corner.x, corner.y, size.width , size.height) ;
+		}
+		if (contourColor != null)
+		{
+			G.setColor(contourColor) ;
+			int[] xCoords = new int[] {corner.x, corner.x + size.width, corner.x + size.width, corner.x, corner.x} ;
+			int[] yCoords = new int[] {corner.y, corner.y, corner.y + size.height, corner.y + size.height, corner.y} ;
+			G.drawPolyline(xCoords, yCoords, 5) ;
+		}
+		G.setStroke(new BasicStroke(stdStroke)) ;
+   }
     public void DrawRoundRect(int[] Pos, String Alignment, int l, int h, int Thickness, int ArcWidth, int ArcHeight, Color color, Color ContourColor, boolean contour)
 	{
-		int[] offset = Uts.OffsetFromPos(Alignment, l, h);
+		int[] offset = UtilS.OffsetFromPos(Alignment, l, h);
 		G.setStroke(new BasicStroke(Thickness));
 		if (contour)
 		{
@@ -179,7 +244,7 @@ public class DrawingOnAPanel
 	}
     public void DrawRoundRect(int[] Pos, String Alignment, int l, int h, int Thickness, int ArcWidth, int ArcHeight, Color[] colors, Color ContourColor, boolean contour)
 	{
-		int[] offset = Uts.OffsetFromPos(Alignment, l, h);
+		int[] offset = UtilS.OffsetFromPos(Alignment, l, h);
 		G.setStroke(new BasicStroke(Thickness));
 		if (contour)
 		{
@@ -194,16 +259,7 @@ public class DrawingOnAPanel
 		}
 		G.setStroke(new BasicStroke(1));
 	}
-    public void DrawCircle(int[] Pos, int diam, boolean fill, Color ContourColor, Color FillColor)
-    {
-    	G.setColor(ContourColor);
-    	G.drawOval(Pos[0] - diam/2, Pos[1] - diam/2, diam, diam);
-    	if (fill)
-    	{
-        	G.setColor(FillColor);
-        	G.fillOval(Pos[0] - diam/2, Pos[1] - diam/2, diam, diam);
-    	}
-    }
+    
     public void DrawPolyLine(int[] x, int[] y, int thickness, Color color)
     {
     	G.setColor(color);
@@ -250,12 +306,12 @@ public class DrawingOnAPanel
     	DrawLine(Pos, new int[] {Pos[0] + size, Pos[1]}, thickness, ColorPalette[7]);
     	DrawArrow(new int[] {Pos[0] + size + ArrowSize/2, Pos[1]}, ArrowSize, 0, true, ArrowSize, ColorPalette[7]);
     	DrawText(new int[] {Pos[0] + size, Pos[1] - TextOffset}, "x", "Center", 0, "Bold", TextSize, ColorPalette[7]);
-    	DrawText(new int[] {Pos[0] + size, Pos[1] + 2*TextOffset}, String.valueOf(Uts.Round(CanvasDim[0], 1)) + " m", "BotLeft", 0, "Plain", TextSize, ColorPalette[7]);
+    	DrawText(new int[] {Pos[0] + size, Pos[1] + 2*TextOffset}, String.valueOf(UtilS.Round(CanvasDim[0], 1)) + " m", "BotLeft", 0, "Plain", TextSize, ColorPalette[7]);
     	// y axis
     	DrawLine(Pos, new int[] {Pos[0], Pos[1] - size}, thickness, ColorPalette[6]);
     	DrawArrow(new int[] {Pos[0], Pos[1] - size - ArrowSize/2}, ArrowSize, Math.PI/2, true, ArrowSize, ColorPalette[6]);
     	DrawText(new int[] {Pos[0] - TextOffset, Pos[1] - size}, "y", "Center", 0, "Bold", TextSize, ColorPalette[6]);
-    	DrawText(new int[] {Pos[0] + TextOffset, Pos[1] - size}, String.valueOf(Uts.Round(CanvasDim[1], 1)) + " m", "BotLeft", 0, "Plain", TextSize, ColorPalette[6]);
+    	DrawText(new int[] {Pos[0] + TextOffset, Pos[1] - size}, String.valueOf(UtilS.Round(CanvasDim[1], 1)) + " m", "BotLeft", 0, "Plain", TextSize, ColorPalette[6]);
     	// z axis
     	DrawLine(Pos, new int[] {Pos[0] - (int) (size/25), Pos[1] + (int) (size/25)}, thickness, ColorPalette[5]);
     	DrawArrow(new int[] {Pos[0] - (int) (size/25) - ArrowSize/4, Pos[1] + (int) (size/25) + ArrowSize/4}, ArrowSize, -3*Math.PI/4, true, ArrowSize, ColorPalette[5]);
@@ -311,4 +367,7 @@ public class DrawingOnAPanel
 			DrawRoundRect(ColorPos, "Center", L, H, 1, 5, 5, Pallete[i], Pallete[i], false);
 		}
 	}
+
+    
+
 }

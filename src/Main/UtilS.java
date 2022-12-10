@@ -23,8 +23,45 @@ import java.util.Arrays;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
-public abstract class Uts 
+public abstract class UtilS 
 {
+
+	public static Point ConvertToDrawingCoords(Point originalCoords, Point canvasPos, Dimension canvasSize, Dimension canvasDim)
+	{
+		int xCoord = (int) (canvasPos.x + originalCoords.x * canvasSize.width / canvasDim.width) ;
+		int yCoord = (int) (canvasPos.y + canvasSize.height - originalCoords.y * canvasSize.height / canvasDim.height) ;
+		return new Point (xCoord, yCoord) ;
+	}
+	
+	public static boolean IsInsideRect(Point Pos, Point TopLeftPos, Dimension RectSize)
+	{
+		if (TopLeftPos.x <= Pos.x &
+			TopLeftPos.y <= Pos.y &
+			Pos.x <= TopLeftPos.x + RectSize.width &
+			Pos.y <= TopLeftPos.y + RectSize.height)
+		{
+			return true;
+		} 
+		else
+		{
+			return false;
+		}
+	}	
+
+	public static double dist(Point Point1, Point Point2)
+	{
+		return Math.sqrt(Math.pow(Point2.x - Point1.x, 2) + Math.pow(Point2.y - Point1.y, 2));
+	}
+	
+	
+	// ***********************************************
+	
+	
+	
+	
+	
+	
+	
 	public static Color[] ColorPalette(int Palette)
 	{
 		Color[] color = new Color[28];
@@ -124,10 +161,6 @@ public abstract class Uts
 		return color;
 	}
 	
-	public static double dist(double[] Point1, double[] Point2)
-	{
-		return Math.sqrt(Math.pow(Point2[0] - Point1[0], 2) + Math.pow(Point2[1] - Point1[1], 2));
-	}
 	
 	public double dist(int[] Point1, int[] Point2)
 	{
@@ -482,17 +515,17 @@ public abstract class Uts
 	
 			if (id == 0)
 			{
-				//System.out.println("opção 1") ;
+				//System.out.println("opï¿½ï¿½o 1") ;
 				System.arraycopy(Array, 1, result, 0, Array.length - 1) ;
 			}
 			else if (id == Array.length - 1)
 			{
-				//System.out.println("opção 2") ;
+				//System.out.println("opï¿½ï¿½o 2") ;
 				System.arraycopy(Array, 0, result, 0, Array.length - 1) ;
 			}
 			else
 			{
-				//System.out.println("opção 3") ;
+				//System.out.println("opï¿½ï¿½o 3") ;
 				System.arraycopy(Array, 0, result, 0, id) ;
 				System.arraycopy(Array, id + 1, result, id, Array.length - id - 1) ;
 			}
@@ -883,15 +916,12 @@ public abstract class Uts
 		return new double[] {(OriginalCoords[0] - CanvasPos[0])/(double)(CanvasSize[0])*CanvasDim[0], (-OriginalCoords[1] + CanvasPos[1] + CanvasSize[1])/(double)(CanvasSize[1])*CanvasDim[1]};
 	}
 	
-	public static int[] ConvertToDrawingCoords(double[] OriginalCoords, int[] CanvasPos, int[] CanvasSize, int[] CanvasDim)
-	{
-		return new int[] {(int) (CanvasPos[0] + OriginalCoords[0]/CanvasDim[0]*CanvasSize[0]), (int) (CanvasPos[1] + CanvasSize[1] - OriginalCoords[1]/CanvasDim[1]*CanvasSize[1])};
-	}
 	
-	public int ConvertToDrawingSize(int[] CanvasPos, int[] CanvasSize, int[] CanvasDim, double size)
+	/*public int ConvertToDrawingSize(int[] CanvasPos, int[] CanvasSize, int[] CanvasDim, double size)
 	{
-		return (ConvertToDrawingCoords(new double[] {0, 0}, CanvasPos, CanvasSize, CanvasDim)[1] - ConvertToDrawingCoords(new double[] {0, size}, CanvasPos, CanvasSize, CanvasDim)[1]);
-	}
+		return (ConvertToDrawingCoords(new Point(0, 0), CanvasPos, CanvasSize, CanvasDim).y - 
+				ConvertToDrawingCoords(new Point(0, size), CanvasPos, CanvasSize, CanvasDim).y);
+	}*/
 
 	public double Bhaskara(double a, double b, double c, String SqrtSign)
 	{
@@ -1216,18 +1246,6 @@ public abstract class Uts
 		NewButton.setBackground(color);
 		NewButton.setPreferredSize(new Dimension(Size[0], Size[1]));	
 		return NewButton;
-	}
-
-	public static boolean PosIsInRect(double[] Pos, double[] RectTopLeft, double L, double H)
-	{
-		if (RectTopLeft[0] <= Pos[0] & RectTopLeft[1] <= Pos[1] & Pos[0] <= RectTopLeft[0] + L & Pos[1] <= RectTopLeft[1] + H)
-		{
-			return true;
-		} 
-		else
-		{
-			return false;
-		}
 	}
 	
 	public boolean MouseIsInside(int[] MousePos, int[] RectPos, int L, int H)
