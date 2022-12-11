@@ -2,6 +2,7 @@ package Components;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Map;
 
 import Graphics.Canva;
 import Graphics.DrawingOnAPanel;
@@ -10,22 +11,22 @@ import Main.UtilS;
 
 public class Artro
 {
-	private int life ;
-	private Point pos ;
-	private int age ;
-	private Species species ;
-	private double[] choice ;
-	private boolean keepChoice ;
-	private int satiation ;
-	private ArtroChoices will ;
-	private int sexWill ;
-	private Directions direction ;
+	private int life ;	// life points, if they reach 0, the artro dies
+	private Point pos ;	// current position of the artro
+	private int age ;	// current age of the artro
+	private Species species ;		// species of the artro, determines its characteristics
+	private Map<ArtroChoices, Double> tendency ;	// tendency or chance (in %) of the artro choosing a certain behavior
+	private boolean keepChoice ;	// should the artro keep its current choice?
+	private int satiation ;			// amount of food in the artro's stomach, if it reaches 0, the artro dies
+	private ArtroChoices will ;		// what the artro wants to do right now
+	private int sexWill ;			// lust of the artro, if it reaches a certain level, the artro will try to mate
+	private Directions direction ;	// current direction the artro is moving in
 	
 	public Artro(Canva canva, int life,
 			 Point pos,
 			 int age,
 			 Species species,
-			 double[] choice,
+			 Map<ArtroChoices, Double> tendency,
 			 boolean keepChoice,
 			 int satiation,
 			 ArtroChoices will,
@@ -37,7 +38,7 @@ public class Artro
 		this.pos = pos ;
 		this.age = age ;
 		this.species = species ;
-		this.choice = choice ;
+		this.tendency = tendency ;
 		this.keepChoice = keepChoice ;
 		this.satiation = satiation ;
 		this.will = will ;
@@ -49,7 +50,7 @@ public class Artro
 	public Point getPos() {return pos ;}
 	public int getAge() {return age ;}
 	public Species getSpecies() {return species ;}
-	public double[] getChoice() {return choice ;}
+	public Map<ArtroChoices, Double> getChoice() {return tendency ;}
 	public boolean getKeepChoice() {return keepChoice ;}
 	public int getSatiation() {return satiation ;}
 	public ArtroChoices getWill() {return will ;}
@@ -114,6 +115,26 @@ public class Artro
 		return null ;
 	}
 	
+	public Food FindClosestVisibleFood(ArrayList<Food> allFood)
+	{
+		Food closestFood = null ;
+		if (0 < allFood.size())
+		{
+			double minDist = UtilS.dist(pos, allFood.get(0).getPos()) ;
+			for (Food food : allFood)
+			{
+				double dist = UtilS.dist(pos, food.getPos()) ;
+				if (dist <= minDist & dist <= species.getVision())
+				{
+					minDist = dist ;
+					closestFood = food ;
+				}
+			}
+		}
+		
+		return closestFood ;
+	}
+	
 	public void Dies()
 	{
 		life = 0 ;
@@ -167,7 +188,7 @@ public class Artro
 			will = "flee";
         }
        	else*/ 
-		if ((!keepChoice & UtilS.chance(choice[0])) & IsHungry() & closestOpponent == null)		// Artro decides to eat food
+		if ((!keepChoice & UtilS.chance(tendency.get(ArtroChoices.eat))) & IsHungry() & closestOpponent == null)		// Artro decides to eat food
         {
             will = ArtroChoices.eat;
             keepChoice = false;
@@ -186,7 +207,7 @@ public class Artro
             will = "group";                                             										// Artro decides to group
             keepChoice = false;
         }*/
-        else if ((!keepChoice & UtilS.chance(choice[5])))
+        else if ((!keepChoice & UtilS.chance(tendency.get(ArtroChoices.wander))))
         {
             will = ArtroChoices.wander;                                             										// Artro decides to wander
             keepChoice = false;
@@ -226,7 +247,7 @@ public class Artro
 	
 	public void MoveTowards(Point targetPos)
 	{
-	    for (int step = 0; step <= species.getStep() - 1; step += 1)
+	    for (int i = 0; i <= species.getStep() - 1; i += 1)
 	    {
 		    double distx = Math.abs(pos.x - targetPos.x);
 		    double disty = Math.abs(pos.y - targetPos.y);
@@ -261,7 +282,7 @@ public class Artro
 		{
 			case eat:
 			{
-				Food food = FindFoodInRange(allFood, species.getVision()) ;
+				Food food = FindClosestVisibleFood(allFood) ;
 				if (food != null)
 				{
 					MoveTowards(food.getPos()) ;
@@ -270,6 +291,8 @@ public class Artro
 				{
 					Move(canva) ;
 				}
+				
+				break ;
 			}
 			case wander:
 				if (UtilS.chance(0.1))
@@ -277,12 +300,16 @@ public class Artro
 					direction = RandomDirection() ;
 				}
 				Move(canva) ;
+				
+				break ;
 			case exist:
 				
+				break ;
+				
 			default:
-				Move(canva) ;
+				
+				break ;
 		}
-		Move(canva) ;
 	}
 	
 	public void Display(Canva canva, DrawingOnAPanel DP)

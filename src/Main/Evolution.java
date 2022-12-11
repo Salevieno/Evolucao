@@ -2,6 +2,7 @@ package Main;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
@@ -12,6 +13,8 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -58,7 +61,7 @@ public class Evolution extends JFrame
 		
 		// initialization
 		colorPalette = UtilS.ColorPalette(0) ;
-		roundDuration = 10 ;
+		roundDuration = 8 ;
 		
 		// create canva
 		mainCanva = new Canva(new Point(100, 5), new Dimension(500, 500), new Dimension(500, 500)) ;		
@@ -74,10 +77,12 @@ public class Evolution extends JFrame
 		for (int i = 0 ; i <= 10 - 1 ; i += 1)
 		{
 			Point pos = UtilS.RandomPosAroundPoint(center, range) ;
-			int satiation = (int) (80 + 20 * Math.random()) ;
-			double[] choiceChances = new double[] {1, 1, 1, 1, 1, 1} ;
-			Artro newArtro = new Artro(mainCanva, satiation, pos, 0, species.get(0),
-					choiceChances, false, 100, ArtroChoices.exist, 1, Directions.up) ;
+			int satiation = (int) (800 + 200 * Math.random()) ;
+			Map<ArtroChoices, Double> tendency = new HashMap<>() ;
+			tendency.put(ArtroChoices.eat, 1.0) ;
+			tendency.put(ArtroChoices.wander, 0.9) ;
+			Artro newArtro = new Artro(mainCanva, 100, pos, 0, species.get(0),
+					tendency, false, satiation, ArtroChoices.exist, 1, Directions.up) ;
 			artros.add(newArtro) ;
 		}
 		
@@ -257,19 +262,23 @@ public class Evolution extends JFrame
 		
 		if (0 < artros.size())
 		{
-			//DP.DrawText(drawingPos, "Center", 0, String.valueOf(artros.get(0).getQuadrant()), new Font("SansSerif", Font.BOLD, 13), Color.black) ;
-			for (Artro artro : artros)
+			/*for (Artro artro : artros)
 			{
 				if (artro.getWill().equals(ArtroChoices.eat))
 				{
 					Point drawingPos = UtilS.ConvertToDrawingCoords(artro.getPos(), mainCanva.getPos(), mainCanva.getSize(), mainCanva.getDimension()) ;
 					DP.DrawCircle(drawingPos, artro.getSpecies().getSize(), Evolution.colorPalette[5], Evolution.colorPalette[5]) ;
+					
+					if (artro.FindFoodInRange(food, artro.getSpecies().getVision()) != null)
+					{
+						DP.DrawCircle(drawingPos, artro.getSpecies().getSize(), Evolution.colorPalette[2], Evolution.colorPalette[2]) ;
+					}
 				}
-			}  
+			} */ 
 		}
 		//mainCanva.DisplayQuadrants(DP) ;
 		
-		round += 1 ;
+		round = (round + 1) % roundDuration ;
 		repaint() ;
 	}
 	
