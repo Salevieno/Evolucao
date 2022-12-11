@@ -23,7 +23,6 @@ import Components.ArtroChoices;
 import Components.Directions;
 import Components.Food;
 import Components.FoodType;
-import Components.Quadrant;
 import Components.Species;
 import Graphics.Canva;
 import Graphics.DrawingOnAPanel;
@@ -44,9 +43,6 @@ public class Evolution extends JFrame
 	private ArrayList<Food> food ;
 	private ArrayList<FoodType> foodTypes ;
 	
-	private static ArrayList<ArrayList<Artro>> artrosInQuadrant ;
-	private static ArrayList<ArrayList<Food>> foodInQuadrant ;
-	
 	private int round ;		// number of the current iteration
 	private int roundDuration ;	// amount of time between rounds
 	private int foodRespawnTime ;	// time taken for the food to respawn (counted in number of rounds)
@@ -65,7 +61,7 @@ public class Evolution extends JFrame
 		roundDuration = 10 ;
 		
 		// create canva
-		mainCanva = new Canva(new Point(100, 5), new Dimension(500, 500), new Dimension(500, 500), 5) ;		
+		mainCanva = new Canva(new Point(100, 5), new Dimension(500, 500), new Dimension(500, 500)) ;		
 		
 		// create species
 		species = new ArrayList<>() ;
@@ -98,27 +94,6 @@ public class Evolution extends JFrame
 			Point pos = UtilS.RandomPosAroundPoint(center, range) ;
 			Food newFood = new Food(pos, foodTypes.get(0)) ;
 			food.add(newFood) ;
-		}
-		
-
-		artrosInQuadrant = new ArrayList<>() ;
-		foodInQuadrant = new ArrayList<>() ;
-		for (int i = 0 ; i <= mainCanva.getQuadrants().length - 1 ; i += 1)
-		{
-			artrosInQuadrant.add(new ArrayList<>()) ;
-			foodInQuadrant.add(new ArrayList<>()) ;
-		}
-		
-		// add artros to the quadrants
-		for (Quadrant quad : mainCanva.getQuadrantsAsList())
-		{
-			quad.ComputeArtrosInside(artros) ;
-		}
-		
-		// add food to the quadrants
-		for (Quadrant quad : mainCanva.getQuadrantsAsList())
-		{
-			quad.ComputeFoodInside(food) ;
 		}
 		
 		foodRespawnTime = 200 ;
@@ -212,9 +187,6 @@ public class Evolution extends JFrame
 		FoodType type = foodTypes.get(0) ;
 		Food newFood = new Food(pos, type) ;
 		food.add(newFood) ;
-		
-		Quadrant quadrantFoodIsIn = mainCanva.FindQuadrant(newFood.getPos()) ;
-		quadrantFoodIsIn.AddFood(newFood) ;
 	}
 		
 	public static Artro FindClosestOpponent(Artro artro)
@@ -239,11 +211,9 @@ public class Evolution extends JFrame
 	
 	public void ArtroEats(Artro artro)
 	{
-		ArrayList<Food> foodInQuadrant = artro.getQuadrant().getFoodInside() ;
-		Food foodInRange = artro.FindFoodInRange(foodInQuadrant, artro.getSpecies().getSize());		
+		Food foodInRange = artro.FindFoodInRange(food, artro.getSpecies().getSize());		
 		artro.Eats(foodInRange) ;
 		food.remove(foodInRange) ;
-		artro.getQuadrant().RemoveFood(foodInRange) ;
 	}
 	
 	public void RunSimulation()
@@ -261,8 +231,7 @@ public class Evolution extends JFrame
 				{
 					ArtroEats(artro) ;
 				}
-				artro.Acts(mainCanva) ;
-				artro.UpdateQuadrant(mainCanva) ;
+				artro.Acts(mainCanva, food) ;
 				artro.Starve() ;
 				
 				if (artro.getLife() == 0)

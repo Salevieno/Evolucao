@@ -20,7 +20,6 @@ public class Artro
 	private ArtroChoices will ;
 	private int sexWill ;
 	private Directions direction ;
-	private Quadrant quadrant ;
 	
 	public Artro(Canva canva, int life,
 			 Point pos,
@@ -44,7 +43,6 @@ public class Artro
 		this.will = will ;
 		this.sexWill = sexWill ;
 		this.direction = direction ;
-		this.quadrant = canva.FindQuadrant(pos) ;
 	}
 	
 	public int getLife() {return life ;}
@@ -57,23 +55,6 @@ public class Artro
 	public ArtroChoices getWill() {return will ;}
 	public int getSexWill() {return sexWill ;}
 	public Directions getDirection() {return direction ;}
-	public Quadrant getQuadrant() {return quadrant ;}
-	
-	/*public Artro GenericArtro()
-	{
-		int life = 100 ;
-		Point pos = new Point(50, 100) ;
-		Species species = Evolution2.species.get(0) ;
-		ArtroChoices choice = ArtroChoices.exist ;
-		boolean keepChoice = true ;
-		int satiation = 100 ;
-		String will = "" ;
-		int sexWill = 1 ;
-		Directions direction = Directions.up ;
-		int quadrant = 0 ;
-		
-		return new Artro(life, pos, 0, species, choice, keepChoice, satiation, will, sexWill, direction, quadrant) ;
-	}*/
 	
 	public Directions RandomDirection()
 	{
@@ -117,11 +98,11 @@ public class Artro
 		return acceptedDirections ;
 	}
 	
-	public Food FindFoodInRange(ArrayList<Food> foodInQuadrant, int range)
+	public Food FindFoodInRange(ArrayList<Food> allFood, int range)
 	{
-		if (0 < foodInQuadrant.size())
+		if (0 < allFood.size())
 		{
-			for (Food food : foodInQuadrant)
+			for (Food food : allFood)
 			{
 				if (UtilS.dist(pos, food.getPos()) <= range)
 				{
@@ -161,23 +142,11 @@ public class Artro
 	
 	public boolean IsHungry()
 	{
-		if (satiation <= 80)
+		if (satiation <= (int) (0.6 * species.getStomach()))
 		{
 			return true ;
 		}
 		return false ;
-	}
-	
-	public void UpdateQuadrant(Canva canva)
-	{
-		// find the quadrant the artro is currently in
-		Quadrant newQuadrant = canva.FindQuadrant(pos) ;
-		
-		// if the registered quadrant is not the current quadrant
-		if (quadrant != newQuadrant)
-		{
-            quadrant = newQuadrant ;	// update quadrant				
-		}
 	}
 	
 	public void Thinks()
@@ -286,13 +255,13 @@ public class Artro
 	    }
 	}
 	
-	public void Acts(Canva canva)
+	public void Acts(Canva canva, ArrayList<Food> allFood)
 	{
 		switch(will)
 		{
 			case eat:
 			{
-				Food food = FindFoodInRange(quadrant.getFoodInside(), species.getVision()) ;
+				Food food = FindFoodInRange(allFood, species.getVision()) ;
 				if (food != null)
 				{
 					MoveTowards(food.getPos()) ;
