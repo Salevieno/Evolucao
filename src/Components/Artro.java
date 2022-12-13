@@ -182,7 +182,7 @@ public class Artro
 		return false ;
 	}
 	
-	public void Starve()
+	public void IncHunger()
 	{
 		satiation += -1;
         if (satiation <= 0)
@@ -215,7 +215,7 @@ public class Artro
 		return ableToMate ;
 	}
 	
-	public void Lust()
+	public void IncMateWill()
 	{
 		if (sexWill < species.getMatePoint())
 		{
@@ -362,6 +362,11 @@ public class Artro
 				if (food != null)
 				{
 					MoveTowards(food.getPos()) ;
+					if (IsReachable(food.getPos()))
+					{
+						Eats(food) ;
+						allFood.remove(food) ;
+					}
 				}
 				else
 				{

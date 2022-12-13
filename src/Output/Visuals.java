@@ -22,7 +22,7 @@ public class Visuals
     Color[] ColorPalette;
 	DrawingOnAPanel DP;
         
-	public Visuals(DrawingOnAPanel DP, int[] CanvasPos, int[] CanvasSize, int[] CanvasDim, int[] DrawingPos)
+	/*public Visuals(DrawingOnAPanel DP, int[] CanvasPos, int[] CanvasSize, int[] CanvasDim, int[] DrawingPos)
 	{
 		ColorPalette = UtilS.ColorPalette(2);
 		this.DP = DP;
@@ -175,7 +175,7 @@ public class Visuals
 
 	public void DrawArtros(double[][] ArtroPos, String[] ArtroWill, int[] ArtroSpecies, int[] ArtroLife, int[] ArtroSize, Color[] color)
 	{
-		/*if (ArtroPos != null)
+		if (ArtroPos != null)
 		{
 			for (int a = 0; a <= ArtroPos.length - 1; a += 1)
 			{
@@ -195,7 +195,7 @@ public class Visuals
 			}
 			//int[] DrawingPos = Uts.ConvertToDrawingCoords(ArtroPos[0], CanvasPos, CanvasSize, CanvasDim);
 			//DP.DrawCircle(DrawingPos, (int) (1.3 * ArtroSize[ArtroSpecies[0]]), true, ColorPalette[4], Color.yellow);
-		}*/
+		}
 	}
 	
 	public void DrawFood(double[][] FoodPos, int[] FoodType, boolean[] FoodStatus, double[] FoodSize, Color[] color)
@@ -372,4 +372,5 @@ public class Visuals
 			}	
 		}
 	}
+	*/
 }

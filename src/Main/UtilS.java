@@ -20,11 +20,30 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Arrays;
 
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 public abstract class UtilS 
 {
+
+	public static JButton AddButton(String text, ImageIcon icon, int[] alignment, Dimension size, Color color)
+	{
+		JButton newButton = new JButton();
+		if (text != null)
+		{
+			newButton.setText(text);
+		}
+		if (icon != null)
+		{
+			newButton.setIcon(icon);
+		}
+		newButton.setVerticalAlignment(alignment[0]);
+		newButton.setHorizontalAlignment(alignment[1]);
+		newButton.setBackground(color);
+		newButton.setPreferredSize(size);	
+		return newButton;
+	}
 
 	public static Point ConvertToDrawingCoords(Point originalCoords, Point canvasPos, Dimension canvasSize, Dimension canvasDim)
 	{
@@ -1233,27 +1252,6 @@ public abstract class UtilS
 			newstring2[j] = newstring[j];
 		}
 		return newstring2;
-	}
-
-	public static JButton AddButton(ImageIcon Icon, int[] Alignment, int[] Size, Color color)
-	{
-		JButton NewButton = new JButton();
-		NewButton.setIcon(Icon);
-		NewButton.setVerticalAlignment(Alignment[0]);
-		NewButton.setHorizontalAlignment(Alignment[1]);
-		NewButton.setBackground(color);
-		NewButton.setPreferredSize(new Dimension(Size[0], Size[1]));	
-		return NewButton;
-	}
-	
-	public static JButton AddButton(String Text, int[] Alignment, int[] Size, Color color)
-	{
-		JButton NewButton = new JButton(Text);
-		NewButton.setVerticalAlignment(Alignment[0]);
-		NewButton.setHorizontalAlignment(Alignment[1]);
-		NewButton.setBackground(color);
-		NewButton.setPreferredSize(new Dimension(Size[0], Size[1]));	
-		return NewButton;
 	}
 	
 	public boolean MouseIsInside(int[] MousePos, int[] RectPos, int L, int H)

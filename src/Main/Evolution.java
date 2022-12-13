@@ -1,10 +1,13 @@
 package Main;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -17,6 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
@@ -34,8 +39,11 @@ import Graphics.DrawingOnAPanel;
 public class Evolution extends JFrame
 {
 	private static final long serialVersionUID = 1L;
-	//private static Container container;
+	private static Container container;
 	private static JPanel mainJPanel;
+	
+	private boolean simulationIsRunning ;
+	private boolean graphsAreVisible ;
 
 	private DrawingOnAPanel DP;	// class with the drawing methods
 
@@ -48,6 +56,10 @@ public class Evolution extends JFrame
 	
 	private int round ;		// number of the current iteration
 	private int roundDuration ;	// amount of time between rounds
+	
+	private ArrayList<Integer> artrosPop ;	// number of artros at any given time
+	private int maxArtroPopEver ;	// maximum number of artros that ever lived simultaneously 
+	
 	private int foodRespawnTime ;	// time taken for the food to respawn (counted in number of rounds)
 	private int maxNumberFood ;	// maximum amount of food that can exist at any given time
 
@@ -57,14 +69,26 @@ public class Evolution extends JFrame
 	{
 		InitializeJPanel();	// initialized the JPanel and puts it inside the JFrame
 		
-		//container = getContentPane();	// defines container
+		container = getContentPane();	// defines container
+		FlowLayout layout = new FlowLayout() ;
+		layout.setAlignment(FlowLayout.LEFT) ;
+		container.setLayout(layout) ;
 		
 		// initialization
 		colorPalette = UtilS.ColorPalette(0) ;
+		AddButtons() ;
 		roundDuration = 8 ;
+		simulationIsRunning = true ;
+		graphsAreVisible = true ;
+		
+		artrosPop = new ArrayList<>() ;
+		maxArtroPopEver = 0 ;
 		
 		// create canva
-		mainCanva = new Canva(new Point(100, 5), new Dimension(500, 500), new Dimension(500, 500)) ;		
+		Point canvaPos = new Point(100, 5) ;
+		Dimension canvaSize = new Dimension(500, 500) ;
+		Dimension canvaDimension = new Dimension(500, 500) ;
+		mainCanva = new Canva(canvaPos, canvaSize, canvaDimension) ;		
 		
 		// create species
 		species = new ArrayList<>() ;
@@ -179,6 +203,45 @@ public class Evolution extends JFrame
         pack();
     }
 	
+	
+	public void AddButtons()
+	{	
+		/* Defining Button Icons */
+		String ImagesPath = ".\\Icons\\";
+		ImageIcon PlayIcon = new ImageIcon(ImagesPath + "PlayIcon.png");
+		ImageIcon GraphsIcon = new ImageIcon(ImagesPath + "GraphsIcon.png");
+		
+		/* Defining Buttons */
+		Color BackgroundColor = colorPalette[5];
+		JButton PlayButton = UtilS.AddButton("", PlayIcon, new int[2], new Dimension(30, 30), BackgroundColor);
+		JButton GraphsButton = UtilS.AddButton("", GraphsIcon, new int[2], new Dimension(30, 30), BackgroundColor);
+		container.add(PlayButton);
+		container.add(GraphsButton);
+		
+		/* Defining button actions */
+		PlayButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				simulationIsRunning = !simulationIsRunning;
+				//Results Re = new Results();
+				//Re.SaveOutputFile("Output.txt", SpeciesPopHist, FoodHist);
+			}
+		});
+		GraphsButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				graphsAreVisible = !graphsAreVisible;
+			}
+		});
+	
+		PlayButton = UtilS.AddButton("", null, new int[2], new Dimension(110, 30), BackgroundColor);
+	}
+	
+	
 	public void CreateArtro()
 	{
 		
@@ -227,6 +290,29 @@ public class Evolution extends JFrame
 		
 	}
 	
+	public void RecordArtrosPop()
+	{
+		int maxNumberRegisters = 1000 ;
+		int currentPop = artros.size() ;
+		
+		// update maximum number of artros ever registered
+		if (maxArtroPopEver < currentPop)
+		{
+			maxArtroPopEver = currentPop ;
+		}
+		
+		// update the latest registers to show in the graph
+		if (artrosPop.size() <= maxNumberRegisters - 1)
+		{
+			artrosPop.add(currentPop) ;
+		}
+		else
+		{
+			artrosPop.remove(0) ;
+			artrosPop.add(currentPop) ;
+		}
+	}
+	
 	public void RunSimulation()
 	{		
 		mainCanva.Display(DP) ;
@@ -238,20 +324,17 @@ public class Evolution extends JFrame
 				Artro artro = artros.get(i) ;
 				
 				artro.Thinks() ;
-				if (artro.getWill().equals(ArtroChoices.eat))
-				{
-					ArtroEats(artro) ;
-				}
 				artro.Acts(mainCanva, food, artros) ;
-				artro.Starve() ;
-				artro.Lust() ;
+				artro.IncHunger() ;
+				artro.IncMateWill() ;
 				
 				if (artro.getLife() == 0)
 				{
 					artros.remove(artro) ;
 				}
+				
+				RecordArtrosPop() ;
 			}
-			//System.out.println(round);
 		}
 		if (round % foodRespawnTime == 0 & food.size() < maxNumberFood)
 		{
@@ -293,9 +376,21 @@ public class Evolution extends JFrame
 			
 			} 			
 		}
-		//mainCanva.DisplayQuadrants(DP) ;
 		
-		round = (round + 1) % roundDuration ;
+		if (simulationIsRunning)
+		{
+			round = (round + 1) % roundDuration ;
+		}
+		
+		if (graphsAreVisible)
+		{
+			Point pos = new Point(650, 150) ;
+			ArrayList<ArrayList<Double>> recordsPop = new ArrayList<>() ;
+			ArrayList<Double> artrosPopAsDoubleList = (ArrayList<Double>) artrosPop.clone() ;
+			recordsPop.add(artrosPopAsDoubleList) ;
+			DP.DrawGraph(pos, "Population", recordsPop, maxArtroPopEver, new Color[] {Color.blue, Color.green}) ;
+		}
+		
 		repaint() ;
 	}
 	

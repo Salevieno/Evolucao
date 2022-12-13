@@ -1065,8 +1065,8 @@ public class EvolutionOld extends JFrame
 		
 		/* Defining Buttons */
 		Color BackgroundColor = ColorPalette[5];
-		JButton PlayButton = UtilS.AddButton(PlayIcon, new int[2], new int[] {30, 30}, BackgroundColor);
-		JButton GraphsButton = UtilS.AddButton(GraphsIcon, new int[2], new int[] {30, 30}, BackgroundColor);
+		//JButton PlayButton = UtilS.AddButton(PlayIcon, new int[2], new int[] {30, 30}, BackgroundColor);
+		//JButton GraphsButton = UtilS.AddButton(GraphsIcon, new int[2], new int[] {30, 30}, BackgroundColor);
 		cp.add(PlayButton);
 		cp.add(GraphsButton);
 		
@@ -1090,7 +1090,7 @@ public class EvolutionOld extends JFrame
 			}
 		});
 	
-		PlayButton = UtilS.AddButton("", new int[2], new int[] {110, 30}, BackgroundColor);
+		//PlayButton = UtilS.AddButton("", new int[2], new int[] {110, 30}, BackgroundColor);
 	}
 	
 	public void Records(int maxlength)
@@ -1130,7 +1130,7 @@ public class EvolutionOld extends JFrame
 		//DP.DrawAxis(new int[] {CanvasPos[0], CanvasPos[1] + CanvasSize[1]}, CanvasSize[0] + 20, CanvasDim);
 		if (ShowCanvas)
 		{
-			V.DrawCanvas();
+			//V.DrawCanvas();
 		}
 		if (ProgramIsRunning)
 		{
@@ -1154,8 +1154,8 @@ public class EvolutionOld extends JFrame
 				}
 			}
 		}
-        V.DrawFood(FoodPos, FoodType, FoodStatus, FoodSize, FoodColor);
-        V.DrawArtros(ArtroPos, ArtroWill, ArtroSpecies, ArtroLife, ArtroSize, ArtroColor);  
+        //V.DrawFood(FoodPos, FoodType, FoodStatus, FoodSize, FoodColor);
+        //V.DrawArtros(ArtroPos, ArtroWill, ArtroSpecies, ArtroLife, ArtroSize, ArtroColor);  
         
         
         /* Draw cool stuff */
@@ -1173,15 +1173,15 @@ public class EvolutionOld extends JFrame
         if (ShowGraphs)
         {
     		int MaxArtrosPopEver = UtilS.FindMax(SpeciesMaxPop);
-    		DP.DrawMenu(new int[] {CanvasPos[0] - 225, CanvasPos[1] + 320}, "Center", 330, 480, 2, new Color[] {ColorPalette[25], ColorPalette[7]}, ColorPalette[9]);
+    		//DP.DrawMenu(new int[] {CanvasPos[0] - 225, CanvasPos[1] + 320}, "Center", 330, 480, 2, new Color[] {ColorPalette[25], ColorPalette[7]}, ColorPalette[9]);
     		for (int c = 0; c <= SpeciesChoices[0].length - 1; c += 1)
     		{
-        		V.DrawVarGraph(new int[] {CanvasPos[0] - 350 + 150 * (int) (c / 3), CanvasPos[1] + 220 + 150 * (c % 3)}, "Tend�ncia de " + ChoiceNames[c], SpeciesChoicesHist[c], 1, ArtroColor);
+        		//V.DrawVarGraph(new int[] {CanvasPos[0] - 350 + 150 * (int) (c / 3), CanvasPos[1] + 220 + 150 * (c % 3)}, "Tend�ncia de " + ChoiceNames[c], SpeciesChoicesHist[c], 1, ArtroColor);
     		}
-    		DP.DrawMenu(new int[] {CanvasPos[0] + CanvasSize[0] + 100, CanvasPos[1] + 170}, "Center", 180, 180, 2, new Color[] {ColorPalette[25], ColorPalette[7]}, ColorPalette[9]);
+    		//DP.DrawMenu(new int[] {CanvasPos[0] + CanvasSize[0] + 100, CanvasPos[1] + 170}, "Center", 180, 180, 2, new Color[] {ColorPalette[25], ColorPalette[7]}, ColorPalette[9]);
     		for (int s = 0; s <= NumberOfSpecies - 1; s += 1)
             {
-    	        V.DrawVarGraph(new int[] {CanvasPos[0] + CanvasSize[0] + 50, CanvasPos[1] + 220}, "Popula��o", SpeciesPopHist, MaxArtrosPopEver, ArtroColor);
+    	        //V.DrawVarGraph(new int[] {CanvasPos[0] + CanvasSize[0] + 50, CanvasPos[1] + 220}, "Popula��o", SpeciesPopHist, MaxArtrosPopEver, ArtroColor);
             }
     		//int MaxFoodAmountEver = Uts.FindMax(MaxFood);
     		/*for (int t = 0; t <= NumberOfFoodTypes - 1; t += 1)
@@ -1210,7 +1210,7 @@ public class EvolutionOld extends JFrame
 	    {
 	        super.paintComponent(g);
 	        DP = new DrawingOnAPanel(g);
-			V = new Visuals(DP, CanvasPos, CanvasSize, CanvasDim, DrawingPos);
+			//V = new Visuals(DP, CanvasPos, CanvasSize, CanvasDim, DrawingPos);
 	        RunProgram();
 	    }
     }
