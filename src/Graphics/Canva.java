@@ -24,6 +24,6 @@ public class Canva
 	
 	public void Display(DrawingOnAPanel DP)
 	{
-		DP.DrawRect(pos, "TopLeft", size, 2, Evolution.colorPalette[4], Evolution.colorPalette[5]) ;
+		DP.DrawRect(pos, "TopLeft", size, 2, Evolution.colorPalette[24], Evolution.colorPalette[5]) ;
 	}
 }

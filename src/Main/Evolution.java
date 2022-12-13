@@ -68,7 +68,7 @@ public class Evolution extends JFrame
 		
 		// create species
 		species = new ArrayList<>() ;
-		species.add(new Species(10, 1, 100, 1000, colorPalette[6])) ;
+		species.add(new Species(10, 1, 100, 100, 1000, colorPalette[6])) ;
 		
 		// create artros
 		artros = new ArrayList<>() ;
@@ -80,8 +80,9 @@ public class Evolution extends JFrame
 			int satiation = (int) (800 + 200 * Math.random()) ;
 			Map<ArtroChoices, Double> tendency = new HashMap<>() ;
 			tendency.put(ArtroChoices.eat, 1.0) ;
+			tendency.put(ArtroChoices.mate, 1.0) ;
 			tendency.put(ArtroChoices.wander, 0.9) ;
-			Artro newArtro = new Artro(mainCanva, 100, pos, 0, species.get(0),
+			Artro newArtro = new Artro(100, pos, 0, species.get(0),
 					tendency, false, satiation, ArtroChoices.exist, 1, Directions.up) ;
 			artros.add(newArtro) ;
 		}
@@ -221,6 +222,11 @@ public class Evolution extends JFrame
 		food.remove(foodInRange) ;
 	}
 	
+	public void ArtrosMate(Artro artro)
+	{
+		
+	}
+	
 	public void RunSimulation()
 	{		
 		mainCanva.Display(DP) ;
@@ -236,8 +242,9 @@ public class Evolution extends JFrame
 				{
 					ArtroEats(artro) ;
 				}
-				artro.Acts(mainCanva, food) ;
+				artro.Acts(mainCanva, food, artros) ;
 				artro.Starve() ;
+				artro.Lust() ;
 				
 				if (artro.getLife() == 0)
 				{
@@ -260,21 +267,31 @@ public class Evolution extends JFrame
 			artro.Display(mainCanva, DP) ;
 		}  
 		
+		
+		// color-coding the artros based on their will for debugging purposes
 		if (0 < artros.size())
 		{
-			/*for (Artro artro : artros)
+			for (Artro artro : artros)
 			{
+				Color color = null ;
 				if (artro.getWill().equals(ArtroChoices.eat))
 				{
-					Point drawingPos = UtilS.ConvertToDrawingCoords(artro.getPos(), mainCanva.getPos(), mainCanva.getSize(), mainCanva.getDimension()) ;
-					DP.DrawCircle(drawingPos, artro.getSpecies().getSize(), Evolution.colorPalette[5], Evolution.colorPalette[5]) ;
+					color = Evolution.colorPalette[0] ; // cyan
 					
 					if (artro.FindFoodInRange(food, artro.getSpecies().getVision()) != null)
 					{
-						DP.DrawCircle(drawingPos, artro.getSpecies().getSize(), Evolution.colorPalette[2], Evolution.colorPalette[2]) ;
+						color = Evolution.colorPalette[1] ; // magenta
 					}
 				}
-			} */ 
+				if (artro.getWill().equals(ArtroChoices.mate))
+				{
+					color = Evolution.colorPalette[2] ; // orange
+				}
+
+				Point drawingPos = UtilS.ConvertToDrawingCoords(artro.getPos(), mainCanva.getPos(), mainCanva.getSize(), mainCanva.getDimension()) ;
+				DP.DrawCircle(drawingPos, artro.getSpecies().getSize(), null, color) ;
+			
+			} 			
 		}
 		//mainCanva.DisplayQuadrants(DP) ;
 		

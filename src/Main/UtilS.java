@@ -99,7 +99,7 @@ public abstract class UtilS
 			color[21] = new Color(180, 0, 180);	// Herb, exp, magic floor, shopping text
 			color[22] = new Color(230, 230, 230);	// Neutral, air, light and snow elements
 			color[23] = new Color(0, 50, 0);	// Herb contour
-			color[24] = new Color(0, 150, 0);	// Status 1 (poison)
+			color[24] = new Color(10, 30, 40);
 			color[25] = new Color(30, 200, 30);	// Bag text
 			color[26] = new Color(0, 150, 255);	// Shopping menu
 			color[27] = new Color(200, 200, 255);	// Sign window

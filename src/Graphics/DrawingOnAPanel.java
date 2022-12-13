@@ -56,8 +56,11 @@ public class DrawingOnAPanel
 	
 	public void DrawCircle(Point pos, int diam, Color contourColor, Color fillColor)
     {
-    	G.setColor(contourColor);
-    	G.drawOval(pos.x - diam / 2, pos.y - diam / 2, diam, diam);
+		if (contourColor != null)
+    	{
+	    	G.setColor(contourColor);
+	    	G.drawOval(pos.x - diam / 2, pos.y - diam / 2, diam, diam);
+    	}
     	if (fillColor != null)
     	{
         	G.setColor(fillColor);
