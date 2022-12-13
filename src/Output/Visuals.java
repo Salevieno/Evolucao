@@ -2,11 +2,9 @@ package Output;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.Toolkit;
 
 import Graphics.DrawingOnAPanel;
-import Main.UtilS;
 
 public class Visuals
 {

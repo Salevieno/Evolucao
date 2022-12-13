@@ -34,6 +34,7 @@ import Components.FoodType;
 import Components.Species;
 import Graphics.Canva;
 import Graphics.DrawingOnAPanel;
+import Output.Results;
 
 
 public class Evolution extends JFrame
@@ -59,6 +60,7 @@ public class Evolution extends JFrame
 	
 	private ArrayList<Integer> artrosPop ;	// number of artros at any given time
 	private int maxArtroPopEver ;	// maximum number of artros that ever lived simultaneously 
+	private ArrayList<Integer> artrosPopAtNRounds ;	// number of artros recorded every N rounds
 	
 	private int foodRespawnTime ;	// time taken for the food to respawn (counted in number of rounds)
 	private int maxNumberFood ;	// maximum amount of food that can exist at any given time
@@ -83,6 +85,7 @@ public class Evolution extends JFrame
 		
 		artrosPop = new ArrayList<>() ;
 		maxArtroPopEver = 0 ;
+		artrosPopAtNRounds = new ArrayList<>() ;
 		
 		// create canva
 		Point canvaPos = new Point(100, 5) ;
@@ -98,16 +101,18 @@ public class Evolution extends JFrame
 		artros = new ArrayList<>() ;
 		Point center = new Point(250, 250) ;
 		Dimension range = new Dimension(100, 100) ;
-		for (int i = 0 ; i <= 10 - 1 ; i += 1)
+		for (int i = 0 ; i <= 4 - 1 ; i += 1)
 		{
 			Point pos = UtilS.RandomPosAroundPoint(center, range) ;
+			Species sp = species.get(0) ;
 			int satiation = (int) (800 + 200 * Math.random()) ;
 			Map<ArtroChoices, Double> tendency = new HashMap<>() ;
 			tendency.put(ArtroChoices.eat, 1.0) ;
 			tendency.put(ArtroChoices.mate, 1.0) ;
 			tendency.put(ArtroChoices.wander, 0.9) ;
-			Artro newArtro = new Artro(100, pos, 0, species.get(0),
-					tendency, false, satiation, ArtroChoices.exist, 1, Directions.up) ;
+			int sexWill = (int) (Math.random() * sp.getMatePoint()) ;
+			
+			Artro newArtro = new Artro(100, pos, 0, sp, tendency, false, satiation, ArtroChoices.exist, sexWill, Directions.up) ;
 			artros.add(newArtro) ;
 		}
 		
@@ -126,13 +131,15 @@ public class Evolution extends JFrame
 			food.add(newFood) ;
 		}
 		
-		foodRespawnTime = 200 ;
-		maxNumberFood = 20 ;
+		foodRespawnTime = 20 ;
+		maxNumberFood = 200 ;
 		
-		/*
-		AddButtons();
-		AddMenus();
-		AddMenuActions(); */
+		
+		// clear Results file
+		Results.ClearFile("Results.txt") ;
+		
+		
+		// set up super frame
 		setTitle("Evolution");	// Sets super frame title
 		setSize(900, 550);		// Sets super frame window size
 		setVisible(true);		// Shows super frame
@@ -207,19 +214,21 @@ public class Evolution extends JFrame
 	public void AddButtons()
 	{	
 		/* Defining Button Icons */
-		String ImagesPath = ".\\Icons\\";
-		ImageIcon PlayIcon = new ImageIcon(ImagesPath + "PlayIcon.png");
-		ImageIcon GraphsIcon = new ImageIcon(ImagesPath + "GraphsIcon.png");
+		String imagesPath = ".\\Icons\\";
+		ImageIcon playIcon = new ImageIcon(imagesPath + "PlayIcon.png");
+		ImageIcon graphsIcon = new ImageIcon(imagesPath + "GraphsIcon.png");
 		
 		/* Defining Buttons */
-		Color BackgroundColor = colorPalette[5];
-		JButton PlayButton = UtilS.AddButton("", PlayIcon, new int[2], new Dimension(30, 30), BackgroundColor);
-		JButton GraphsButton = UtilS.AddButton("", GraphsIcon, new int[2], new Dimension(30, 30), BackgroundColor);
-		container.add(PlayButton);
-		container.add(GraphsButton);
+		Color BGColor = colorPalette[5];
+		JButton playButton = UtilS.AddButton("", playIcon, new int[2], new Dimension(30, 30), null);
+		JButton graphsButton = UtilS.AddButton("", graphsIcon, new int[2], new Dimension(30, 30), null);
+		JButton saveButton = UtilS.AddButton("Save", null, new int[2], new Dimension(30, 30), null);
+		container.add(playButton);
+		container.add(graphsButton);
+		container.add(saveButton);
 		
 		/* Defining button actions */
-		PlayButton.addActionListener(new ActionListener()
+		playButton.addActionListener(new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent e) 
@@ -229,7 +238,7 @@ public class Evolution extends JFrame
 				//Re.SaveOutputFile("Output.txt", SpeciesPopHist, FoodHist);
 			}
 		});
-		GraphsButton.addActionListener(new ActionListener()
+		graphsButton.addActionListener(new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent e) 
@@ -237,8 +246,19 @@ public class Evolution extends JFrame
 				graphsAreVisible = !graphsAreVisible;
 			}
 		});
-	
-		PlayButton = UtilS.AddButton("", null, new int[2], new Dimension(110, 30), BackgroundColor);
+		saveButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				ArrayList<ArrayList<Double>> recordsPop = new ArrayList<>() ;
+				ArrayList<Double> artrosPopAsDoubleList = (ArrayList<Double>) artrosPop.clone() ;
+				recordsPop.add(artrosPopAsDoubleList) ;
+				Results.SaveOutputFile("Results.txt", recordsPop) ;
+			}
+		});
+		
+		playButton = UtilS.AddButton("", null, new int[2], new Dimension(110, 30), BGColor);
 	}
 	
 	
@@ -332,9 +352,9 @@ public class Evolution extends JFrame
 				{
 					artros.remove(artro) ;
 				}
-				
-				RecordArtrosPop() ;
 			}
+			
+			RecordArtrosPop() ;
 		}
 		if (round % foodRespawnTime == 0 & food.size() < maxNumberFood)
 		{
@@ -349,6 +369,24 @@ public class Evolution extends JFrame
 		{
 			artro.Display(mainCanva, DP) ;
 		}  
+
+		
+		if (round % 7992 == 0)
+		{			
+			for (int i = 0 ; i <= artrosPop.size() - 1; i += 1)
+			{
+				if (i % 10 == 0)
+				{
+					artrosPopAtNRounds.add(artrosPop.get(i)) ;
+				}
+			}
+			// append to results file
+			Results.ClearFile("Results.txt") ;
+			ArrayList<ArrayList<Double>> recordsPop = new ArrayList<>() ;
+			ArrayList<Double> artrosPopAsDoubleList = (ArrayList<Double>) artrosPopAtNRounds.clone() ;
+			recordsPop.add(artrosPopAsDoubleList) ;
+			Results.SaveOutputFile("Results.txt", recordsPop) ;
+		}
 		
 		
 		// color-coding the artros based on their will for debugging purposes
@@ -379,7 +417,7 @@ public class Evolution extends JFrame
 		
 		if (simulationIsRunning)
 		{
-			round = (round + 1) % roundDuration ;
+			round += 1 ;
 		}
 		
 		if (graphsAreVisible)

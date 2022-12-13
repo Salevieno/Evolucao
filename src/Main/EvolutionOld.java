@@ -1077,8 +1077,8 @@ public class EvolutionOld extends JFrame
 			public void actionPerformed(ActionEvent e) 
 			{
 				ProgramIsRunning = !ProgramIsRunning;
-				Results Re = new Results();
-				Re.SaveOutputFile("Output.txt", SpeciesPopHist, FoodHist);
+				//Results Re = new Results();
+				//Re.SaveOutputFile("Output.txt", SpeciesPopHist, FoodHist);
 			}
 		});
 		GraphsButton.addActionListener(new ActionListener()
