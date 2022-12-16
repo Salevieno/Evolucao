@@ -1,4 +1,4 @@
-package Main;
+package main;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,15 +14,11 @@ import java.util.Arrays;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
-import Graphics.DrawingOnAPanel;
-import Output.Results;
-import Output.Visuals;
-
+import graphics.DrawingOnAPanel;
+import graphics.Visuals;
+/*
 public class EvolutionOld extends JFrame
 {	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	Container cp;
 	int[] SuperFrameSize = new int[] {1250, 680};
@@ -39,11 +35,11 @@ public class EvolutionOld extends JFrame
 	DrawingOnAPanel DP;
 	Visuals V;
 	
-	/* Space */  
+	 Space   
     public double[][] SpaceLimits = new double[][] {{0, 0}, {550, 550}};     // [[xmin, ymin], [xmax, ymax]]
 	public double[] SpaceSize = new double[] {SpaceLimits[1][0] - SpaceLimits[0][0], SpaceLimits[1][1] - SpaceLimits[0][1]};
 	
-	/* Artros */
+	 Artros 
 	public int NumberOfArtros;
 	public int NumberOfSpecies;
     public int[] ArtroLife;					// [length = NumberOfArtros][current life, 0 < Life = alive]
@@ -58,7 +54,7 @@ public class EvolutionOld extends JFrame
     public int[] ArtroDir;					// [length = NumberOfArtros][direction of movement]
     public int[] ArtroQuadrant;				// [length = NumberOfArtros][quadrant in which the artro is]
 
-    /* Species */
+     Species 
     public double[][] ArtroInitialPos;		// [length = species][species][x, y]
     public double[][] ArtroDispersion;		// [length = species][species][dispersion in x, dispersion in y]
     public int[] SpeciesLife;				// [length = species][Amount of life]
@@ -74,12 +70,12 @@ public class EvolutionOld extends JFrame
     public double[] ArtroMut;				// [length = species][chance of mutation]
     public Color[] ArtroColor;				// [length = species][color]
 
-    /* Records */
+     Records 
     public int[] SpeciesMaxPop;				// [length = species][maximum population reached by each species]
     public double[][][] SpeciesChoicesHist;	// history of the chance of choices [choice][round][species]
     public int[][] SpeciesPopHist;			// history of the population with time [round][species]
     	
-	/* Food */
+	 Food 
     public int NumberOfFood;  
 	public int NumberOfFoodTypes;                           
     public boolean[] FoodStatus;			// [true = exists]
@@ -96,7 +92,7 @@ public class EvolutionOld extends JFrame
     public int[][] FoodHist;				// [history of the population with time]
     public int[] MaxFood;					// [maximum food amount ever reached by each food type]
 	
-	/* Global variables */
+	 Global variables 
 	int round = 0, delay = 10;
 	Color[] ColorPalette;
 	String[] ChoiceNames = new String[] {"comer", "reproduzir", "ca�ar", "fugir", "agrupar", "passear"};
@@ -117,7 +113,7 @@ public class EvolutionOld extends JFrame
 		LegendMin = 0;
 		LegendMax = 0;
 		
-		/* Defining Container */
+		 Defining Container 
 		cp = getContentPane();
 		//cp.setLayout(new FlowLayout(FlowLayout.LEFT,10,10));
 
@@ -130,7 +126,7 @@ public class EvolutionOld extends JFrame
 		setVisible(true);								// Super frame shows
 	}
 
-	/*public void Inicializacao()
+	public void Inicializacao()
 	{
 		int NumArtroPar = 15;
 		Object[] object = UtilS.ReadInputFile("input.txt");
@@ -229,7 +225,7 @@ public class EvolutionOld extends JFrame
     	}
 	    ShowCanvas = true;
 	    ProgramIsRunning = true;
-	}*/
+	}
 	
 	public void CreateArtro(int a, int Life, double[] Pos, int species, int size, int step, int vision, double[] choice, String will, int sexwish, int sexapp, int satiation, int stomach, int age, int sexage, int foodvalue, int dir, double mut, int quad)
 	{
@@ -271,7 +267,7 @@ public class EvolutionOld extends JFrame
 	    return false;
 	}
 	
-	/*public int ClosestFood(double[] artroPos, int artroQuad, double artroVision)
+	public int ClosestFood(double[] artroPos, int artroQuad, double artroVision)
 	{
 	    int closestFood = -1;
 	    double MinFoodDist = UtilS.dist(artroPos, FoodPos[0]);
@@ -289,9 +285,9 @@ public class EvolutionOld extends JFrame
 	        }
 	    }
         return closestFood;
-	}*/
+	}
 	
-	/*public int ClosestMate(int artroID, int artroSpecies, double[] artroPos, double artroVision)
+	public int ClosestMate(int artroID, int artroSpecies, double[] artroPos, double artroVision)
 	{
 	    int closestMate = -1;
 	    double MinMateDist = artroVision;
@@ -308,9 +304,9 @@ public class EvolutionOld extends JFrame
 	        }
 	    }
         return closestMate;
-	}*/
+	}
 	
-	/*public int ClosestOpponent(int artroID, int artroSpecies, double[] artroPos, double artroVision)
+	public int ClosestOpponent(int artroID, int artroSpecies, double[] artroPos, double artroVision)
 	{
 	    int closestOpponent = -1;
 	    double MinFightDist = artroVision;
@@ -327,9 +323,9 @@ public class EvolutionOld extends JFrame
 	        }
 	    }
         return closestOpponent;
-	}*/
+	}
 
-	/*public int NumberOfCloseFriends(int artroID, int artroSpecies, double[] artroPos, double artroVision)
+	public int NumberOfCloseFriends(int artroID, int artroSpecies, double[] artroPos, double artroVision)
 	{
 	    int NumCloseFriends = 0;
 	    if (ArtrosInQuadrant[ArtroQuadrant[artroID]] != null)
@@ -344,7 +340,7 @@ public class EvolutionOld extends JFrame
 	        }
 	    }
         return NumCloseFriends;
-	}*/
+	}
 	
 	public int[] CountNumOfAlive(String unit)
 	{
@@ -375,12 +371,12 @@ public class EvolutionOld extends JFrame
     	return new int[] {-1};
 	}
 	
-	/*public double GroupFightBonus(int a)
+	public double GroupFightBonus(int a)
 	{
 		double bonus = 1;
 		bonus += (double)NumberOfCloseFriends(a, ArtroSpecies[a], ArtroPos[a], ArtroVision[ArtroSpecies[a]]);
 		return bonus;
-	}*/
+	}
 	
 	public double[] SpeciesAvrPar(double[][] Par, int p)
 	{
@@ -589,7 +585,7 @@ public class EvolutionOld extends JFrame
 	}
 
 	
-	/*public int FindQuadrant(double[] pos)
+	public int FindQuadrant(double[] pos)
 	{
 		int NumberOfXQuadrants = (int) Math.sqrt(NumberOfQuadrants) ;
 		double[][] QuadrantTopLeft = new double[NumberOfQuadrants][2] ;
@@ -612,9 +608,9 @@ public class EvolutionOld extends JFrame
 		}
 		
 		return -1 ;
-	}*/
+	}
 	
-	/*public int FindFoodInRange(int a)
+	public int FindFoodInRange(int a)
 	{
 		if (FoodInQuadrant[ArtroQuadrant[a]] != null)
 		{
@@ -628,9 +624,9 @@ public class EvolutionOld extends JFrame
 			}
 		}
 		return -1 ;
-	}*/
+	}
 	
-	/*public int[] FindFoodInVision(int a)
+	public int[] FindFoodInVision(int a)
 	{
 		int[] FoodInRange = null ;
 		for (int f = 0; f <= NumberOfFood - 1; f += 1)
@@ -642,9 +638,9 @@ public class EvolutionOld extends JFrame
 		}
 		
 		return FoodInRange ;
-	}*/
+	}
 	
-	/*public void UpdateArtrosQuadrant()
+	public void UpdateArtrosQuadrant()
 	{
 		for (int a = 0; a <= NumberOfArtros - 1; a += 1)
 	    {
@@ -657,7 +653,7 @@ public class EvolutionOld extends JFrame
                 ArtrosInQuadrant[newQuadrant] = UtilS.AddElemToVec(ArtrosInQuadrant[newQuadrant], a) ;				
 			}
 	    }
-	}*/
+	}
 	
 	public boolean ArtroIsHungry(int a)
 	{
@@ -671,8 +667,8 @@ public class EvolutionOld extends JFrame
 		}
 	}
 	
-	/* Artos actions */
-	/*public void ArtrosAct()
+	 Artos actions 
+	public void ArtrosAct()
 	{
 	    for (int a = 0; a <= NumberOfArtros - 1; a += 1)
 	    {
@@ -766,10 +762,10 @@ public class EvolutionOld extends JFrame
     	        }
 	        }
 	    }
-	}*/
+	}
 
 	
-	/*public void ArtrosEat()
+	public void ArtrosEat()
 	{
 	    for (int a = 0; a <= NumberOfArtros - 1; a += 1)
 	    {
@@ -790,10 +786,10 @@ public class EvolutionOld extends JFrame
 	    		}
     		}
 	    }
-	}*/
+	}
 	
 
-	/*public void ArtrosMate2()
+	public void ArtrosMate2()
 	{
 	    for (int a1 = 0; a1 <= NumberOfArtros - 1; a1 += 1)
 	    {
@@ -858,10 +854,10 @@ public class EvolutionOld extends JFrame
                 }
 	       }
 	    }
-	}*/
+	}
 	
 	
-	/*public void ArtrosFight()
+	public void ArtrosFight()
 	{
 		for (int a1 = 0; a1 <= NumberOfArtros - 1; a1 += 1)
 		{
@@ -890,7 +886,7 @@ public class EvolutionOld extends JFrame
 				}
 			}
 	    }
-	}*/
+	}
 	
 	
 	public void ArtrosLust()
@@ -917,7 +913,7 @@ public class EvolutionOld extends JFrame
 	    }
 	}
 
-	/*public void ArtrosThink()
+	public void ArtrosThink()
 	{
 		for (int a = 0; a <= NumberOfArtros - 1; a += 1)
 	    {
@@ -971,7 +967,7 @@ public class EvolutionOld extends JFrame
 			//}
 			//ArtroDir[a] = (int) (4*Math.random());
 	    }
-	}*/
+	}
 	
 	public void ArtrosAge()
 	{
@@ -1019,9 +1015,9 @@ public class EvolutionOld extends JFrame
 		NumberOfArtros -= 1;
 	}
 
-	/* Food actions */
+	 Food actions 
 	
-	/*public void RespawnFood()
+	public void RespawnFood()
 	{
 	    for (int f = 0; f <= NumberOfFood - 1; f += 1)
 	    {
@@ -1042,12 +1038,12 @@ public class EvolutionOld extends JFrame
 	            }
 	        }
 	    }
-	}*/
+	}
 
-	/* Other functions */
+	 Other functions 
 	public void AddMenus()
 	{
-		/* Defining menu bars */
+		 Defining menu bars 
 		
 	}
 	
@@ -1058,19 +1054,19 @@ public class EvolutionOld extends JFrame
 	
 	public void AddButtons()
 	{	
-		/* Defining Button Icons */
+		 Defining Button Icons 
 		String ImagesPath = ".\\Icons\\";
 		ImageIcon PlayIcon = new ImageIcon(ImagesPath + "PlayIcon.png");
 		ImageIcon GraphsIcon = new ImageIcon(ImagesPath + "GraphsIcon.png");
 		
-		/* Defining Buttons */
+		 Defining Buttons 
 		Color BackgroundColor = ColorPalette[5];
 		//JButton PlayButton = UtilS.AddButton(PlayIcon, new int[2], new int[] {30, 30}, BackgroundColor);
 		//JButton GraphsButton = UtilS.AddButton(GraphsIcon, new int[2], new int[] {30, 30}, BackgroundColor);
 		cp.add(PlayButton);
 		cp.add(GraphsButton);
 		
-		/* Defining button actions */
+		 Defining button actions 
 		PlayButton.addActionListener(new ActionListener()
 		{
 			@Override
@@ -1137,7 +1133,7 @@ public class EvolutionOld extends JFrame
 			if (round % delay == 0)
 			{
 				long startTime = System.nanoTime();
-				/*ArtrosThink();
+				ArtrosThink();
 				ArtrosAct();
 				UpdateArtrosQuadrant();
 		        ArtrosEat();
@@ -1146,7 +1142,7 @@ public class EvolutionOld extends JFrame
 		        ArtrosMate2();
 		        ArtrosFight();
 		        ArtrosAge();
-		        RespawnFood();*/
+		        RespawnFood();
 		        //System.out.println("elapsed time = " + (System.nanoTime() - startTime));
 		        if (round % (10 * delay) == 0)
 				{
@@ -1158,16 +1154,16 @@ public class EvolutionOld extends JFrame
         //V.DrawArtros(ArtroPos, ArtroWill, ArtroSpecies, ArtroLife, ArtroSize, ArtroColor);  
         
         
-        /* Draw cool stuff */
+         Draw cool stuff 
 		//DP.DrawCircle(Uts.ConvertToDrawingCoords(ArtroPos[0], CanvasPos, CanvasSize, CanvasDim), 2*ArtroVision[0], false, Color.red, null) ;
-		/*int[] FoodInRange = FindFoodInVision(0) ;
+		int[] FoodInRange = FindFoodInVision(0) ;
 		if (FoodInRange != null)
 		{
 			for (int i = 0; i <= FoodInRange.length - 1; i += 1)
 			{
 				DP.DrawCircle(Uts.ConvertToDrawingCoords(FoodPos[FoodInRange[i]], CanvasPos, CanvasSize, CanvasDim), (int) (FoodSize[FoodType[FoodInRange[i]]]), true, ColorPalette[4], Color.yellow);
 			}
-		}*/
+		}
 		
 		
         if (ShowGraphs)
@@ -1184,10 +1180,10 @@ public class EvolutionOld extends JFrame
     	        //V.DrawVarGraph(new int[] {CanvasPos[0] + CanvasSize[0] + 50, CanvasPos[1] + 220}, "Popula��o", SpeciesPopHist, MaxArtrosPopEver, ArtroColor);
             }
     		//int MaxFoodAmountEver = Uts.FindMax(MaxFood);
-    		/*for (int t = 0; t <= NumberOfFoodTypes - 1; t += 1)
+    		for (int t = 0; t <= NumberOfFoodTypes - 1; t += 1)
             {
     	        V.DrawVarGraph(new int[] {CanvasPos[0] - 200,  CanvasPos[1] + 520}, "Comida", FoodHist, MaxFoodAmountEver, FoodColor);
-            }*/
+            }
         }
         //System.out.println(ArtroSatiation[0]);
         //System.out.println(Arrays.deepToString(ArtrosInQuadrant));
@@ -1197,9 +1193,9 @@ public class EvolutionOld extends JFrame
 	
 	class Panel2 extends JPanel 
 	{
-	    /**
+	    *
 		 * 
-		 */
+		 
 		private static final long serialVersionUID = 1L;
 		Panel2() 
 	    {
@@ -1280,4 +1276,4 @@ public class EvolutionOld extends JFrame
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         pack();
     }
-}
+}*/

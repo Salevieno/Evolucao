@@ -1,4 +1,4 @@
-package Graphics;
+package graphics;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -12,22 +12,18 @@ import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
-import Components.Artro;
-import Components.Food;
-import Main.UtilS;
+import main.UtilS;
 
 public class DrawingOnAPanel
 {
-    Font TextFont = new Font("SansSerif", Font.PLAIN, 20);
-	Font BoldTextFont = new Font("SansSerif", Font.BOLD, 20);
+    Font stdFont = new Font("SansSerif", Font.PLAIN, 20);
+	Font boldStdFont = new Font("SansSerif", Font.BOLD, 20);
 	int stdStroke = 1;
 	private Graphics2D G;
-	Color[] ColorPalette;
 	
 	public DrawingOnAPanel(Graphics g)
 	{
 		G = (Graphics2D) g;
-		ColorPalette = UtilS.ColorPalette(2);
 	}	
 	public void paint(Graphics g) 
     { 
@@ -40,7 +36,7 @@ public class DrawingOnAPanel
 	
 	
 	// primitive functions
-	public void DrawText(Point Pos, String Alignment, double angle, String Text, Font font, Color color)
+	public void DrawText(Point pos, String alignment, double angle, String text, Font font, Color color)
 	{
 		// Rectangle by default starts at the left bottom
 		//int TextL = UtilG.TextL(Text, font, G), TextH = UtilG.TextH(font.getSize()) ;
@@ -49,8 +45,8 @@ public class DrawingOnAPanel
 		AffineTransform backup = G.getTransform() ;		
 		G.setColor(color) ;
 		G.setFont(font) ;
-		G.setTransform(AffineTransform.getRotateInstance(-angle * Math.PI / 180, Pos.x, Pos.y)) ;	// Rotate text
-		G.drawString(Text, Pos.x + offset[0], Pos.y + offset[1]) ;
+		//G.setTransform(AffineTransform.getRotateInstance(-angle * Math.PI / 180, pos.x, pos.y)) ;	// Rotate text
+		G.drawString(text, pos.x + offset[0], pos.y + offset[1]) ;
         G.setTransform(backup) ;
     }
 	
@@ -78,7 +74,7 @@ public class DrawingOnAPanel
     }
 	
 	// composed functions
-	public void DrawArtros(ArrayList<Artro> artros, Canva canva)
+	/*public void DrawArtros(ArrayList<Artro> artros, Canva canva)
 	{
 		if (artros != null)
 		{
@@ -94,7 +90,7 @@ public class DrawingOnAPanel
 					System.out.println(drawingPos);
 					DrawCircle(drawingPos, artros.get(i).getSpecies().getSize(), ColorPalette[4], artros.get(i).getSpecies().getColor());
 				}
-				//DP.DrawText(DrawingPos, ArtroWill[a], "Center", 0, "Bold", 10, ColorPalette[5]);
+				//DP.DrawText(DrawingPos, ArtroWill[a], "Center", 0, "Bold", 10, zAxisColor);
 			}
 			//int[] DrawingPos = Uts.ConvertToDrawingCoords(ArtroPos.x, CanvasPos, CanvasSize, CanvasDim);
 			//DP.DrawCircle(DrawingPos, (int) (1.3 * ArtroSize[ArtroSpecies[0]]), true, ColorPalette[4], Color.yellow);
@@ -109,14 +105,9 @@ public class DrawingOnAPanel
 			{
 				Point drawingPos = UtilS.ConvertToDrawingCoords(food.get(i).getPos(), canva.getPos(), canva.getSize(), canva.getDimension());
 				DrawCircle(drawingPos, food.get(i).getType().getSize(), ColorPalette[4], food.get(i).getType().getColor());
-				/*if (FoodStatus[f])
-				{
-					//DP.DrawText(Uts.ConvertToDrawingCoords(FoodPos[f], CanvasPos, CanvasSize, CanvasDim), String.valueOf(f), "Center", 0, "None", 13, Color.black);
-					//DP.DrawCircle(UtilS.ConvertToDrawingCoords(FoodPos[f], CanvasPos, CanvasSize, CanvasDim), (int) (FoodSize[FoodType[f]]), true, ColorPalette[4], color[FoodType[f]]);
-				}*/
 			}
 		}
-	}
+	}*/
     
     public void DrawPolyLine(ArrayList<Integer> x, ArrayList<Integer> y, int thickness, Color color)
     {
@@ -134,63 +125,71 @@ public class DrawingOnAPanel
     }
 	
 
-    public void DrawGrid(Point initPos, Point finalPos, int NumSpacing)
+    public void DrawGrid(Point initPos, Point finalPos, int NumSpacing, Color lineColor)
 	{
-		int LineThickness = 1;
-		int[] Length = new int[] {finalPos.x - initPos.x, initPos.y - finalPos.y};
-		for (int i = 0; i <= NumSpacing - 1; i += 1)
+		int stroke = 1;
+		Dimension length = new Dimension(finalPos.x - initPos.x, initPos.y - finalPos.y) ;
+		for (int i = 0 ; i <= NumSpacing - 1 ; i += 1)
 		{
-			DrawLine(new Point (initPos.x + (i + 1)*Length[0]/NumSpacing, initPos.y),
-					new Point (initPos.x + (i + 1)*Length[0]/NumSpacing, initPos.y - Length[1]), LineThickness, ColorPalette[4]);						
-			DrawLine(new Point (initPos.x, initPos.y - (i + 1)*Length[1]/NumSpacing),
-					new Point (initPos.x + Length[0], initPos.y - (i + 1)*Length[1]/NumSpacing), LineThickness, ColorPalette[4]);						
+			// horizontal lines
+			Point hPoint1 = new Point (initPos.x, initPos.y - (i + 1)*length.height/NumSpacing) ;
+			Point hPoint2 = new Point (initPos.x + length.width, initPos.y - (i + 1)*length.height/NumSpacing) ;
+			DrawLine(hPoint1, hPoint2, stroke, lineColor) ;	
+			
+			// vertical lines
+			Point vPoint1 = new Point (initPos.x + (i + 1)*length.width/NumSpacing, initPos.y) ;
+			Point vPoint2 = new Point (initPos.x + (i + 1)*length.width/NumSpacing, initPos.y - length.height) ;
+			DrawLine(vPoint1, vPoint2, stroke, lineColor) ;					
 		}
 	}
     
 
-    public void DrawAxis(Point Pos, int size, int[] CanvasDim)
+    public void DrawAxis(Point Pos, int size, int[] CanvasDim, Color xAxisColor, Color yAxisColor, Color zAxisColor)
     {
-    	int thickness = 2;
+    	Font textFont = new Font("SansSerif", Font.BOLD, 15) ;
+    	int stroke = 2;
     	int ArrowSize = 20;
-    	int TextSize = 15, TextOffset = 10;
+    	int TextOffset = 10;
     	// x axis
-    	DrawLine(Pos, new Point (Pos.x + size, Pos.y), thickness, ColorPalette[7]);
-    	DrawArrow(new Point (Pos.x + size + ArrowSize/2, Pos.y), ArrowSize, 0, true, ArrowSize, ColorPalette[7]);
-    	DrawText(new Point (Pos.x + size, Pos.y - TextOffset), "x", "Center", 0, "Bold", TextSize, ColorPalette[7]);
-    	DrawText(new Point (Pos.x + size, Pos.y + 2*TextOffset), String.valueOf(UtilS.Round(CanvasDim[0], 1)) + " m", "BotLeft", 0, "Plain", TextSize, ColorPalette[7]);
+    	DrawLine(Pos, new Point (Pos.x + size, Pos.y), stroke, xAxisColor);
+    	DrawArrow(new Point (Pos.x + size + ArrowSize/2, Pos.y), ArrowSize, 0, true, ArrowSize, xAxisColor);
+    	//Point Pos, String Alignment, double angle, String Text, Font font, Color color
+    	DrawText(new Point (Pos.x + size, Pos.y - TextOffset), "Center", 0, "x", textFont, xAxisColor);
+    	DrawText(new Point (Pos.x + size, Pos.y + 2*TextOffset), "BotLeft", 0, String.valueOf(UtilS.Round(CanvasDim[0], 1)) + " m", textFont, xAxisColor);
     	// y axis
-    	DrawLine(Pos, new Point (Pos.x, Pos.y - size), thickness, ColorPalette[6]);
-    	DrawArrow(new Point (Pos.x, Pos.y - size - ArrowSize/2), ArrowSize, Math.PI/2, true, ArrowSize, ColorPalette[6]);
-    	DrawText(new Point (Pos.x - TextOffset, Pos.y - size), "y", "Center", 0, "Bold", TextSize, ColorPalette[6]);
-    	DrawText(new Point (Pos.x + TextOffset, Pos.y - size), String.valueOf(UtilS.Round(CanvasDim[1], 1)) + " m", "BotLeft", 0, "Plain", TextSize, ColorPalette[6]);
+    	DrawLine(Pos, new Point (Pos.x, Pos.y - size), stroke, yAxisColor);
+    	DrawArrow(new Point (Pos.x, Pos.y - size - ArrowSize/2), ArrowSize, Math.PI/2, true, ArrowSize, yAxisColor);
+    	DrawText(new Point (Pos.x - TextOffset, Pos.y - size), "Center", 0, "y", textFont, yAxisColor);
+    	DrawText(new Point (Pos.x + TextOffset, Pos.y - size), "BotLeft", 0, String.valueOf(UtilS.Round(CanvasDim[1], 1)) + " m", textFont, yAxisColor);
     	// z axis
-    	DrawLine(Pos, new Point (Pos.x - (int) (size/25), Pos.y + (int) (size/25)), thickness, ColorPalette[5]);
-    	DrawArrow(new Point (Pos.x - (int) (size/25) - ArrowSize/4, Pos.y + (int) (size/25) + ArrowSize/4), ArrowSize, -3*Math.PI/4, true, ArrowSize, ColorPalette[5]);
-    	DrawText(new Point (Pos.x - (int) (size/25) - TextOffset, Pos.y + (int) (size/25) - TextOffset), "z", "Center", 0, "Bold", TextSize, ColorPalette[5]);
+    	DrawLine(Pos, new Point (Pos.x - (int) (size/25), Pos.y + (int) (size/25)), stroke, zAxisColor);
+    	DrawArrow(new Point (Pos.x - (int) (size/25) - ArrowSize/4, Pos.y + (int) (size/25) + ArrowSize/4), ArrowSize, -3*Math.PI/4, true, ArrowSize, zAxisColor);
+    	DrawText(new Point (Pos.x - (int) (size/25) - TextOffset, Pos.y + (int) (size/25) - TextOffset), "Center", 0, "z", textFont, zAxisColor);
     }
     
-    public void DrawGraph(Point pos, String Title, int size, Color color)
+    public void DrawGraph(Point pos, String Title, int size, Color titleColor, Color lineColor)
 	{
-		int asize = 8 * size / 100;
-		double aangle = Math.PI * 30 / 180.0;
-		DrawText(new Point (pos.x + size/2, (int) (pos.y - size - 13 - 2)), Title, "Center", 0, "Bold", 13, color);
-		DrawLine(pos, new Point (pos.x, (int) (pos.y - size - asize)), 2, ColorPalette[9]);
-		DrawLine(pos, new Point ((int) (pos.x + size + asize), pos.y), 2, ColorPalette[9]);
-		DrawArrow(new Point (pos.x + size + asize, pos.y), asize, aangle, false, 0.4 * asize, ColorPalette[9]);
-		DrawArrow(new Point (pos.x + size + asize, pos.y), asize, aangle, false, 0.4 * asize, ColorPalette[9]);
+    	Font textFont = new Font("SansSerif", Font.BOLD, 13) ;
+		int arrowSize = 8 * size / 100;
+		DrawText(new Point (pos.x + size/5, (int) (pos.y - size - 13)), "TopLeft", 0, Title, textFont, titleColor);
+		DrawLine(pos, new Point (pos.x, (int) (pos.y - size - arrowSize)), 2, lineColor);
+		DrawLine(pos, new Point ((int) (pos.x + size + arrowSize), pos.y), 2, lineColor);
+		DrawArrow(new Point (pos.x + size + arrowSize, pos.y), arrowSize, 0, false, 0.4 * arrowSize, lineColor);
+		DrawArrow(new Point (pos.x, pos.y - size - arrowSize), arrowSize, Math.PI / 2, false, 0.4 * arrowSize, lineColor);
 		//DrawPolyLine(new int[] {pos.x - asize, pos.x, pos.x + asize}, new int[] {(int) (pos.y - 1.1*size) + asize, (int) (pos.y - 1.1*size), (int) (pos.y - 1.1*size) + asize}, 2, ColorPalette[4]);
 		//DrawPolyLine(new int[] {(int) (pos.x + 1.1*size - asize), (int) (pos.x + 1.1*size), (int) (pos.x + 1.1*size - asize)}, new int[] {pos.y - asize, pos.y, pos.y + asize}, 2, ColorPalette[4]);
-		DrawGrid(pos, new Point (pos.x + size, pos.y - size), 10);
+		DrawGrid(pos, new Point (pos.x + size, pos.y - size), 10, Color.black);
 	}
 	
-	public void DrawGraph(Point pos, String title, ArrayList<ArrayList<Double>> yValues, double maxEver, Color[] color)
+	public void PlotGraph(Point pos, String title, ArrayList<ArrayList<Double>> yValues, double maxYEver, Color[] color)
 	{
+    	Font textFont = new Font("SansSerif", Font.BOLD, 12) ;
 		int size = 100;
-		DrawGraph(pos, title, size, ColorPalette[14]);
+		DrawGraph(pos, title, size, Color.blue, Color.black);
 		if (1 <= yValues.size())
 		{
 			Point maxYPos = new Point (pos.x - size / 4, pos.y - size) ;
-			DrawText(maxYPos, String.valueOf(maxEver), "Center", 0, "Bold", 12, ColorPalette[9]);
+			DrawText(maxYPos, "TopLeft", 0, String.valueOf(maxYEver), textFont, Color.blue);
 			
 			// for each curve
 			for (int j = 0; j <= yValues.size() - 1; j += 1)
@@ -209,7 +208,7 @@ public class DrawingOnAPanel
 					}
 					ArrayList<Double> yList = yValues.get(j) ;
 					double y = Double.parseDouble(String.valueOf(yList.get(i))) ;
-					yPos.add((pos.y - (int) (size * y / maxEver))) ;
+					yPos.add((pos.y - (int) (size * y / maxYEver))) ;
 				}
 				DrawPolyLine(xPos, yPos, 2, color[j]);
 			}
@@ -256,9 +255,9 @@ public class DrawingOnAPanel
 	        G.setTransform(backup);
 		}
 	}
-    public void DrawText(Point pos, String Text, String Alignment, float angle, String Style, int size, Color color)
+    /*public void DrawText(Point pos, String Text, String Alignment, float angle, String Style, int size, Color color)
     {
-		float TextL = UtilS.TextL(Text, TextFont, size, G), TextH = UtilS.TextH(size);
+		float TextL = UtilS.TextL(Text, TextFont, G), TextH = UtilS.TextH(size);
     	int[] Offset = UtilS.OffsetFromPos(Alignment, (int)TextL, (int)TextH);
 		AffineTransform a = null;	// Rotate rectangle
 		AffineTransform backup = G.getTransform();
@@ -289,7 +288,7 @@ public class DrawingOnAPanel
     	G.setColor(color);
     	G.drawString(Text, pos.x + Offset[0], pos.y + Offset[1]);
         G.setTransform(backup);
-    }
+    }*/
     /*public void DrawFitText(Point Pos, String Text, String Alignment, float angle, String Style, int sy, int length, int size, Color color)
 	{
 		String[] FitText = UtilS.FitText(Text, length);
@@ -381,15 +380,15 @@ public class DrawingOnAPanel
     	}
     	G.drawArc(Pos.x - Math.abs(l/2), Pos.y - Math.abs(h/2), l, h, (int) angle[0], (int) angle[1]);
     }
-    public void DrawArrow(Point Pos, int size, double theta, boolean fill, double ArrowSize, Color color)
+    public void DrawArrow(Point Pos, int size, double theta, boolean fill, double tipSize, Color color)
     {
     	double open = 0.8;
-    	int ax1 = (int)(Pos.x - open*size*Math.cos(theta) - ArrowSize/3.5*Math.sin(theta));
-    	int ay1 = (int)(Pos.y + open*size*Math.sin(theta) - ArrowSize/3.5*Math.cos(theta));
+    	int ax1 = (int)(Pos.x - open*size*Math.cos(theta) - tipSize/3.5*Math.sin(theta));
+    	int ay1 = (int)(Pos.y + open*size*Math.sin(theta) - tipSize/3.5*Math.cos(theta));
     	int ax2 = Pos.x;
     	int ay2 = Pos.y;
-     	int ax3 = (int)(Pos.x - open*size*Math.cos(theta) + ArrowSize/3.5*Math.sin(theta));
-     	int ay3 = (int)(Pos.y + open*size*Math.sin(theta) + ArrowSize/3.5*Math.cos(theta));
+     	int ax3 = (int)(Pos.x - open*size*Math.cos(theta) + tipSize/3.5*Math.sin(theta));
+     	int ay3 = (int)(Pos.y + open*size*Math.sin(theta) + tipSize/3.5*Math.cos(theta));
      	DrawPolygon(new int[] {ax1, ax2, ax3}, new int[] {ay1, ay2, ay3}, fill, color, color);
     }
     

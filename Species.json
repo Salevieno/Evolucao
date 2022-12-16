@@ -1,0 +1,18 @@
+[
+	{
+		"size": 10,
+		"step": 1,
+		"vision": 100,
+		"matePoint": 100,
+		"stomach": 1000,
+		"color": [255, 0, 0]
+	},
+	{
+		"size": 10,
+		"step": 1,
+		"vision": 100,
+		"matePoint": 100,
+		"stomach": 1000,
+		"color": [0, 200, 200]
+	}
+]

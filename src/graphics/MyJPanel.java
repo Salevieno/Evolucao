@@ -1,11 +1,11 @@
-package Graphics;
+package graphics;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
 
 import javax.swing.JPanel;
 
-import Main.Evolution;
+import main.Evolution;
 
 public class MyJPanel extends JPanel
 {

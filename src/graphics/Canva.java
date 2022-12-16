@@ -1,9 +1,10 @@
-package Graphics;
+package graphics;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 
-import Main.Evolution;
+import main.Evolution;
 
 public class Canva
 {
@@ -24,6 +25,6 @@ public class Canva
 	
 	public void Display(DrawingOnAPanel DP)
 	{
-		DP.DrawRect(pos, "TopLeft", size, 2, Evolution.colorPalette[24], Evolution.colorPalette[5]) ;
+		DP.DrawRect(pos, "TopLeft", size, 2, new Color(10, 30, 40), Color.blue) ;
 	}
 }

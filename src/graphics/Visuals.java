@@ -1,10 +1,8 @@
-package Output;
+package graphics;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-
-import Graphics.DrawingOnAPanel;
 
 public class Visuals
 {

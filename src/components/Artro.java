@@ -1,14 +1,14 @@
-package Components;
+package components;
 
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
-import Graphics.Canva;
-import Graphics.DrawingOnAPanel;
-import Main.Evolution;
-import Main.UtilS;
+import graphics.Canva;
+import graphics.DrawingOnAPanel;
+import main.Evolution;
+import main.UtilS;
 
 public class Artro
 {

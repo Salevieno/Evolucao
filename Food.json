@@ -1,0 +1,14 @@
+[ 
+	{ 
+		"Center": [250, 250],
+		"Range": [100, 100],
+		"Amount": 20,
+		"TypeID": 0
+	},
+	{ 
+		"Center": [250, 250],
+		"Range": [100, 100],
+		"Amount": 20,
+		"TypeID": 1
+	}
+]

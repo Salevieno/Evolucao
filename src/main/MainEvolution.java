@@ -3,7 +3,7 @@
 	Last update: 09/12/2022
  **/
 
-package Main ;
+package main ;
 
 import javax.swing.JFrame ;
 

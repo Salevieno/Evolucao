@@ -1,4 +1,4 @@
-package Main;
+package main;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -15,6 +15,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,15 +28,18 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
 
-import Components.Artro;
-import Components.ArtroChoices;
-import Components.Directions;
-import Components.Food;
-import Components.FoodType;
-import Components.Species;
-import Graphics.Canva;
-import Graphics.DrawingOnAPanel;
-import Output.Results;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import components.Artro;
+import components.ArtroChoices;
+import components.Directions;
+import components.Food;
+import components.FoodType;
+import components.Species;
+import graphics.Canva;
+import graphics.DrawingOnAPanel;
 
 
 public class Evolution extends JFrame
@@ -47,96 +52,65 @@ public class Evolution extends JFrame
 	private boolean graphsAreVisible ;
 
 	private DrawingOnAPanel DP;	// class with the drawing methods
+	private Records RE ;		// class that keeps the records (population, etc.)
 
 	private Canva mainCanva ;
 	
 	private ArrayList<Artro> artros ;
-	public static ArrayList<Species> species ;
+	private ArrayList<Species> species ;
 	private ArrayList<Food> food ;
 	private ArrayList<FoodType> foodTypes ;
 	
 	private int round ;		// number of the current iteration
 	private int roundDuration ;	// amount of time between rounds
 	
-	private ArrayList<Integer> artrosPop ;	// number of artros at any given time
-	private int maxArtroPopEver ;	// maximum number of artros that ever lived simultaneously 
-	private ArrayList<Integer> artrosPopAtNRounds ;	// number of artros recorded every N rounds
-	
 	private int foodRespawnTime ;	// time taken for the food to respawn (counted in number of rounds)
 	private int maxNumberFood ;	// maximum amount of food that can exist at any given time
 
-	public static Color[] colorPalette ;	// colors used
+	//public static Color[] colorPalette ;	// colors used
 	
 	public Evolution()
 	{
-		InitializeJPanel();	// initialized the JPanel and puts it inside the JFrame
+		// initialize the JPanel and puts it inside the JFrame
+		InitializeJPanel();
 		
-		container = getContentPane();	// defines container
+		
+		// initialize container
+		container = getContentPane();
 		FlowLayout layout = new FlowLayout() ;
 		layout.setAlignment(FlowLayout.LEFT) ;
 		container.setLayout(layout) ;
 		
-		// initialization
-		colorPalette = UtilS.ColorPalette(0) ;
+		
+		// initialize global variables
+		//colorPalette = UtilS.ColorPalette(0) ;
 		AddButtons() ;
 		roundDuration = 8 ;
 		simulationIsRunning = true ;
 		graphsAreVisible = true ;
 		
-		artrosPop = new ArrayList<>() ;
-		maxArtroPopEver = 0 ;
-		artrosPopAtNRounds = new ArrayList<>() ;
+		RE = new Records() ;	
+		
 		
 		// create canva
 		Point canvaPos = new Point(100, 5) ;
 		Dimension canvaSize = new Dimension(500, 500) ;
 		Dimension canvaDimension = new Dimension(500, 500) ;
 		mainCanva = new Canva(canvaPos, canvaSize, canvaDimension) ;		
+
 		
-		// create species
-		species = new ArrayList<>() ;
-		species.add(new Species(10, 1, 100, 100, 1000, colorPalette[6])) ;
-		
-		// create artros
-		artros = new ArrayList<>() ;
-		Point center = new Point(250, 250) ;
-		Dimension range = new Dimension(100, 100) ;
-		for (int i = 0 ; i <= 4 - 1 ; i += 1)
-		{
-			Point pos = UtilS.RandomPosAroundPoint(center, range) ;
-			Species sp = species.get(0) ;
-			int satiation = (int) (800 + 200 * Math.random()) ;
-			Map<ArtroChoices, Double> tendency = new HashMap<>() ;
-			tendency.put(ArtroChoices.eat, 1.0) ;
-			tendency.put(ArtroChoices.mate, 1.0) ;
-			tendency.put(ArtroChoices.wander, 0.9) ;
-			int sexWill = (int) (Math.random() * sp.getMatePoint()) ;
-			
-			Artro newArtro = new Artro(100, pos, 0, sp, tendency, false, satiation, ArtroChoices.exist, sexWill, Directions.up) ;
-			artros.add(newArtro) ;
-		}
-		
-		// create food types
-		foodTypes = new ArrayList<>() ;
-		foodTypes.add(new FoodType(10, 100, colorPalette[3])) ;
-		
-		// create food
-		food = new ArrayList<>() ;
-		center = new Point(250, 250) ;
-		range = new Dimension(200, 200) ;
-		for (int i = 0 ; i <= 10 - 1 ; i += 1)
-		{
-			Point pos = UtilS.RandomPosAroundPoint(center, range) ;
-			Food newFood = new Food(pos, foodTypes.get(0)) ;
-			food.add(newFood) ;
-		}
+		// load input
+		LoadSpecies() ;
+		LoadArtros() ;
+		LoadFoodTypes() ;
+		LoadFood() ;
 		
 		foodRespawnTime = 20 ;
-		maxNumberFood = 200 ;
+		maxNumberFood = 200 ;		
 		
 		
 		// clear Results file
-		Results.ClearFile("Results.txt") ;
+		Output.ClearFile("Results.txt") ;		
 		
 		
 		// set up super frame
@@ -219,7 +193,7 @@ public class Evolution extends JFrame
 		ImageIcon graphsIcon = new ImageIcon(imagesPath + "GraphsIcon.png");
 		
 		/* Defining Buttons */
-		Color BGColor = colorPalette[5];
+		Color BGColor = Color.blue ;
 		JButton playButton = UtilS.AddButton("", playIcon, new int[2], new Dimension(30, 30), null);
 		JButton graphsButton = UtilS.AddButton("", graphsIcon, new int[2], new Dimension(30, 30), null);
 		JButton saveButton = UtilS.AddButton("Save", null, new int[2], new Dimension(30, 30), null);
@@ -251,21 +225,150 @@ public class Evolution extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-				ArrayList<ArrayList<Double>> recordsPop = new ArrayList<>() ;
-				ArrayList<Double> artrosPopAsDoubleList = (ArrayList<Double>) artrosPop.clone() ;
-				recordsPop.add(artrosPopAsDoubleList) ;
-				Results.SaveOutputFile("Results.txt", recordsPop) ;
+				Output.UpdateOutputFile("Results.txt", RE) ;
 			}
 		});
 		
-		playButton = UtilS.AddButton("", null, new int[2], new Dimension(110, 30), BGColor);
+		//playButton = UtilS.AddButton("", null, new int[2], new Dimension(110, 30), BGColor);
 	}
 	
 	
-	public void CreateArtro()
+	public Object ReadJson(String filePath)
 	{
-		
+		JSONParser parser = new JSONParser();
+        try
+        {
+            Object jsonData = parser.parse(new FileReader(filePath));
+            return jsonData ;
+        }
+        catch(FileNotFoundException fe)
+        {
+            fe.printStackTrace();
+            return null ;
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return null ;
+        }
 	}
+	
+	public void LoadSpecies()
+	{
+		// read input file
+		Object data = ReadJson("Species.json") ;
+        
+        //convert Object to JSONArray
+        JSONArray jsonArray= (JSONArray)data;
+        
+		// create species
+		species = new ArrayList<>() ;
+        for (int i = 0 ; i <= jsonArray.size() - 1; i += 1)
+        {
+        	JSONObject jsonObject = (JSONObject) jsonArray.get(i) ;
+        	long size = (long) jsonObject.get("size") ;
+        	long step = (long) jsonObject.get("step") ;
+        	long vision = (long) jsonObject.get("vision") ;
+        	long matePoint = (long) jsonObject.get("matePoint") ;
+        	long stomach = (long) jsonObject.get("stomach") ;
+            JSONArray colorArray= (JSONArray)jsonObject.get("color");
+        	Color color = new Color((int)(long)colorArray.get(0), (int)(long)colorArray.get(1), (int)(long)colorArray.get(2)) ;
+        	
+    		species.add(new Species((int)size, (int)step, (int)vision, (int)matePoint, (int)stomach, color)) ;
+        }
+	}
+	
+	public void LoadArtros()
+	{
+		// read input file
+		Object data = ReadJson("Artros.json") ;
+        
+        //convert Object to JSONArray
+        JSONArray jsonArray= (JSONArray)data;
+		
+		// create artros
+        artros = new ArrayList<>() ;
+        for (int i = 0 ; i <= jsonArray.size() - 1; i += 1)
+        {
+        	JSONObject jsonObject = (JSONObject) jsonArray.get(i) ;
+            JSONArray centerArray= (JSONArray)jsonObject.get("Center");
+            JSONArray rangeArray= (JSONArray)jsonObject.get("Range");
+            Point center = new Point((int)(long)centerArray.get(0), (int)(long)centerArray.get(1)) ;
+    		Dimension range = new Dimension((int)(long)rangeArray.get(0), (int)(long)rangeArray.get(1)) ;
+    		int numberArtros = (int)(long)jsonObject.get("Amount") ;
+    		for (int j = 0 ; j <= numberArtros - 1 ; j += 1)
+    		{
+    			Point pos = UtilS.RandomPosAroundPoint(center, range) ;
+    			int speciesID = (int)(long)jsonObject.get("SpeciesID");
+    			Species sp = species.get(speciesID) ;
+    			int minSatiation = (int)(long)jsonObject.get("MinSatiation");
+    			int satiation = (int) (minSatiation + (sp.getStomach() - minSatiation) * Math.random()) ;
+                JSONArray tendArray= (JSONArray)jsonObject.get("Tendencies");
+    			Map<ArtroChoices, Double> tendency = new HashMap<>() ;
+    			tendency.put(ArtroChoices.eat, (int)(long)tendArray.get(0) / 100.0) ;
+    			tendency.put(ArtroChoices.mate, (int)(long)tendArray.get(1) / 100.0) ;
+    			tendency.put(ArtroChoices.wander, (int)(long)tendArray.get(2) / 100.0) ;
+    			int minSexWill = (int)(long)jsonObject.get("MinSexWill");
+    			int sexWill = (int) (minSexWill + (sp.getMatePoint() - minSexWill) * Math.random()) ;
+    			
+    			Artro newArtro = new Artro(100, pos, 0, sp, tendency, false, satiation, ArtroChoices.exist, sexWill, Directions.up) ;
+    			artros.add(newArtro) ;
+    		}
+    	}
+	}
+	
+	public void LoadFoodTypes()
+	{
+		// read input file
+		Object data = ReadJson("FoodTypes.json") ;
+        
+        //convert Object to JSONArray
+        JSONArray jsonArray= (JSONArray)data;
+		        
+        // create food types
+		foodTypes = new ArrayList<>() ;
+		
+		for (int i = 0 ; i <= jsonArray.size() - 1; i += 1)
+		{
+			JSONObject jsonObject = (JSONObject) jsonArray.get(i) ;
+			int size = (int)(long) jsonObject.get("Size") ;
+			int value = (int)(long) jsonObject.get("Value") ;
+			JSONArray colorArray= (JSONArray)jsonObject.get("Color");
+        	Color color = new Color((int)(long)colorArray.get(0), (int)(long)colorArray.get(1), (int)(long)colorArray.get(2)) ;
+        	
+        	foodTypes.add(new FoodType(size, value, color)) ;
+		}
+	}
+	
+	public void LoadFood()
+	{
+		// read input file
+		Object data = ReadJson("Food.json") ;
+        
+        //convert Object to JSONArray
+        JSONArray jsonArray= (JSONArray)data;
+		        
+        // create food
+		food = new ArrayList<>() ;
+		
+		for (int i = 0 ; i <= jsonArray.size() - 1; i += 1)
+		{
+			JSONObject jsonObject = (JSONObject) jsonArray.get(i) ;
+			JSONArray centerArray= (JSONArray)jsonObject.get("Center");
+            JSONArray rangeArray= (JSONArray)jsonObject.get("Range");
+            Point center = new Point((int)(long)centerArray.get(0), (int)(long)centerArray.get(1)) ;
+    		Dimension range = new Dimension((int)(long)rangeArray.get(0), (int)(long)rangeArray.get(1)) ;
+    		int numberFood = (int)(long)jsonObject.get("Amount") ;
+    		for (int j = 0 ; j <= numberFood - 1 ; j += 1)
+			{
+				Point pos = UtilS.RandomPosAroundPoint(center, range) ;
+				int typeID = (int)(long)jsonObject.get("TypeID");
+    			FoodType type = foodTypes.get(typeID) ;
+    			food.add(new Food(pos, type)) ;
+			}
+		}		
+	}
+	
 	
 	public void CreateFood()
 	{
@@ -316,20 +419,20 @@ public class Evolution extends JFrame
 		int currentPop = artros.size() ;
 		
 		// update maximum number of artros ever registered
-		if (maxArtroPopEver < currentPop)
+		if (RE.maxArtroPopEver < currentPop)
 		{
-			maxArtroPopEver = currentPop ;
+			RE.maxArtroPopEver = currentPop ;
 		}
 		
 		// update the latest registers to show in the graph
-		if (artrosPop.size() <= maxNumberRegisters - 1)
+		if (RE.artrosPop.size() <= maxNumberRegisters - 1)
 		{
-			artrosPop.add(currentPop) ;
+			RE.artrosPop.add(currentPop) ;
 		}
 		else
 		{
-			artrosPop.remove(0) ;
-			artrosPop.add(currentPop) ;
+			RE.artrosPop.remove(0) ;
+			RE.artrosPop.add(currentPop) ;
 		}
 	}
 	
@@ -373,19 +476,15 @@ public class Evolution extends JFrame
 		
 		if (round % 7992 == 0)
 		{			
-			for (int i = 0 ; i <= artrosPop.size() - 1; i += 1)
+			for (int i = 0 ; i <= RE.artrosPop.size() - 1; i += 1)
 			{
 				if (i % 10 == 0)
 				{
-					artrosPopAtNRounds.add(artrosPop.get(i)) ;
+					RE.artrosPopAtNRounds.add(RE.artrosPop.get(i)) ;
 				}
 			}
 			// append to results file
-			Results.ClearFile("Results.txt") ;
-			ArrayList<ArrayList<Double>> recordsPop = new ArrayList<>() ;
-			ArrayList<Double> artrosPopAsDoubleList = (ArrayList<Double>) artrosPopAtNRounds.clone() ;
-			recordsPop.add(artrosPopAsDoubleList) ;
-			Results.SaveOutputFile("Results.txt", recordsPop) ;
+			Output.UpdateOutputFile("Results.txt", RE) ;
 		}
 		
 		
@@ -397,20 +496,20 @@ public class Evolution extends JFrame
 				Color color = null ;
 				if (artro.getWill().equals(ArtroChoices.eat))
 				{
-					color = Evolution.colorPalette[0] ; // cyan
+					color = Color.cyan ;
 					
 					if (artro.FindFoodInRange(food, artro.getSpecies().getVision()) != null)
 					{
-						color = Evolution.colorPalette[1] ; // magenta
+						color = Color.magenta ;
 					}
 				}
 				if (artro.getWill().equals(ArtroChoices.mate))
 				{
-					color = Evolution.colorPalette[2] ; // orange
+					color = Color.orange ;
 				}
 
 				Point drawingPos = UtilS.ConvertToDrawingCoords(artro.getPos(), mainCanva.getPos(), mainCanva.getSize(), mainCanva.getDimension()) ;
-				DP.DrawCircle(drawingPos, artro.getSpecies().getSize(), null, color) ;
+				DP.DrawCircle(drawingPos, artro.getSpecies().getSize() / 2, null, color) ;
 			
 			} 			
 		}
@@ -422,11 +521,11 @@ public class Evolution extends JFrame
 		
 		if (graphsAreVisible)
 		{
-			Point pos = new Point(650, 150) ;
+			Point graphPos = new Point(650, 150) ;
 			ArrayList<ArrayList<Double>> recordsPop = new ArrayList<>() ;
-			ArrayList<Double> artrosPopAsDoubleList = (ArrayList<Double>) artrosPop.clone() ;
+			ArrayList<Double> artrosPopAsDoubleList = RE.ArrayListToDouble(RE.artrosPop) ;
 			recordsPop.add(artrosPopAsDoubleList) ;
-			DP.DrawGraph(pos, "Population", recordsPop, maxArtroPopEver, new Color[] {Color.blue, Color.green}) ;
+			DP.PlotGraph(graphPos, "Population", recordsPop, RE.maxArtroPopEver, new Color[] {Color.blue, Color.green}) ;
 		}
 		
 		repaint() ;

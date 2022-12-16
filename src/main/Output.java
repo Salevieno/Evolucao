@@ -1,4 +1,4 @@
-package Output ;
+package main ;
 
 import java.io.BufferedWriter ;
 import java.io.FileWriter ;
@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList ;
 
-public abstract class Results 
+public abstract class Output 
 {
 	public static void SaveInputFile(String filename, String var1, String var2)
 	{
@@ -69,4 +69,13 @@ public abstract class Results
             System.out.println("Error writing to file '" + fileName + "'") ;
         }
 	}	
+
+	public static void UpdateOutputFile(String fileName, Records RE)
+	{
+		ClearFile(fileName) ;
+		ArrayList<ArrayList<Double>> recordsPop = new ArrayList<>() ;
+		ArrayList<Double> artrosPopAsDoubleList = RE.ArrayListToDouble(RE.artrosPopAtNRounds) ;
+		recordsPop.add(artrosPopAsDoubleList) ;
+		SaveOutputFile(fileName, recordsPop) ;
+	}
 }
