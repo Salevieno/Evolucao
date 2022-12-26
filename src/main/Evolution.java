@@ -3,7 +3,6 @@ package main;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -24,7 +23,6 @@ import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
 
@@ -42,11 +40,10 @@ import graphics.Canva;
 import graphics.DrawingOnAPanel;
 
 
-public class Evolution extends JFrame
+public class Evolution extends JPanel
 {
 	private static final long serialVersionUID = 1L;
 	private static Container container;
-	private static JPanel mainJPanel;
 	
 	private boolean simulationIsRunning ;
 	private boolean graphsAreVisible ;
@@ -69,22 +66,16 @@ public class Evolution extends JFrame
 
 	//public static Color[] colorPalette ;	// colors used
 	
-	public Evolution()
+	public Evolution(Dimension frameDimension)
 	{
-		// initialize the JPanel and puts it inside the JFrame
+		// initialize the JPanel
 		InitializeJPanel();
-		
-		
-		// initialize container
-		container = getContentPane();
-		FlowLayout layout = new FlowLayout() ;
-		layout.setAlignment(FlowLayout.LEFT) ;
-		container.setLayout(layout) ;
+		this.setPreferredSize(frameDimension);
 		
 		
 		// initialize global variables
 		//colorPalette = UtilS.ColorPalette(0) ;
-		AddButtons() ;
+		//AddButtons() ;
 		roundDuration = 8 ;
 		simulationIsRunning = true ;
 		graphsAreVisible = true ;
@@ -113,21 +104,18 @@ public class Evolution extends JFrame
 		Output.ClearFile("Results.txt") ;		
 		
 		
-		// set up super frame
-		setTitle("Evolution");	// Sets super frame title
-		setSize(900, 550);		// Sets super frame window size
-		setVisible(true);		// Shows super frame
 	}	
 	
 	
 	
 	private void InitializeJPanel() 
 	{
-        mainJPanel = new MyJPanel(this.getSize());			// creates a personalized JPanel
-        mainJPanel.setBackground(new Color(250, 240, 220));					// set background color
-        mainJPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));	// set panel border
+		JPanel panel = this;
+       // mainJPanel = new MyJPanel(this.getSize());			// creates a personalized JPanel
+        panel.setBackground(new Color(250, 240, 220));	// set background color
+        panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));	// set panel border
         
-        mainJPanel.addMouseListener(new MouseAdapter() 
+        panel.addMouseListener(new MouseAdapter() 
         {
 			public void mousePressed(MouseEvent evt)
 			{
@@ -138,14 +126,14 @@ public class Evolution extends JFrame
 
 		    }
 		});
-        mainJPanel.addMouseMotionListener(new MouseMotionAdapter() 
+        panel.addMouseMotionListener(new MouseMotionAdapter() 
         {
             public void mouseDragged(MouseEvent evt) 
             {
 
             }
         });
-        mainJPanel.addMouseWheelListener(new MouseWheelListener()
+        panel.addMouseWheelListener(new MouseWheelListener()
         {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent evt) 
@@ -153,7 +141,7 @@ public class Evolution extends JFrame
 				
 			}       	
         });
-        mainJPanel.addKeyListener(new KeyListener()
+        panel.addKeyListener(new KeyListener()
         {
 			@Override
 			public void keyPressed(KeyEvent evt)
@@ -179,9 +167,9 @@ public class Evolution extends JFrame
 			}        	
         });
         
-        this.setContentPane(mainJPanel);	// adds the component to the frame
+        /*this.setContentPane(mainJPanel);	// adds the component to the frame
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	// sets "close on x" behavior
-        pack();
+        pack();*/
     }
 	
 	
@@ -193,7 +181,6 @@ public class Evolution extends JFrame
 		ImageIcon graphsIcon = new ImageIcon(imagesPath + "GraphsIcon.png");
 		
 		/* Defining Buttons */
-		Color BGColor = Color.blue ;
 		JButton playButton = UtilS.AddButton("", playIcon, new int[2], new Dimension(30, 30), null);
 		JButton graphsButton = UtilS.AddButton("", graphsIcon, new int[2], new Dimension(30, 30), null);
 		JButton saveButton = UtilS.AddButton("Save", null, new int[2], new Dimension(30, 30), null);
@@ -531,8 +518,15 @@ public class Evolution extends JFrame
 		repaint() ;
 	}
 	
-	
-	public class MyJPanel extends JPanel
+    @Override
+    public void paintComponent(Graphics g) 
+    {
+        super.paintComponent(g);
+        DP = new DrawingOnAPanel(g);
+        RunSimulation() ;
+    }
+    
+	/*public class MyJPanel extends JPanel
 	{
 		private static final long serialVersionUID = 1L;
 		
@@ -544,9 +538,10 @@ public class Evolution extends JFrame
 	    @Override
 	    public void paintComponent(Graphics g) 
 	    {
+	    	System.out.println("repainting");
 	        super.paintComponent(g);
 	        DP = new DrawingOnAPanel(g);
 	        RunSimulation() ;
 	    }
-	}
+	}*/
 }
