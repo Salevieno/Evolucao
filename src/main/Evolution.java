@@ -84,9 +84,9 @@ public class Evolution extends JPanel
 		
 		
 		// create canva
-		Point canvaPos = new Point(100, 5) ;
-		Dimension canvaSize = new Dimension(500, 500) ;
-		Dimension canvaDimension = new Dimension(500, 500) ;
+		Point canvaPos = new Point(40, 5) ;
+		Dimension canvaSize = new Dimension(420, 420) ;
+		Dimension canvaDimension = new Dimension(420, 420) ;
 		mainCanva = new Canva(canvaPos, canvaSize, canvaDimension) ;		
 
 		
@@ -476,7 +476,7 @@ public class Evolution extends JPanel
 		
 		
 		// color-coding the artros based on their will for debugging purposes
-		if (0 < artros.size())
+		/*if (0 < artros.size())
 		{
 			for (Artro artro : artros)
 			{
@@ -499,7 +499,7 @@ public class Evolution extends JPanel
 				DP.DrawCircle(drawingPos, artro.getSpecies().getSize() / 2, null, color) ;
 			
 			} 			
-		}
+		}*/
 		
 		if (simulationIsRunning)
 		{
@@ -508,7 +508,7 @@ public class Evolution extends JPanel
 		
 		if (graphsAreVisible)
 		{
-			Point graphPos = new Point(650, 150) ;
+			Point graphPos = new Point(500, 150) ;
 			ArrayList<ArrayList<Double>> recordsPop = new ArrayList<>() ;
 			ArrayList<Double> artrosPopAsDoubleList = RE.ArrayListToDouble(RE.artrosPop) ;
 			recordsPop.add(artrosPopAsDoubleList) ;

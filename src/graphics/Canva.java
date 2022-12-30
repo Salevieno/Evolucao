@@ -25,6 +25,6 @@ public class Canva
 	
 	public void Display(DrawingOnAPanel DP)
 	{
-		DP.DrawRect(pos, "TopLeft", size, 2, new Color(10, 30, 40), Color.blue) ;
+		DP.DrawRect(pos, "TopLeft", size, 2, new Color(60, 100, 60), Color.blue) ;
 	}
 }
