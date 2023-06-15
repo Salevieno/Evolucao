@@ -446,10 +446,10 @@ public class Evolution extends JPanel
 			
 			RecordArtrosPop() ;
 		}
-		if (round % foodRespawnTime == 0 & food.size() < maxNumberFood)
-		{
-			CreateFood() ;
-		}
+//		if (round % foodRespawnTime == 0 & food.size() < maxNumberFood)
+//		{
+//			CreateFood() ;
+//		}
 		
 		for (Food food : food)
 		{
