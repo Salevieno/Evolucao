@@ -14,14 +14,14 @@ import java.util.ArrayList;
 
 import main.UtilS;
 
-public class DrawingOnAPanel
+public class DrawingOnPanel
 {
     Font stdFont = new Font("SansSerif", Font.PLAIN, 20);
 	Font boldStdFont = new Font("SansSerif", Font.BOLD, 20);
 	int stdStroke = 1;
 	private Graphics2D G;
 	
-	public DrawingOnAPanel(Graphics g)
+	public DrawingOnPanel(Graphics g)
 	{
 		G = (Graphics2D) g;
 	}	
@@ -33,8 +33,17 @@ public class DrawingOnAPanel
 	{
 		
 	}   
+
 	
 	
+	public Graphics2D getG()
+	{
+		return G;
+	}
+	public void setG(Graphics2D g)
+	{
+		G = g;
+	}
 	// primitive functions
 	public void DrawText(Point pos, String alignment, double angle, String text, Font font, Color color)
 	{

@@ -19,4 +19,26 @@ public class Records
 	{
 		return (ArrayList<Double>) originalArray.clone() ;
 	}
+	
+	public void RecordArtrosPop(int currentPop)
+	{
+		int maxNumberRegisters = 1000 ;
+		
+		// update maximum number of artros ever registered
+		if (maxArtroPopEver < currentPop)
+		{
+			maxArtroPopEver = currentPop ;
+		}
+		
+		// update the latest registers to show in the graph
+		if (artrosPop.size() <= maxNumberRegisters - 1)
+		{
+			artrosPop.add(currentPop) ;
+		}
+		else
+		{
+			artrosPop.remove(0) ;
+			artrosPop.add(currentPop) ;
+		}
+	}
 }

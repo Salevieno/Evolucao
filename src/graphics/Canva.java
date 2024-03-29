@@ -23,7 +23,7 @@ public class Canva
 	public Dimension getSize() {return size ;}
 	public Dimension getDimension() {return dim ;}
 	
-	public void Display(DrawingOnAPanel DP)
+	public void display(DrawingOnPanel DP)
 	{
 		DP.DrawRect(pos, "TopLeft", size, 2, new Color(10, 30, 40), Color.blue) ;
 	}

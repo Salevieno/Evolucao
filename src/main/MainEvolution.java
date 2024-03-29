@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 
 import javax.swing.JFrame ;
+import javax.swing.JPanel;
 
 /**
  * Made with love by Salevieno
@@ -16,20 +17,34 @@ public class MainEvolution extends JFrame
 {
 	private static final long serialVersionUID = 1L ;
 
+	
 	public static void main (String[] args) 
 	{
 		Dimension screenDimension = new Dimension(640, 480) ;
 		
-		JFrame frame = new JFrame("Jogo de 1 dia") ;
-		frame.setTitle("Evolution") ;
+		// creating frame and setting size
+		JFrame frame = new JFrame("Evolution") ;
 		frame.setSize(screenDimension) ;
-		frame.add(new Evolution(screenDimension)) ;
+		
+		// creating and setting layout
+		FlowLayout layout = new FlowLayout(FlowLayout.LEFT, 0, 0) ;
+		
+		// adding layout to container
+		Container container = frame.getContentPane();
+		container.setLayout(layout) ;
+		
+		// creating panels and adding to frame
+		ButtonsPanel buttonsPanel = new ButtonsPanel(screenDimension) ;
+		GraphsPanel graphsPanel = new GraphsPanel(screenDimension) ;
+		Evolution canvaPanel = new Evolution(screenDimension) ;
+		frame.add(buttonsPanel) ;
+		frame.add(graphsPanel) ;
+		frame.add(canvaPanel) ;
+		
+		// final frame settings
 		frame.setVisible(true) ;
 		frame.setDefaultCloseOperation(EXIT_ON_CLOSE) ;
 		
-		Container container = frame.getContentPane();
-		FlowLayout layout = new FlowLayout() ;
-		layout.setAlignment(FlowLayout.LEFT) ;
-		container.setLayout(layout) ;
+		new Simulation(buttonsPanel, graphsPanel, canvaPanel) ;
 	}
 }

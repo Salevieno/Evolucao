@@ -14,7 +14,7 @@ import java.util.Arrays;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
-import graphics.DrawingOnAPanel;
+import graphics.DrawingOnPanel;
 import graphics.Visuals;
 /*
 public class EvolutionOld extends JFrame

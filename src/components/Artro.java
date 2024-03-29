@@ -2,12 +2,12 @@ package components;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import graphics.Canva;
-import graphics.DrawingOnAPanel;
-import main.Evolution;
+import graphics.DrawingOnPanel;
 import main.UtilS;
 
 public class Artro
@@ -102,7 +102,7 @@ public class Artro
 		return acceptedDirections ;
 	}
 	
-	public Food FindFoodInRange(ArrayList<Food> allFood, int range)
+	public Food FindFoodInRange(List<Food> allFood, int range)
 	{
 		if (0 < allFood.size())
 		{
@@ -118,7 +118,7 @@ public class Artro
 		return null ;
 	}
 	
-	public Food FindClosestVisibleFood(ArrayList<Food> allFood)
+	public Food FindClosestVisibleFood(List<Food> allFood)
 	{
 		Food closestFood = null ;
 		if (0 < allFood.size())
@@ -138,7 +138,7 @@ public class Artro
 		return closestFood ;
 	}
 	
-	public Artro FindClosestVisibleMate(ArrayList<Artro> allArtros)
+	public Artro FindClosestVisibleMate(List<Artro> allArtros)
 	{
 		Artro closestMate = null ;
 		if (0 < allArtros.size())
@@ -223,7 +223,7 @@ public class Artro
 		}
 	}
 	
-	public void Mate(Artro mate, ArrayList<Artro> allArtros)
+	public void Mate(Artro mate, List<Artro> allArtros)
 	{
 		Point newPos = new Point((pos.x + mate.getPos().x) / 2, (pos.y + mate.getPos().y) / 2) ;
 		int newAge = 0 ;
@@ -237,10 +237,31 @@ public class Artro
 		sexWill = 0 ;
 		mate.setSexWill(0) ;
 	}
+
+	
+	public static Artro FindClosestOpponent(Artro artro)
+	{
+	    Artro closestOpponent = null;
+	    /*double minDist = artro.getSpecies().getVision();
+	    if (artrosInQuadrant.get(artro.getQuadrant()) != null)
+	    {
+		    for (int i = 0; i <= artrosInQuadrant.get(artro.getQuadrant()).size() - 1; i += 1)
+	        {
+		    	Artro opponent = artrosInQuadrant.get(artro.getQuadrant()).get(i);
+		    	double opponentDist = UtilS.dist(artro.getPos(), opponent.getPos());
+	            if (opponent != artro & opponent.getSpecies() == artro.getSpecies() & opponentDist < minDist & opponentDist <= artro.getSpecies().getVision())
+	            {
+	                closestOpponent = opponent;
+	            }
+	        }
+	    }*/
+	    
+        return closestOpponent;
+	}
 	
 	public void Thinks()
 	{
-		Artro closestOpponent = Evolution.FindClosestOpponent(this) ;
+		Artro closestOpponent = FindClosestOpponent(this) ;
 		
 		/*if (will.equals("fight") & closestOpponent == -1)
         {
@@ -353,7 +374,7 @@ public class Artro
 	    }
 	}
 	
-	public void Acts(Canva canva, ArrayList<Food> allFood, ArrayList<Artro> allArtros)
+	public void Acts(Canva canva, List<Food> allFood, List<Artro> allArtros)
 	{
 		switch(will)
 		{
@@ -404,7 +425,7 @@ public class Artro
 		}
 	}
 	
-	public void Display(Canva canva, DrawingOnAPanel DP)
+	public void display(Canva canva, DrawingOnPanel DP)
 	{
 		Point drawingPos = UtilS.ConvertToDrawingCoords(pos, canva.getPos(), canva.getSize(), canva.getDimension()) ;
 		if (will.equals(ArtroChoices.fight))

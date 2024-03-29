@@ -15,7 +15,7 @@ import javax.swing.JButton;
 public abstract class UtilS 
 {
 
-	public static JButton AddButton(String text, ImageIcon icon, int[] alignment, Dimension size, Color color)
+	public static JButton createButton(String text, ImageIcon icon, int[] alignment, Dimension size, Color color)
 	{
 		JButton newButton = new JButton();
 		if (text != null)
