@@ -2,19 +2,55 @@ package main;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
+import org.json.simple.parser.JSONParser;
+
 public abstract class UtilS 
 {
 
+	public static Object ReadJson(String filePath)
+	{
+		JSONParser parser = new JSONParser();
+        try
+        {
+            Object jsonData = parser.parse(new FileReader(filePath));
+            return jsonData ;
+        }
+        catch(FileNotFoundException fe)
+        {
+            fe.printStackTrace();
+            return null ;
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return null ;
+        }
+	}
+	
+	public static Image loadImage(String filePath)
+	{
+		Image image = new ImageIcon(filePath).getImage() ;
+		if (image.getWidth(null) != -1 & image.getHeight(null) != -1)
+		{
+			return image ;
+		}
+		else
+		{
+			System.out.println("Image not found at " + filePath);
+			return null ;
+		}
+	}
+	
 	public static JButton createButton(String text, ImageIcon icon, int[] alignment, Dimension size, Color color)
 	{
 		JButton newButton = new JButton();

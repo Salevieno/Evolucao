@@ -5,8 +5,6 @@ import java.awt.Graphics;
 
 import javax.swing.JPanel;
 
-import main.Evolution;
-
 public class MyJPanel extends JPanel
 {
 	private static final long serialVersionUID = 1L;

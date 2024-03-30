@@ -11,6 +11,7 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.List;
 
 import main.UtilS;
 
@@ -47,6 +48,7 @@ public class DrawingOnPanel
 	// primitive functions
 	public void DrawText(Point pos, String alignment, double angle, String text, Font font, Color color)
 	{
+		// TODO alignment is not doing anything
 		// Rectangle by default starts at the left bottom
 		//int TextL = UtilG.TextL(Text, font, G), TextH = UtilG.TextH(font.getSize()) ;
 		//int[] offset = UtilG.OffsetFromPos(Alignment, TextL, TextH) ;
@@ -118,7 +120,7 @@ public class DrawingOnPanel
 		}
 	}*/
     
-    public void DrawPolyLine(ArrayList<Integer> x, ArrayList<Integer> y, int thickness, Color color)
+    public void DrawPolyLine(List<Integer> x, List<Integer> y, int thickness, Color color)
     {
     	int[] xCoords = new int [x.size()] ;
     	int[] yCoords = new int [y.size()] ;
@@ -263,6 +265,10 @@ public class DrawingOnPanel
 			}
 	        G.setTransform(backup);
 		}
+	}
+	public void DrawImage(Image image, Point pos)
+	{
+		G.drawImage(image, pos.x - image.getWidth(null) / 2, pos.y - image.getHeight(null) / 2, image.getWidth(null), image.getHeight(null), null);
 	}
     /*public void DrawText(Point pos, String Text, String Alignment, float angle, String Style, int size, Color color)
     {

@@ -7,14 +7,19 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList ;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class Output 
 {
-	public static void SaveInputFile(String filename, String var1, String var2)
+	
+	private static final String fileName = "Results.txt" ;
+	
+	public static void SaveInputFile(String var1, String var2)
 	{
 		try
 		{	
-			FileWriter fileWriter = new FileWriter (filename + ".txt") ;
+			FileWriter fileWriter = new FileWriter (fileName + ".txt") ;
 			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter) ; 
 			
 			// Section 1
@@ -31,11 +36,11 @@ public abstract class Output
 		}		
 		catch(IOException ex) 
 		{
-            System.out.println("Error writing to file '" + filename + "'") ;
+            System.out.println("Error writing to file '" + fileName + "'") ;
         }
 	}	
 	
-	public static void ClearFile(String fileName)
+	public static void ClearFile()
 	{
 		try
 		{	
@@ -47,7 +52,7 @@ public abstract class Output
         }
 	}
 	
-	public static void SaveOutputFile(String fileName, ArrayList<ArrayList<Double>> popHist)
+	public static void SaveOutputFile(List<List<Double>> popHist)
 	{
 		try
 		{	
@@ -70,12 +75,12 @@ public abstract class Output
         }
 	}	
 
-	public static void UpdateOutputFile(String fileName, Records RE)
+	public static void UpdateOutputFile()
 	{
-		ClearFile(fileName) ;
-		ArrayList<ArrayList<Double>> recordsPop = new ArrayList<>() ;
-		ArrayList<Double> artrosPopAsDoubleList = RE.ArrayListToDouble(RE.artrosPopAtNRounds) ;
+		ClearFile() ;
+		List<List<Double>> recordsPop = new ArrayList<>() ;
+		List<Double> artrosPopAsDoubleList = Records.artrosPopAtNRounds.stream().map(i -> (double) i).collect(Collectors.toList()) ;
 		recordsPop.add(artrosPopAsDoubleList) ;
-		SaveOutputFile(fileName, recordsPop) ;
+		SaveOutputFile(recordsPop) ;
 	}
 }

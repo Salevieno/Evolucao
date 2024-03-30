@@ -1,44 +1,63 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class Records
+public abstract class Records
 {
-	public ArrayList<Integer> artrosPop ;	// number of artros at any given time
-	public int maxArtroPopEver ;	// maximum number of artros that ever lived simultaneously 
-	public ArrayList<Integer> artrosPopAtNRounds ;	// number of artros recorded every N rounds
+	public static List<Integer> artrosPop ;	// number of artros at any given time
+	public static int maxArtroPopEver ;	// maximum number of artros that ever lived simultaneously 
+	public static List<Integer> fpsList ;
+	public static int maxFPSEver ;
+	public static List<Integer> artrosPopAtNRounds ;	// number of artros recorded every N rounds
+	private static final int maxNumberRegisters = 1000 ;
 	
-	public Records()
+	static
 	{
 		artrosPop = new ArrayList<>() ;
+		fpsList = new ArrayList<>() ;
 		maxArtroPopEver = 0 ;
 		artrosPopAtNRounds = new ArrayList<>() ;
 	}
 	
-	public ArrayList<Double> ArrayListToDouble(ArrayList<Integer> originalArray)
+	public static void updatePop(int currentPop)
 	{
-		return (ArrayList<Double>) originalArray.clone() ;
+		updateMaxPopEver(currentPop) ;
+		addIfNumberAllows(artrosPop, currentPop) ;
 	}
 	
-	public void RecordArtrosPop(int currentPop)
+	public static void updateFPS(int fps)
 	{
-		int maxNumberRegisters = 1000 ;
-		
-		// update maximum number of artros ever registered
+		updateMaxFPSEver(fps) ;
+		addIfNumberAllows(fpsList, fps) ;
+	}
+	
+	private static void updateMaxFPSEver(int fps)
+	{
+		if (maxFPSEver < fps)
+		{
+			maxFPSEver = fps ;
+		}
+	}
+	
+	private static void updateMaxPopEver(int currentPop)
+	{
 		if (maxArtroPopEver < currentPop)
 		{
 			maxArtroPopEver = currentPop ;
 		}
-		
-		// update the latest registers to show in the graph
-		if (artrosPop.size() <= maxNumberRegisters - 1)
+	}
+	
+	private static void addIfNumberAllows(List<Integer> record, int newRecord)
+	{
+		if (record.size() <= maxNumberRegisters - 1)
 		{
-			artrosPop.add(currentPop) ;
+			record.add(newRecord) ;
 		}
 		else
 		{
-			artrosPop.remove(0) ;
-			artrosPop.add(currentPop) ;
+			record.remove(0) ;
+			record.add(newRecord) ;
 		}
 	}
 }

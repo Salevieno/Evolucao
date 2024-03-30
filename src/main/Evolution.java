@@ -1,160 +1,117 @@
 package main;
 
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.util.List;
-
-import javax.swing.JPanel;
 
 import components.Artro;
 import components.Food;
-import graphics.Canva;
-import graphics.DrawingOnPanel;
+import components.FoodType;
+import components.Species;
+import panels.CanvaPanel;
+import panels.GraphsPanel;
 
-
-public class Evolution extends JPanel
+public class Evolution
 {
-	private static final long serialVersionUID = 1L;
-
-	private DrawingOnPanel DP;	// class with the drawing methods
-
-	private Canva mainCanva ;
-
-	//public static Color[] colorPalette ;	// colors used
 	
-	public Evolution(Dimension frameDimension)
-	{
-		
-		// initialize the JPanel
-		InitializeJPanel(frameDimension);	
-		
-		// create canva
-		Point canvaPos = new Point(100, 5) ;
-		Dimension canvaSize = new Dimension(500, 500) ;
-		Dimension canvaDimension = new Dimension(500, 500) ;
-		mainCanva = new Canva(canvaPos, canvaSize, canvaDimension) ;	
-		
-		DP = new DrawingOnPanel(null) ;
-	}		
+	private static int round ;		// number of the current iteration
+	
+	private static int foodRespawnTime ;	// time taken for the food to respawn (counted in number of rounds)
+	private static int maxNumberFood ;	// maximum amount of food that can exist at any given time
+	
+	private static boolean isRunning ;
+	
+	private static List<Artro> artros ;
+	private static List<Food> food ;
 	
 	
-	public Canva getMainCanva()
+	public Evolution()
 	{
-		return mainCanva;
+		round = 0 ;
+		
+		foodRespawnTime = 20 ;
+		maxNumberFood = 200 ;
+		
+		// load input
+		Species.load() ;
+		artros = Artro.load() ;
+		FoodType.load() ;
+		food = Food.load() ;	
+		
+		// clear results file
+		Output.ClearFile() ;
+		
+		isRunning = true ;
 	}
-
-
-	public DrawingOnPanel getDP()
+	
+	public static void run()
 	{
-        System.out.println(DP.getG());
-		return DP;
-	}
-
-	public void displayCanva()
-	{
-		mainCanva.display(DP) ;
-	}
-
-	public void displayArtros(List<Artro> artros)
-	{
-		for (Artro artro : artros)
+		artrosAct() ;
+		
+		if (round % foodRespawnTime == 0 & food.size() < maxNumberFood)
 		{
-			artro.display(mainCanva, DP) ;
-		} 
-	}
+			CreateFood() ;
+		}
+//		if (round % 7992 == 0)
+//		{
+//			saveRecords() ;
+//		}
 
-	public void displayFood(List<Food> foods)
-	{
-		for (Food food : foods)
+		Records.updatePop(artros.size()) ;
+		GraphsPanel.updateRecords() ;
+		
+		if (isRunning)
 		{
-			food.display(mainCanva, DP) ;
+			round += 1 ;
+		}
+
+	}
+	
+	public static void artrosAct()
+	{
+		for (int i = 0 ; i <= artros.size() - 1 ; i += 1)
+		{				
+			Artro artro = artros.get(i) ;
+			artro.Thinks() ;
+			artro.Acts(CanvaPanel.getCanvaDimension(), food, artros) ;
+			artro.IncHunger() ;
+			artro.IncMateWill() ;
+				
+			if (artro.getLife() == 0)
+			{
+				artros.remove(artro) ;
+			}
+			
 		}
 	}
-
-	private void InitializeJPanel(Dimension frameDimension) 
+	
+	public static void saveRecords()
 	{
-		JPanel panel = this;
-       // mainJPanel = new MyJPanel(this.getSize());			// creates a personalized JPanel
-        panel.setBackground(new Color(250, 240, 220));	// set background color
-        panel.setPreferredSize(new Dimension (frameDimension.width - 120, frameDimension.height - 40));	
-        //panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));	// set panel border
-        
-        panel.addMouseListener(new MouseAdapter() 
-        {
-			public void mousePressed(MouseEvent evt)
+		int saveEveryNRounds = 10 ;
+		for (int i = 0 ; i <= Records.artrosPop.size() - 1; i += 1)
+		{
+			if (i % saveEveryNRounds == 0)
 			{
-				
+				Records.artrosPopAtNRounds.add(Records.artrosPop.get(i)) ;
 			}
-			public void mouseReleased(MouseEvent evt) 
-			{
+		}
 
-		    }
-		});
-        panel.addMouseMotionListener(new MouseMotionAdapter() 
-        {
-            public void mouseDragged(MouseEvent evt) 
-            {
+		Output.UpdateOutputFile() ;
+	}
 
-            }
-        });
-        panel.addMouseWheelListener(new MouseWheelListener()
-        {
-			@Override
-			public void mouseWheelMoved(MouseWheelEvent evt) 
-			{
-				
-			}       	
-        });
-        panel.addKeyListener(new KeyListener()
-        {
-			@Override
-			public void keyPressed(KeyEvent evt)
-			{
-				int key = evt.getKeyCode();
-				System.out.println(1);
-				if (key == KeyEvent.VK_ESCAPE)
-				{
-					
-				}
-			}
-
-			@Override
-			public void keyReleased(KeyEvent evt)
-			{
-				
-			}
-
-			@Override
-			public void keyTyped(KeyEvent evt)
-			{
-				
-			}        	
-        });
-        
-        /*this.setContentPane(mainJPanel);	// adds the component to the frame
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	// sets "close on x" behavior
-        pack();*/
-    }
-		
+	public static List<Artro> getArtros() { return artros ;}
+	public static List<Food> getFood() { return food ;}
+	public static boolean isRunning() { return isRunning ;}
 	
+	public static void switchIsRunning() { isRunning = !isRunning ;}
 	
-    @Override
-    public void paintComponent(Graphics g) 
-    {
-        super.paintComponent(g);
-        DP.setG((Graphics2D) g) ;
-        
-        displayCanva() ;
-        System.out.println(DP.getG());
-    }
+	public static void CreateFood()
+	{
+		Point centerOfCreation = new Point(1000, 1000) ;
+		Dimension rangeOfCreation = new Dimension(500, 500) ;
+		Point pos = UtilS.RandomPosAroundPoint(centerOfCreation, rangeOfCreation) ;
+		FoodType type = FoodType.getAll().get(0) ;
+		food.add(new Food(pos, type)) ;
+	}
+
 }

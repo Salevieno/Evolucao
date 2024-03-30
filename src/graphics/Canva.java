@@ -4,13 +4,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 
-import main.Evolution;
-
 public class Canva
 {
 	Point pos ;
 	Dimension size ;
 	Dimension dim ;
+	
+	private static final Color bgColor = new Color(30, 30, 40) ;
 	
 	public Canva(Point pos, Dimension size, Dimension dim)
 	{
@@ -25,6 +25,6 @@ public class Canva
 	
 	public void display(DrawingOnPanel DP)
 	{
-		DP.DrawRect(pos, "TopLeft", size, 2, new Color(60, 100, 60), Color.blue) ;
+		DP.DrawRect(pos, "TopLeft", size, 2, bgColor, Color.black) ;
 	}
 }

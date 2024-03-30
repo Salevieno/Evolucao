@@ -1,11 +1,13 @@
 package main ;
 
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 
 import javax.swing.JFrame ;
-import javax.swing.JPanel;
+
+import panels.ButtonsPanel;
+import panels.CanvaPanel;
+import panels.GraphsPanel;
 
 /**
  * Made with love by Salevieno
@@ -16,35 +18,36 @@ import javax.swing.JPanel;
 public class MainEvolution extends JFrame
 {
 	private static final long serialVersionUID = 1L ;
-
 	
-	public static void main (String[] args) 
+	public static final Dimension screenSize = new Dimension(640, 480) ;
+
+	public MainEvolution()
 	{
-		Dimension screenDimension = new Dimension(640, 480) ;
 		
 		// creating frame and setting size
-		JFrame frame = new JFrame("Evolution") ;
-		frame.setSize(screenDimension) ;
+		this.setTitle("Evolution");
+		this.setSize(screenSize) ;
+		this.setLocation(250, 150) ;
 		
 		// creating and setting layout
 		FlowLayout layout = new FlowLayout(FlowLayout.LEFT, 0, 0) ;
+		this.getContentPane().setLayout(layout) ;
 		
-		// adding layout to container
-		Container container = frame.getContentPane();
-		container.setLayout(layout) ;
+		new Evolution() ;
 		
 		// creating panels and adding to frame
-		ButtonsPanel buttonsPanel = new ButtonsPanel(screenDimension) ;
-		GraphsPanel graphsPanel = new GraphsPanel(screenDimension) ;
-		Evolution canvaPanel = new Evolution(screenDimension) ;
-		frame.add(buttonsPanel) ;
-		frame.add(graphsPanel) ;
-		frame.add(canvaPanel) ;
+		this.add(new ButtonsPanel(screenSize)) ;
+		this.add(GraphsPanel.getPanel()) ;
+		this.add(new CanvaPanel(screenSize)) ;
 		
 		// final frame settings
-		frame.setVisible(true) ;
-		frame.setDefaultCloseOperation(EXIT_ON_CLOSE) ;
+		this.setVisible(true) ;
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE) ;
 		
-		new Simulation(buttonsPanel, graphsPanel, canvaPanel) ;
+	}
+	
+	public static void main (String[] args) 
+	{
+		new MainEvolution() ;
 	}
 }

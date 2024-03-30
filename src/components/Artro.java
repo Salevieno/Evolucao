@@ -1,10 +1,15 @@
 package components;
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import graphics.Canva;
 import graphics.DrawingOnPanel;
@@ -79,10 +84,10 @@ public class Artro
 		}		
 	}
 	
-	public ArrayList<Directions> AcceptedDiretions(Canva canva)
+	public List<Directions> AcceptedDiretions(Dimension canvaSize)
 	{
-		ArrayList<Directions> acceptedDirections = new ArrayList<>() ;
-		if (pos.x + species.getStep() <= canva.getDimension().width)
+		List<Directions> acceptedDirections = new ArrayList<>() ;
+		if (pos.x + species.getStep() <= canvaSize.width)
 		{
 			acceptedDirections.add(Directions.right) ;
 		}
@@ -90,7 +95,7 @@ public class Artro
 		{
 			acceptedDirections.add(Directions.left) ;
 		}
-		if (pos.y + species.getStep() <= canva.getDimension().height)
+		if (pos.y + species.getStep() <= canvaSize.height)
 		{
 			acceptedDirections.add(Directions.up) ;
 		}
@@ -227,7 +232,7 @@ public class Artro
 	{
 		Point newPos = new Point((pos.x + mate.getPos().x) / 2, (pos.y + mate.getPos().y) / 2) ;
 		int newAge = 0 ;
-		Map<ArtroChoices,Double> newTendency = tendency ;
+		Map<ArtroChoices, Double> newTendency = tendency ;
 		int newSatiation = (satiation + mate.getSatiation()) / 2 ;
 		ArtroChoices newWill = ArtroChoices.exist ;
 		int newSexWill = 0 ;
@@ -308,18 +313,18 @@ public class Artro
         }	
 	}
 	
-	public void Wander(Canva canva)
+	public void Wander(Dimension canvaDimension)
 	{
 		if (UtilS.chance(0.1))
 		{
 			direction = RandomDirection() ;
 		}
-		Move(canva) ;
+		Move(canvaDimension) ;
 	}
 	
-	public void Move(Canva canva)
+	public void Move(Dimension canvaDimension)
 	{
-		ArrayList<Directions> acceptedDirections = AcceptedDiretions(canva) ;
+		List<Directions> acceptedDirections = AcceptedDiretions(canvaDimension) ;
 		if (!acceptedDirections.contains(direction))
 		{
 			direction = acceptedDirections.get( (int) (acceptedDirections.size() * Math.random()) ) ;
@@ -374,7 +379,7 @@ public class Artro
 	    }
 	}
 	
-	public void Acts(Canva canva, List<Food> allFood, List<Artro> allArtros)
+	public void Acts(Dimension canvaDimension, List<Food> allFood, List<Artro> allArtros)
 	{
 		switch(will)
 		{
@@ -391,10 +396,11 @@ public class Artro
 				}
 				else
 				{
-					Move(canva) ;
+					Move(canvaDimension) ;
 				}
 				
 				break ;
+				
 			case mate:
 				Artro closestMate = FindClosestVisibleMate(allArtros) ;
 				if (closestMate != null)
@@ -407,14 +413,16 @@ public class Artro
 				}
 				else
 				{
-					Wander(canva) ;
+					Wander(canvaDimension) ;
 				}
 				
 				break ;
+				
 			case wander:
-				Wander(canva) ;
+				Wander(canvaDimension) ;
 				
 				break ;
+				
 			case exist:
 				
 				break ;
@@ -434,17 +442,57 @@ public class Artro
 		}
 		else
 		{
-			DP.DrawCircle(drawingPos, species.getSize(), null, species.getColor()) ;
+			DP.DrawImage(species.getImage(), drawingPos) ;
 		}
 	}
 
+
+	public static List<Artro> load()
+	{
+		// read input file
+		Object data = UtilS.ReadJson("Artros.json") ;
+        
+        //convert Object to JSONArray
+        JSONArray jsonArray= (JSONArray)data;
+		
+		// create artros
+        List<Artro> artros = new ArrayList<>() ;
+        for (int i = 0 ; i <= jsonArray.size() - 1; i += 1)
+        {
+        	JSONObject jsonObject = (JSONObject) jsonArray.get(i) ;
+            JSONArray centerArray= (JSONArray)jsonObject.get("Center");
+            JSONArray rangeArray= (JSONArray)jsonObject.get("Range");
+            Point center = new Point((int)(long)centerArray.get(0), (int)(long)centerArray.get(1)) ;
+    		Dimension range = new Dimension((int)(long)rangeArray.get(0), (int)(long)rangeArray.get(1)) ;
+    		int numberArtros = (int)(long)jsonObject.get("Amount") ;
+    		for (int j = 0 ; j <= numberArtros - 1 ; j += 1)
+    		{
+    			Point pos = UtilS.RandomPosAroundPoint(center, range) ;
+    			int speciesID = (int)(long)jsonObject.get("SpeciesID");
+    			Species sp = Species.getAll().get(speciesID) ;
+    			int minSatiation = (int)(long)jsonObject.get("MinSatiation");
+    			int satiation = (int) (minSatiation + (sp.getStomach() - minSatiation) * Math.random()) ;
+                JSONArray tendArray= (JSONArray)jsonObject.get("Tendencies");
+    			Map<ArtroChoices, Double> tendency = new HashMap<>() ;
+    			tendency.put(ArtroChoices.eat, (int)(long)tendArray.get(0) / 100.0) ;
+    			tendency.put(ArtroChoices.mate, (int)(long)tendArray.get(1) / 100.0) ;
+    			tendency.put(ArtroChoices.wander, (int)(long)tendArray.get(2) / 100.0) ;
+    			int minSexWill = (int)(long)jsonObject.get("MinSexWill");
+    			int sexWill = (int) (minSexWill + (sp.getMatePoint() - minSexWill) * Math.random()) ;
+    			
+    			Artro newArtro = new Artro(100, pos, 0, sp, tendency, false, satiation, ArtroChoices.exist, sexWill, Directions.up) ;
+    			artros.add(newArtro) ;
+    		}
+    	}
+        
+        return artros ;
+	}
 	
 	@Override
 	public int hashCode() {
 		return Objects.hash(age, direction, keepChoice, life, pos, satiation, sexWill, species, tendency, will);
 	}
 	
-
 	@Override	
 	public boolean equals(Object obj) {
 		if (this == obj)
