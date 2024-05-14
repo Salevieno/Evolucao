@@ -6,14 +6,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import graphics.Canva;
-import graphics.DrawingOnPanel;
+import graphics.DrawPrimitives;
+import libUtil.Align;
+import libUtil.Util;
 import main.UtilS;
+import panels.CanvaPanel;
 
 public class Artro
 {
@@ -26,32 +29,37 @@ public class Artro
 	private int satiation ;			// amount of food in the artro's stomach, if it reaches 0, the artro dies
 	private ArtroChoices will ;		// what the artro wants to do right now
 	private int sexWill ;			// lust of the artro, if it reaches a certain level, the artro will try to mate
-	private Directions direction ;	// current direction the artro is moving in
+	private double speed = 3 ;
+	private double direction ;	// angle counterclockwise
 	
-	public Artro(int life,
-			 Point pos,
-			 int age,
-			 Species species,
-			 Map<ArtroChoices, Double> tendency,
-			 boolean keepChoice,
-			 int satiation,
-			 ArtroChoices will,
-			 int sexWill,
-			 Directions direction
-			)
+	private static final List<Artro> all ;
+	
+	static
 	{
-		this.life = life ;
-		this.pos = pos ;
-		this.age = age ;
-		this.species = species ;
-		this.tendency = tendency ;
-		this.keepChoice = keepChoice ;
-		this.satiation = satiation ;
-		this.will = will ;
-		this.sexWill = sexWill ;
-		this.direction = direction ;
+		all = new ArrayList<>() ;
 	}
 	
+	public Artro(Point pos, Species species, Map<ArtroChoices, Double> tendency, int satiation, int sexWill)
+	{
+		this.pos = pos ;
+		this.species = species ;
+		this.tendency = tendency ;
+		this.satiation = satiation ;
+		this.sexWill = sexWill ;
+		age = 0 ;
+		life = species.getMaxLife() ;
+		will = ArtroChoices.wander ;
+		direction = 360 * Math.random() ;
+		all.add(this) ;
+	}
+	
+	public Artro(Point pos, Species species, Map<ArtroChoices, Double> tendency)
+	{
+		this(pos, species, tendency, species.getStomach(), 0) ;
+	}
+
+
+
 	public int getLife() {return life ;}
 	public Point getPos() {return pos ;}
 	public int getAge() {return age ;}
@@ -61,7 +69,12 @@ public class Artro
 	public int getSatiation() {return satiation ;}
 	public ArtroChoices getWill() {return will ;}
 	public int getSexWill() {return sexWill ;}
-	public Directions getDirection() {return direction ;}
+	public double getDirection() {return direction ;}
+	public static List<Artro> getAll() { return all ;}
+	public static List<Artro> getAllOfSpecies(Species species)
+	{
+		return all.stream().filter(artro -> artro.getSpecies().equals(species)).collect(Collectors.toList()) ;
+	}
 	
 	public void setSexWill(int newValue) {sexWill = newValue ;}
 	
@@ -143,13 +156,13 @@ public class Artro
 		return closestFood ;
 	}
 	
-	public Artro FindClosestVisibleMate(List<Artro> allArtros)
+	public Artro findClosestVisibleMate()
 	{
 		Artro closestMate = null ;
-		if (0 < allArtros.size())
+		if (0 < all.size())
 		{
-			double minDist = UtilS.dist(pos, allArtros.get(0).getPos()) ;
-			for (Artro artro : allArtros)
+			double minDist = UtilS.dist(pos, all.get(0).getPos()) ;
+			for (Artro artro : all)
 			{
 				double dist = UtilS.dist(pos, artro.getPos()) ;
 				if (dist <= minDist & !this.equals(artro) & species.equals(artro.species) & dist <= species.getVision())
@@ -163,22 +176,11 @@ public class Artro
 		return closestMate ;
 	}
 	
-	public boolean IsReachable(Point targetPos)
-	{
-		if (UtilS.dist(pos, targetPos) <= species.getSize())
-		{
-			return true ;
-		}
-		
-		return false ;
-	}
+	public boolean isReachable(Point targetPos) { return UtilS.dist(pos, targetPos) <= avrSize() ;}
 	
-	public void Dies()
-	{
-		life = 0 ;
-	}
+	public void dies() { all.remove(this) ;}
 	
-	public boolean IsHungry()
+	public boolean isHungry()
 	{
 		if (satiation <= (int) (0.6 * species.getStomach()))
 		{
@@ -187,40 +189,29 @@ public class Artro
 		return false ;
 	}
 	
-	public void IncHunger()
+	public void incHunger()
 	{
 		satiation += -1;
         if (satiation <= 0)
         {
-        	Dies() ;
+        	dies() ;
         }
 	}
 
-	public void Eats(Food food)
+	public void eats(Food food)
 	{
-		if (food != null)
-		{
-		    satiation += food.getType().getValue() ;
-		    if (species.getStomach() < satiation)
-		    {
-		    	satiation = species.getStomach() ;
-		    }
-		}
+		if (food == null) { return ;}
+		
+	    satiation += food.getType().getValue() ;
+	    if (species.getStomach() < satiation)
+	    {
+	    	satiation = species.getStomach() ;
+	    }
 	}
 
-	public boolean IsAbleToMate()
-	{
-		boolean ableToMate = false ;
-		
-		if (sexWill == species.getMatePoint())
-		{
-			ableToMate = true ;
-		}
-		
-		return ableToMate ;
-	}
+	public boolean isAbleToMate() { return species.getMatePoint() <= sexWill ;}
 	
-	public void IncMateWill()
+	public void incMateWill()
 	{
 		if (sexWill < species.getMatePoint())
 		{
@@ -228,21 +219,22 @@ public class Artro
 		}
 	}
 	
-	public void Mate(Artro mate, List<Artro> allArtros)
+	private boolean mutation() { return Util.chance(0.1) ;}
+	
+	public void mate(Artro mate)
 	{
 		Point newPos = new Point((pos.x + mate.getPos().x) / 2, (pos.y + mate.getPos().y) / 2) ;
-		int newAge = 0 ;
-		Map<ArtroChoices, Double> newTendency = tendency ;
-		int newSatiation = (satiation + mate.getSatiation()) / 2 ;
-		ArtroChoices newWill = ArtroChoices.exist ;
-		int newSexWill = 0 ;
-		Artro newArtro = new Artro(100, newPos, newAge, species, newTendency, keepChoice, newSatiation, newWill, newSexWill, direction) ;
-		allArtros.add(newArtro) ;
+		Map<ArtroChoices, Double> newTendency = new HashMap<>() ;
+		for (ArtroChoices choice : ArtroChoices.values())
+		{
+			double gene = mutation() ? Math.random() : (tendency.get(choice) + mate.getChoice().get(choice)) / 2.0 ;
+			newTendency.put(choice, gene) ;
+		}
+		Artro newArtro = new Artro(newPos, species, newTendency) ;
 		
 		sexWill = 0 ;
 		mate.setSexWill(0) ;
 	}
-
 	
 	public static Artro FindClosestOpponent(Artro artro)
 	{
@@ -264,7 +256,37 @@ public class Artro
         return closestOpponent;
 	}
 	
-	public void Thinks()
+	private boolean isInsideCanvas(Point newPos)
+	{
+		return Util.isInside(newPos, new Point(0, 0), CanvaPanel.getCanvaDimension()) ;
+	}
+	
+	public void move()
+	{
+		Point newPos = Util.Translate(pos, (int) (speed * Math.cos(direction)), (int) (speed * Math.sin(direction))) ;
+		if (isInsideCanvas(newPos))
+		{
+			pos = newPos ;
+		}
+	}
+	
+	public void moveTowards(Point targetPos)
+	{
+		direction = Util.calcAngle(pos, targetPos) ;
+		move() ;
+	}
+	
+
+	public void wander()
+	{
+		if (UtilS.chance(0.1))
+		{
+			direction = 360 * Math.random() ;
+		}
+		move() ;
+	}
+
+	public void thinks()
 	{
 		Artro closestOpponent = FindClosestOpponent(this) ;
 		
@@ -277,109 +299,43 @@ public class Artro
             keepChoice = true;
         }*/
         
-		/*if ((keepChoice & UtilS.chance(1 - choice[2] * GroupFightBonus(a))) & -1 < closestOpponent)		// Artro decides to flee
+		/*if ((keepChoice & UtilS.chance(1 - choice[2] * GroupFightBonus(a))) & -1 < closestOpponent)
         {
 			will = "flee";
         }
        	else*/ 
-		if (!keepChoice & UtilS.chance(tendency.get(ArtroChoices.eat)) & IsHungry() & closestOpponent == null)		// Artro decides to eat food
+		if (!keepChoice & UtilS.chance(tendency.get(ArtroChoices.eat)) & isHungry() & closestOpponent == null)
         {
             will = ArtroChoices.eat;
             keepChoice = false;
         }
-        else if (!keepChoice & UtilS.chance(tendency.get(ArtroChoices.mate)) & IsAbleToMate())				// Artro decides to mate (bang)
+        else if (!keepChoice & UtilS.chance(tendency.get(ArtroChoices.mate)) & isAbleToMate())
         {
             will = ArtroChoices.mate;
             keepChoice = false;
         }
         /*else if ((keepChoice & UtilS.chance(choice[2] * GroupFightBonus(a))) & -1 < closestOpponent)
         {
-            will = "fight";                                             										// Artro decides to fight
+            will = "fight";
         }
         else if ((!keepChoice & UtilS.chance(choice[4])))
         {
-            will = "group";                                             										// Artro decides to group
+            will = "group";
             keepChoice = false;
         }*/
         else if ((!keepChoice & UtilS.chance(tendency.get(ArtroChoices.wander))))
         {
-            will = ArtroChoices.wander;                                             										// Artro decides to wander
+            will = ArtroChoices.wander;
             keepChoice = false;
         }
-        else
-        {
-            will = ArtroChoices.exist;                                             										// Artro decides to just exist (do nothing)
-            keepChoice = false;
-        }	
+//        else
+//        {
+//            will = ArtroChoices.exist;
+//            keepChoice = false;
+//        }	
 	}
-	
-	public void Wander(Dimension canvaDimension)
-	{
-		if (UtilS.chance(0.1))
-		{
-			direction = RandomDirection() ;
-		}
-		Move(canvaDimension) ;
-	}
-	
-	public void Move(Dimension canvaDimension)
-	{
-		List<Directions> acceptedDirections = AcceptedDiretions(canvaDimension) ;
-		if (!acceptedDirections.contains(direction))
-		{
-			direction = acceptedDirections.get( (int) (acceptedDirections.size() * Math.random()) ) ;
-		}
 		
-		if (direction.equals(Directions.right))
-        {
-            pos.x += species.getStep();     // move right
-        }
-        if (direction.equals(Directions.left))
-        {
-        	pos.x += -species.getStep();    // move left
-        }      
-        if (direction.equals(Directions.up))
-        {
-        	pos.y += species.getStep();     // move up
-        }
-        if (direction.equals(Directions.down))
-        {
-        	pos.y += -species.getStep();    // move down
-        }
-	}
-	
-	public void MoveTowards(Point targetPos)
-	{
-	    for (int i = 0; i <= species.getStep() - 1; i += 1)
-	    {
-		    double distx = Math.abs(pos.x - targetPos.x);
-		    double disty = Math.abs(pos.y - targetPos.y);
-		    if (disty < distx)
-	        {
-	            if (pos.x < targetPos.x)       				// Point is to the right of artro
-	            {
-	                pos.x += species.getStep() ;     	// move right
-	            }
-	            else
-	            {
-	            	pos.x += -species.getStep();    	// move left
-	            }
-	        }
-	        else                                
-	        {
-	            if (pos.y < targetPos.y)       				// Point is above artro
-	            {
-	                pos.y += species.getStep();     	// move up
-	            }
-	            else
-	            {
-	                pos.y += -species.getStep();    	// move down
-	            }
-	        }
-	    }
-	}
-	
-	public void Acts(Dimension canvaDimension, List<Food> allFood, List<Artro> allArtros)
+	public void acts(List<Food> allFood)
 	{
 		switch(will)
 		{
@@ -387,63 +343,64 @@ public class Artro
 				Food food = FindClosestVisibleFood(allFood) ;
 				if (food != null)
 				{
-					MoveTowards(food.getPos()) ;
-					if (IsReachable(food.getPos()))
+					moveTowards(food.getPos()) ;
+					if (isReachable(food.getPos()))
 					{
-						Eats(food) ;
+						eats(food) ;
 						allFood.remove(food) ;
 					}
 				}
 				else
 				{
-					Move(canvaDimension) ;
+					wander() ;
 				}
 				
-				break ;
+				return ;
 				
 			case mate:
-				Artro closestMate = FindClosestVisibleMate(allArtros) ;
+				Artro closestMate = findClosestVisibleMate() ;
 				if (closestMate != null)
 				{
-					MoveTowards(closestMate.getPos()) ;
-					if (IsReachable(closestMate.getPos()))
+					moveTowards(closestMate.getPos()) ;
+					if (isReachable(closestMate.getPos()))
 					{
-						Mate(closestMate, allArtros) ;
+						mate(closestMate) ;
 					}
 				}
 				else
 				{
-					Wander(canvaDimension) ;
+					wander() ;
 				}
 				
-				break ;
+				return ;
 				
 			case wander:
-				Wander(canvaDimension) ;
+				wander() ;
 				
-				break ;
+				return ;
 				
-			case exist:
-				
-				break ;
+//			case exist:
+//				
+//				return ;
 				
 			default:
 				
-				break ;
+				return ;
 		}
 	}
 	
-	public void display(Canva canva, DrawingOnPanel DP)
+	public void display(Canva canva, DrawPrimitives DP)
 	{
 		Point drawingPos = UtilS.ConvertToDrawingCoords(pos, canva.getPos(), canva.getSize(), canva.getDimension()) ;
-		if (will.equals(ArtroChoices.fight))
-		{
-			//DP.DrawCircle(drawingPos, species.getSize(), Evolution.colorPalette[4], Evolution.colorPalette[6]) ;
-		}
-		else
-		{
-			DP.DrawImage(species.getImage(), drawingPos) ;
-		}
+//		if (will.equals(ArtroChoices.fight))
+//		{
+//
+//		}
+//		else
+//		{
+//			
+//		}
+		DP.drawImage(species.getImage(), drawingPos, Align.center) ;
 	}
 
 
@@ -465,22 +422,23 @@ public class Artro
             Point center = new Point((int)(long)centerArray.get(0), (int)(long)centerArray.get(1)) ;
     		Dimension range = new Dimension((int)(long)rangeArray.get(0), (int)(long)rangeArray.get(1)) ;
     		int numberArtros = (int)(long)jsonObject.get("Amount") ;
+			int speciesID = (int)(long)jsonObject.get("SpeciesID");
+			int minSatiation = (int)(long)jsonObject.get("MinSatiation");
+            JSONArray tendArray= (JSONArray)jsonObject.get("Tendencies");
+			Map<ArtroChoices, Double> tendency = new HashMap<>() ;
+			tendency.put(ArtroChoices.eat, (int)(long)tendArray.get(0) / 100.0) ;
+			tendency.put(ArtroChoices.mate, (int)(long)tendArray.get(1) / 100.0) ;
+			tendency.put(ArtroChoices.wander, (int)(long)tendArray.get(2) / 100.0) ;
+			Species species = Species.getAll().get(speciesID) ;
+			int minSexWill = (int)(long)jsonObject.get("MinSexWill");
     		for (int j = 0 ; j <= numberArtros - 1 ; j += 1)
     		{
     			Point pos = UtilS.RandomPosAroundPoint(center, range) ;
-    			int speciesID = (int)(long)jsonObject.get("SpeciesID");
-    			Species sp = Species.getAll().get(speciesID) ;
-    			int minSatiation = (int)(long)jsonObject.get("MinSatiation");
-    			int satiation = (int) (minSatiation + (sp.getStomach() - minSatiation) * Math.random()) ;
-                JSONArray tendArray= (JSONArray)jsonObject.get("Tendencies");
-    			Map<ArtroChoices, Double> tendency = new HashMap<>() ;
-    			tendency.put(ArtroChoices.eat, (int)(long)tendArray.get(0) / 100.0) ;
-    			tendency.put(ArtroChoices.mate, (int)(long)tendArray.get(1) / 100.0) ;
-    			tendency.put(ArtroChoices.wander, (int)(long)tendArray.get(2) / 100.0) ;
-    			int minSexWill = (int)(long)jsonObject.get("MinSexWill");
-    			int sexWill = (int) (minSexWill + (sp.getMatePoint() - minSexWill) * Math.random()) ;
+    			int satiation = (int) (minSatiation + (species.getStomach() - minSatiation) * Math.random()) ;
+    			int sexWill = (int) (minSexWill + (species.getMatePoint() - minSexWill) * Math.random()) ;
     			
-    			Artro newArtro = new Artro(100, pos, 0, sp, tendency, false, satiation, ArtroChoices.exist, sexWill, Directions.up) ;
+//    			Artro newArtro = new Artro(100, pos, 0, species, tendency, false, satiation, ArtroChoices.exist, sexWill, Directions.getRandom()) ;
+    			Artro newArtro = new Artro(pos, species, tendency, satiation, sexWill) ;
     			artros.add(newArtro) ;
     		}
     	}
@@ -488,28 +446,11 @@ public class Artro
         return artros ;
 	}
 	
-	@Override
-	public int hashCode() {
-		return Objects.hash(age, direction, keepChoice, life, pos, satiation, sexWill, species, tendency, will);
-	}
+	private double avrSize() { return (species.getSize().getWidth() + species.getSize().getHeight()) / 2 ;}
 	
-	@Override	
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Artro other = (Artro) obj;
-		return age == other.age && direction == other.direction && keepChoice == other.keepChoice && life == other.life
-				&& Objects.equals(pos, other.pos) && satiation == other.satiation && sexWill == other.sexWill
-				&& Objects.equals(species, other.species) && Objects.equals(tendency, other.tendency)
-				&& will == other.will;
-	}
-
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		return "Artro [life=" + life + ", pos=" + pos + ", age=" + age + ", species=" + species + ", tendency="
 				+ tendency + ", keepChoice=" + keepChoice + ", satiation=" + satiation + ", will=" + will + ", sexWill="
 				+ sexWill + ", direction=" + direction + "]";

@@ -2,11 +2,11 @@ package components;
 
 public enum ArtroChoices
 {
-	fight,
-	flee,
+//	fight,
+//	flee,
 	eat,
 	mate,
-	group,
+//	group,
 	wander,
-	exist
+//	exist
 }

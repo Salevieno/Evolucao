@@ -1,18 +1,18 @@
 [
 	{
-		"size": 10,
+		"maxLife": 100,
 		"step": 1,
 		"vision": 100,
-		"matePoint": 100,
+		"matePoint": 1000,
 		"stomach": 1000,
-		"color": [255, 0, 0]
+		"color": [0, 255, 0]
 	},
 	{
-		"size": 10,
+		"maxLife": 100,
 		"step": 1,
 		"vision": 100,
-		"matePoint": 100,
+		"matePoint": 1000,
 		"stomach": 1000,
-		"color": [0, 200, 200]
+		"color": [200, 20, 0]
 	}
 ]

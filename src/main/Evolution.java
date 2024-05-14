@@ -32,13 +32,11 @@ public class Evolution
 		foodRespawnTime = 20 ;
 		maxNumberFood = 200 ;
 		
-		// load input
 		Species.load() ;
 		artros = Artro.load() ;
 		FoodType.load() ;
-		food = Food.load() ;	
+		food = Food.load() ;
 		
-		// clear results file
 		Output.ClearFile() ;
 		
 		isRunning = true ;
@@ -52,13 +50,9 @@ public class Evolution
 		{
 			CreateFood() ;
 		}
-//		if (round % 7992 == 0)
-//		{
-//			saveRecords() ;
-//		}
 
-		Records.updatePop(artros.size()) ;
-		GraphsPanel.updateRecords() ;
+		Records.updateFPS((int) CanvaPanel.getFPS()) ;
+		GraphsPanel.updateRecords(artros) ;
 		
 		if (isRunning)
 		{
@@ -72,10 +66,10 @@ public class Evolution
 		for (int i = 0 ; i <= artros.size() - 1 ; i += 1)
 		{				
 			Artro artro = artros.get(i) ;
-			artro.Thinks() ;
-			artro.Acts(CanvaPanel.getCanvaDimension(), food, artros) ;
-			artro.IncHunger() ;
-			artro.IncMateWill() ;
+			artro.thinks() ;
+			artro.acts(food) ;
+			artro.incHunger() ;
+			artro.incMateWill() ;
 				
 			if (artro.getLife() == 0)
 			{

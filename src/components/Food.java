@@ -9,7 +9,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import graphics.Canva;
-import graphics.DrawingOnPanel;
+import graphics.DrawPrimitives;
 import main.UtilS;
 
 public class Food
@@ -25,13 +25,9 @@ public class Food
 	
 	public static List<Food> load()
 	{
-		// read input file
-		Object data = UtilS.ReadJson("Food.json") ;
-        
-        //convert Object to JSONArray
-        JSONArray jsonArray= (JSONArray)data;
+		Object data = UtilS.ReadJson("Food.json") ;        
+        JSONArray jsonArray= (JSONArray) data ;
 		        
-        // create food
 		List<Food> food = new ArrayList<>() ;
 		
 		for (int i = 0 ; i <= jsonArray.size() - 1; i += 1)
@@ -54,10 +50,10 @@ public class Food
 		return food ;
 	}
 	
-	public void display(Canva canva, DrawingOnPanel DP)
+	public void display(Canva canva, DrawPrimitives DP)
 	{
 		Point drawingPos = UtilS.ConvertToDrawingCoords(pos, canva.getPos(), canva.getSize(), canva.getDimension());
-		DP.DrawCircle(drawingPos, type.getSize(), null, type.getColor());
+		DP.circle(drawingPos, type.getSize(), type.getColor(), type.getColor());
 	}
 	
 	public Point getPos() {return pos ;}

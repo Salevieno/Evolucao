@@ -12,14 +12,14 @@ import panels.GraphsPanel;
 /**
  * Made with love by Salevieno
  * @author Salevieno
- * @version 1.0
+ * @version 2.0
  * @since December 09, 2022
  **/
 public class MainEvolution extends JFrame
 {
 	private static final long serialVersionUID = 1L ;
 	
-	public static final Dimension screenSize = new Dimension(640, 480) ;
+	public static final Dimension screenSize = new Dimension(1280, 800) ;
 
 	public MainEvolution()
 	{
@@ -27,7 +27,7 @@ public class MainEvolution extends JFrame
 		// creating frame and setting size
 		this.setTitle("Evolution");
 		this.setSize(screenSize) ;
-		this.setLocation(250, 150) ;
+		this.setLocation(200, 20) ;
 		
 		// creating and setting layout
 		FlowLayout layout = new FlowLayout(FlowLayout.LEFT, 0, 0) ;

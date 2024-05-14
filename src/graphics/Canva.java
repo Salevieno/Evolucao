@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 
+import libUtil.Align;
+
 public class Canva
 {
 	Point pos ;
@@ -23,8 +25,8 @@ public class Canva
 	public Dimension getSize() {return size ;}
 	public Dimension getDimension() {return dim ;}
 	
-	public void display(DrawingOnPanel DP)
+	public void display(DrawPrimitives	 DP)
 	{
-		DP.DrawRect(pos, "TopLeft", size, 2, bgColor, Color.black) ;
+		DP.drawRect(pos, Align.topLeft, size, 2, bgColor, Color.black) ;
 	}
 }

@@ -19,34 +19,37 @@ import javax.swing.JPanel;
 import components.Artro;
 import components.Food;
 import graphics.Canva;
-import graphics.DrawingOnPanel;
+import graphics.DrawPrimitives;
 import main.Evolution;
-import main.Records;
 
 
 public class CanvaPanel extends JPanel
 {
 	private static final long serialVersionUID = 1L;
 
-	private static final DrawingOnPanel DP;
+	private static final DrawPrimitives DP;
 	private static final Canva canva ;
 	private static final Color bgColor ;
 	public static final Point canvaPos ;
 	public static final Dimension canvaSize ;
 	public static final Dimension canvaDimension ;
+	private static long frameTime ;
 	private static double fps ;
+	private static final double maxFPS ;
 	
 	private static boolean displayCanva ;
 	
 	static
 	{
-		DP = new DrawingOnPanel(null) ;
+		DP = new DrawPrimitives() ;
 		bgColor = new Color(50, 50, 50) ;
 		canvaPos = new Point(50, 25) ;
-		canvaSize = new Dimension(350, 350) ;
+		canvaSize = new Dimension(650, 650) ;
 		canvaDimension = new Dimension(2000, 2000) ;
 		canva = new Canva(canvaPos, canvaSize, canvaDimension) ;
+		frameTime = System.nanoTime() ;
 		fps = 0 ;
+		maxFPS = 60 ;
 		displayCanva = true ;
 	}
 	
@@ -129,19 +132,23 @@ public class CanvaPanel extends JPanel
         });
    
     }
-		
+	private static boolean frameReady()
+	{
+		return 1.0 / maxFPS <= (Math.pow(10, -9) * (System.nanoTime() - frameTime)) ;
+	}
 	public static double getFPS() { return fps ;}
 	
     @Override
     public void paintComponent(Graphics g) 
     {
         super.paintComponent(g);
-        DP.setG((Graphics2D) g) ;
+        DP.setGraphics((Graphics2D) g) ;
 
-		long timeCounter = System.nanoTime() ;
 		canva.display(DP) ;
-		if (Evolution.isRunning())
+		fps = 1.0 / (Math.pow(10, -9) * (System.nanoTime() - frameTime)) ;
+		if (frameReady() && Evolution.isRunning())
 		{
+			frameTime = System.nanoTime() ;
 			Evolution.run() ;
 		}
 		if (displayCanva)
@@ -150,7 +157,5 @@ public class CanvaPanel extends JPanel
 			displayArtros(Evolution.getArtros()) ;
 		}
 		repaint() ;
-		fps = 1.0 / (Math.pow(10, -9) * (System.nanoTime() - timeCounter)) ;
-		Records.updateFPS((int) fps) ;
     }
 }

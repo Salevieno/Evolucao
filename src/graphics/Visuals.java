@@ -16,7 +16,7 @@ public class Visuals
     int[] DiagramsNPoints;
 
     Color[] ColorPalette;
-	DrawingOnPanel DP;
+	Draw DP;
         
 	/*public Visuals(DrawingOnAPanel DP, int[] CanvasPos, int[] CanvasSize, int[] CanvasDim, int[] DrawingPos)
 	{
