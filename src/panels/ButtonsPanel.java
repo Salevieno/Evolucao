@@ -16,9 +16,9 @@ import main.UtilS;
 public class ButtonsPanel extends JPanel
 {
 	private static final long serialVersionUID = 1L;
-	private static final Dimension STD_BUTTON_SIZE = new Dimension(30, 30) ;
-	private static final Color bgColor = new Color(50, 50, 50) ;
-	
+	private static final Dimension STD_BUTTON_SIZE = new Dimension(30, 30);
+	private static final Color bgColor = new Color(50, 50, 50);
+
 	private static ImageIcon playIcon = new ImageIcon(".\\Icons\\PlayIcon.png");
 	private static ImageIcon graphsIcon = new ImageIcon(".\\Icons\\GraphsIcon.png");
 	private static ImageIcon displayCanvaIcon = new ImageIcon("Artro1.png");
@@ -27,7 +27,7 @@ public class ButtonsPanel extends JPanel
 	{
 		this.setPreferredSize(new Dimension(frameDimensions.width, 40));
 		this.setBackground(bgColor);
-		
+
 		// creating and adding buttons to frame
 		JButton playButton = UtilS.createButton("", playIcon, new int[2], STD_BUTTON_SIZE, null);
 		JButton graphsButton = UtilS.createButton("", graphsIcon, new int[2], STD_BUTTON_SIZE, null);
@@ -37,62 +37,58 @@ public class ButtonsPanel extends JPanel
 		this.add(graphsButton);
 		this.add(displayCanva);
 		this.add(saveButton);
-		
+
 		// Defining button actions
-		playButton.addActionListener(new ActionListener()
-		{
+		playButton.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) 
+			public void actionPerformed(ActionEvent e)
 			{
-				playButtonAction() ;
+				playButtonAction();
 			}
 		});
-		graphsButton.addActionListener(new ActionListener()
-		{
+		graphsButton.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) 
+			public void actionPerformed(ActionEvent e)
 			{
-				graphsButtonAction() ;
+				graphsButtonAction();
 			}
 		});
-		displayCanva.addActionListener(new ActionListener()
-		{
+		displayCanva.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) 
+			public void actionPerformed(ActionEvent e)
 			{
-				displayCanvaButtonAction() ;
+				displayCanvaButtonAction();
 			}
 		});
-		saveButton.addActionListener(new ActionListener()
-		{
+		saveButton.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) 
+			public void actionPerformed(ActionEvent e)
 			{
-				saveButtonAction() ;
+				saveButtonAction();
 			}
 		});
-		
+
 	}
-	
+
 	public void playButtonAction()
 	{
-		Evolution.switchIsRunning() ;
+		Evolution.switchIsRunning();
 //		Results Re = new Results();
 //		Re.SaveOutputFile("Output.txt", SpeciesPopHist, FoodHist);
 	}
-	
+
 	public void graphsButtonAction()
 	{
-		GraphsPanel.switchGraphsAreVisible() ;
+		GraphsPanel.switchGraphsAreVisible();
 	}
-	
+
 	public void displayCanvaButtonAction()
 	{
-		CanvaPanel.switchDisplayCanva() ;
+		CanvaPanel.switchDisplayCanva();
 	}
-	
+
 	public void saveButtonAction()
 	{
-		Output.UpdateOutputFile() ;
+		Output.UpdateOutputFile();
 	}
 }

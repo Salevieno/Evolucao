@@ -8,17 +8,17 @@ import javax.swing.JPanel;
 public class MyJPanel extends JPanel
 {
 	private static final long serialVersionUID = 1L;
-	
-	public MyJPanel(Dimension panelSize) 
-    {
-        setPreferredSize(panelSize);	// sets a preferred size for the custom panel
-    }
-	
-    @Override
-    public void paintComponent(Graphics g) 
-    {
-        super.paintComponent(g);
-        //DP = new DrawingOnAPanel(g);
-		//V = new Visuals(DP, CanvasPos, CanvasSize, CanvasDim, DrawingPos);
-    }
+
+	public MyJPanel(Dimension panelSize)
+	{
+		setPreferredSize(panelSize); // sets a preferred size for the custom panel
+	}
+
+	@Override
+	public void paintComponent(Graphics g)
+	{
+		super.paintComponent(g);
+		// DP = new DrawingOnAPanel(g);
+		// V = new Visuals(DP, CanvasPos, CanvasSize, CanvasDim, DrawingPos);
+	}
 }

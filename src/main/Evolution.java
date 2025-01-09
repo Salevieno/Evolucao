@@ -1,6 +1,5 @@
 package main;
 
-import java.awt.Dimension;
 import java.awt.Point;
 import java.util.List;
 
@@ -11,101 +10,98 @@ import components.Species;
 import panels.CanvaPanel;
 import panels.GraphsPanel;
 
-public class Evolution
+public abstract class Evolution
 {
-	
-	private static int round ;		// number of the current iteration
-	
-	private static int foodRespawnTime ;	// time taken for the food to respawn (counted in number of rounds)
-	private static int maxNumberFood ;	// maximum amount of food that can exist at any given time
-	
-	private static boolean isRunning ;
-	
-	private static List<Artro> artros ;
-	private static List<Food> food ;
-	
-	
-	public Evolution()
+
+	private static int round; // number of the current iteration
+
+	private static int foodRespawnTime; // number of rounds taken for the food to respawn
+	private static int maxNumberFood; // maximum amount of food that can exist at a time
+
+	private static boolean isRunning;
+
+	private static List<Artro> artros;
+	private static List<Food> food;
+
+	public static void initialize()
 	{
-		round = 0 ;
-		
-		foodRespawnTime = 20 ;
-		maxNumberFood = 200 ;
-		
-		Species.load() ;
-		artros = Artro.load() ;
-		FoodType.load() ;
-		food = Food.load() ;
-		
-		Output.ClearFile() ;
-		
-		isRunning = true ;
+
+		Species.load();
+		artros = Artro.load();
+		FoodType.load();
+		food = Food.load();
+
+		Output.ClearFile();
+
+		foodRespawnTime = 20;
+		maxNumberFood = 200;
+		round = 0;
+		isRunning = true;
+
 	}
-	
+
 	public static void run()
 	{
-		artrosAct() ;
-		
+		artrosAct();
+
 		if (round % foodRespawnTime == 0 & food.size() < maxNumberFood)
 		{
-			CreateFood() ;
+			CreateFood();
 		}
 
-		Records.updateFPS((int) CanvaPanel.getFPS()) ;
-		GraphsPanel.updateRecords(artros) ;
-		
+		Records.updateFPS((int) CanvaPanel.getFPS());
+		GraphsPanel.updateRecords(artros);
+
 		if (isRunning)
 		{
-			round += 1 ;
+			round += 1;
 		}
 
 	}
-	
+
 	public static void artrosAct()
 	{
-		for (int i = 0 ; i <= artros.size() - 1 ; i += 1)
-		{				
-			Artro artro = artros.get(i) ;
-			artro.thinks() ;
-			artro.acts(food) ;
-			artro.incHunger() ;
-			artro.incMateWill() ;
-				
+		for (int i = 0; i <= artros.size() - 1; i += 1)
+		{
+			Artro artro = artros.get(i);
+			artro.thinks();
+			artro.acts(food);
+			artro.incHunger();
+			artro.incMateWill();
+
 			if (artro.getLife() == 0)
 			{
-				artros.remove(artro) ;
+				artros.remove(artro);
 			}
-			
+
 		}
 	}
-	
-	public static void saveRecords()
-	{
-		int saveEveryNRounds = 10 ;
-		for (int i = 0 ; i <= Records.artrosPop.size() - 1; i += 1)
-		{
-			if (i % saveEveryNRounds == 0)
-			{
-				Records.artrosPopAtNRounds.add(Records.artrosPop.get(i)) ;
-			}
-		}
 
-		Output.UpdateOutputFile() ;
-	}
-
-	public static List<Artro> getArtros() { return artros ;}
-	public static List<Food> getFood() { return food ;}
-	public static boolean isRunning() { return isRunning ;}
-	
-	public static void switchIsRunning() { isRunning = !isRunning ;}
-	
 	public static void CreateFood()
 	{
-		Point centerOfCreation = new Point(1000, 1000) ;
-		Dimension rangeOfCreation = new Dimension(500, 500) ;
-		Point pos = UtilS.RandomPosAroundPoint(centerOfCreation, rangeOfCreation) ;
-		FoodType type = FoodType.getAll().get(0) ;
-		food.add(new Food(pos, type)) ;
+		Point pos = UtilS.RandomPosAroundPoint(FoodType.centerOfCreation, FoodType.rangeOfCreation);
+		FoodType type = FoodType.getAll().get(0);
+		food.add(new Food(pos, type));
+	}
+
+	public static List<Artro> getArtros()
+	{
+		return artros;
+	}
+
+	public static List<Food> getFood()
+	{
+		return food;
+	}
+
+	public static boolean isRunning()
+	{
+		return isRunning;
+	}
+
+	public static void switchIsRunning()
+	{
+		isRunning = !isRunning;
 	}
 
 }

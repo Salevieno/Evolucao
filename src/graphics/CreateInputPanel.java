@@ -19,11 +19,12 @@ public class CreateInputPanel extends JDialog implements ActionListener
 	private static final long serialVersionUID = 1L;
 	private JLabel[] Labels;
 	private String NameLabel;
-	private ArrayList<JTextField[]> Lines = new ArrayList<JTextField[]>();	
+	private ArrayList<JTextField[]> Lines = new ArrayList<JTextField[]>();
 	private double[][] Input;
 	private JButton[] Buttons;
-	
-	public CreateInputPanel (JFrame parent, String PanelName, String NameLabel, JLabel[] Labels, JButton[] Buttons, int[][] ButtonSizes)
+
+	public CreateInputPanel(JFrame parent, String PanelName, String NameLabel, JLabel[] Labels, JButton[] Buttons,
+			int[][] ButtonSizes)
 	{
 		super(parent, PanelName, true);
 		this.Lines.add(CreateLineTextFields(Labels.length));
@@ -49,8 +50,8 @@ public class CreateInputPanel extends JDialog implements ActionListener
 		}
 		return TF;
 	}
-	
-	public void actionPerformed(ActionEvent ae) 
+
+	public void actionPerformed(ActionEvent ae)
 	{
 		Object source = ae.getSource();
 		for (int i = 0; i <= Buttons.length - 1; i += 1)
@@ -62,49 +63,46 @@ public class CreateInputPanel extends JDialog implements ActionListener
 				JPanel panel = DrawScreen();
 				getContentPane().add(panel);
 				pack();
-			}
-			else if(source == Buttons[1] & Buttons[i].getText().contains("Remove"))
+			} else if (source == Buttons[1] & Buttons[i].getText().contains("Remove"))
 			{
 				Lines.remove(Lines.size() - 1);
 				getContentPane().removeAll();
 				JPanel panel = DrawScreen();
 				getContentPane().add(panel);
 				pack();
-			}
-			else if (source == Buttons[2] & Buttons[i].getText().equals("Ok")) 
+			} else if (source == Buttons[2] & Buttons[i].getText().equals("Ok"))
 			{
 				this.Input = new double[Lines.size()][Lines.get(0).length];
-				for(int j = 0; j < Lines.size(); j += 1)
+				for (int j = 0; j < Lines.size(); j += 1)
 				{
-					for(int k = 0; k < Lines.get(j).length; k += 1)
+					for (int k = 0; k < Lines.get(j).length; k += 1)
 					{
 						this.Input[j][k] = Double.parseDouble(Lines.get(j)[k].getText());
 					}
 				}
 				dispose();
-			}
-			else if(source == Buttons[3] & Buttons[i].getText().equals("Cancel"))
+			} else if (source == Buttons[3] & Buttons[i].getText().equals("Cancel"))
 			{
 				dispose();
 			}
 		}
 	}
-	
+
 	private GridBagConstraints SetGridPos(GridBagConstraints gbc, int gridx, int gridy)
 	{
 		gbc.gridx = gridx;
 		gbc.gridy = gridy;
 		return gbc;
 	}
-	
+
 	private void AddButton(JPanel panel, GridBagConstraints gbc, JButton Button, int gridx, int gridy)
 	{
 		gbc = SetGridPos(gbc, gridx, gridy);
 		panel.add(Button, gbc);
 	}
-	
+
 	private JPanel DrawScreen()
-	{	
+	{
 		JPanel panel = new JPanel();
 		GridBagConstraints gbc = new GridBagConstraints();
 		panel.setLayout(new GridBagLayout());
@@ -119,11 +117,11 @@ public class CreateInputPanel extends JDialog implements ActionListener
 		int gridx = 0, gridy = 1;
 		for (int i = 0; i <= Lines.size() - 1; i += 1)
 		{
-			JLabel MatLabel = new JLabel (NameLabel + " " + (i + 1));
+			JLabel MatLabel = new JLabel(NameLabel + " " + (i + 1));
 			JTextField[] line = Lines.get(i);
 			gbc = SetGridPos(gbc, gridx, gridy);
 			panel.add(MatLabel, gbc);
-			for(int j = 0; j <= line.length - 1; j += 1)
+			for (int j = 0; j <= line.length - 1; j += 1)
 			{
 				gridx += 1;
 				gbc = SetGridPos(gbc, gridx, gridy);
@@ -146,10 +144,11 @@ public class CreateInputPanel extends JDialog implements ActionListener
 		return panel;
 	}
 
-	public double[][] run() 
+	public double[][] run()
 	{
 		this.setVisible(true);
-		//Here the program will "stop" until it's "dispose()"d, when the "dispose()" happens, the next line will happen
+		// Here the program will "stop" until it's "dispose()"d, when the "dispose()"
+		// happens, the next line will happen
 		return Input;
 	}
 }

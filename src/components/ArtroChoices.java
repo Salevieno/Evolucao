@@ -4,8 +4,7 @@ public enum ArtroChoices
 {
 //	fight,
 //	flee,
-	eat,
-	mate,
+	eat, mate,
 //	group,
 	wander,
 //	exist

@@ -7,6 +7,8 @@
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="json-simple-1.1.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/salvi/Downloads/libUtil.jar"/>
+	<classpathentry kind="lib" path="C:/Users/salvi/Desktop/Github/myLibs/libUtil.jar"/>
+	<classpathentry kind="lib" path="C:/Users/salvi/Desktop/Github/myLibs/libGraphics.jar"/>
+	<classpathentry kind="lib" path="C:/Users/salvi/Desktop/Github/myLibs/libChart.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

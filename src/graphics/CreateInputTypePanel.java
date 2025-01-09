@@ -18,8 +18,9 @@ public class CreateInputTypePanel extends JDialog implements ActionListener
 	private JLabel[] Labels;
 	private String Input;
 	private JButton[] Buttons;
-	
-	public CreateInputTypePanel (JFrame parent, String PanelName, JLabel[] Labels, JButton[] Buttons, int[][] ButtonSizes)
+
+	public CreateInputTypePanel(JFrame parent, String PanelName, JLabel[] Labels, JButton[] Buttons,
+			int[][] ButtonSizes)
 	{
 		super(parent, PanelName, true);
 		this.Labels = Labels;
@@ -33,39 +34,38 @@ public class CreateInputTypePanel extends JDialog implements ActionListener
 		getContentPane().add(panel);
 		pack();
 	}
-	
-	public void actionPerformed(ActionEvent ae) 
+
+	public void actionPerformed(ActionEvent ae)
 	{
 		Object source = ae.getSource();
 		for (int i = 0; i <= Buttons.length - 1; i += 1)
 		{
-			if (source == Buttons[i] & !Buttons[i].getText().equals("Cancel")) 
+			if (source == Buttons[i] & !Buttons[i].getText().equals("Cancel"))
 			{
 				this.Input = Buttons[i].getText();
 				dispose();
-			}
-			else if(Buttons[i].getText().equals("Cancel"))
+			} else if (Buttons[i].getText().equals("Cancel"))
 			{
 				dispose();
 			}
 		}
 	}
-	
+
 	private GridBagConstraints SetGridPos(GridBagConstraints gbc, int gridx, int gridy)
 	{
 		gbc.gridx = gridx;
 		gbc.gridy = gridy;
 		return gbc;
 	}
-	
+
 	private void AddButton(JPanel panel, GridBagConstraints gbc, JButton Button, int gridx, int gridy)
 	{
 		gbc = SetGridPos(gbc, gridx, gridy);
 		panel.add(Button, gbc);
 	}
-	
+
 	private JPanel DrawScreen()
-	{	
+	{
 		JPanel panel = new JPanel();
 		GridBagConstraints gbc = new GridBagConstraints();
 		panel.setLayout(new GridBagLayout());
@@ -86,10 +86,11 @@ public class CreateInputTypePanel extends JDialog implements ActionListener
 		return panel;
 	}
 
-	public String run() 
+	public String run()
 	{
 		this.setVisible(true);
-		//Here the program will "stop" until it's "dispose()"d, when the "dispose()" happens, the next line will happen
+		// Here the program will "stop" until it's "dispose()"d, when the "dispose()"
+		// happens, the next line will happen
 		return Input;
 	}
 }
