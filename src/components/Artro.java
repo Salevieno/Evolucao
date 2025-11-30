@@ -47,10 +47,10 @@ public class Artro
 		this.tendency = tendency;
 		this.satiation = satiation;
 		this.sexWill = sexWill;
-		age = 0;
-		life = species.getMaxLife();
-		will = ArtroChoices.wander;
-		direction = 360 * Math.random();
+		this.age = 0;
+		this.life = species.getMaxLife();
+		this.will = ArtroChoices.wander;
+		this.direction = 360 * Math.random();
 		all.add(this);
 	}
 
@@ -75,16 +75,11 @@ public class Artro
 
 		switch (randomNumber)
 		{
-		case 0:
-			return Directions.up;
-		case 1:
-			return Directions.down;
-		case 2:
-			return Directions.right;
-		case 3:
-			return Directions.left;
-		default:
-			return Directions.up;
+			case 0: return Directions.up;
+			case 1: return Directions.down;
+			case 2: return Directions.right;
+			case 3: return Directions.left;
+			default: return Directions.up;
 		}
 	}
 
@@ -139,14 +134,8 @@ public class Artro
 
 	public Artro findClosestVisibleMate()
 	{
-		if (all == null)
-		{
-			return null;
-		}
-		if (all.isEmpty())
-		{
-			return null;
-		}
+		if (all == null) { return null ;}
+		if (all.isEmpty()) { return null ;}
 
 		Artro closestMate = null;
 		double minDist = UtilS.dist(pos, all.get(0).getPos());
@@ -189,10 +178,7 @@ public class Artro
 
 	public void eats(Food food)
 	{
-		if (food == null)
-		{
-			return;
-		}
+		if (food == null) { return ;}
 
 		satiation += food.getType().getValue();
 		if (species.getStomach() < satiation)

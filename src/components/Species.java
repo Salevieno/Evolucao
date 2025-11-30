@@ -31,7 +31,7 @@ public class Species
 
 	static
 	{
-		images = new Image[] { UtilS.loadImage(Path.ASSETS + "Artro1.png"), UtilS.loadImage(Path.ASSETS + "Artro2.png") };
+		images = new Image[] { Util.loadImage(Path.ASSETS + "Artro1.png"), Util.loadImage(Path.ASSETS + "Artro2.png") };
 		all = new ArrayList<>();
 	}
 

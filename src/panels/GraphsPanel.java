@@ -18,7 +18,6 @@ import components.Artro;
 import components.ArtroChoices;
 import components.Species;
 import graphics.Align;
-import graphics.Draw;
 import graphics.DrawPrimitives;
 import main.MainEvolution;
 import main.Records;
@@ -55,7 +54,6 @@ public abstract class GraphsPanel
 			{
 				super.paintComponent(g);
 				DP.setGraphics((Graphics2D) g);
-				Draw.setDP(DP);
 				if (graphsAreVisible)
 				{
 					displayGraphs();
