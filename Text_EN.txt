@@ -1,8 +1,0 @@
-* Nomes dos menus *
-Bem vindo ao jogo da aventura!
-Novo jogo (n) Carregar jogo (l)
-
-* Nome dos submenus *
-Bem vindo ao jogo da aventura!
-Novo jogo (n) Carregar jogo (l)
-_

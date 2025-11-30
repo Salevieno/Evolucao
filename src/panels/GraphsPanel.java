@@ -17,6 +17,7 @@ import charts.Dataset;
 import components.Artro;
 import components.ArtroChoices;
 import components.Species;
+import graphics.Align;
 import graphics.Draw;
 import graphics.DrawPrimitives;
 import main.MainEvolution;
@@ -45,7 +46,7 @@ public abstract class GraphsPanel
 
 			public void displayGraphs()
 			{
-				charts.forEach(Chart::updateMaxYEver);
+				// charts.forEach(Chart::updateMaxYEver);
 				charts.forEach(plot -> plot.display(DP));
 			}
 
@@ -70,11 +71,11 @@ public abstract class GraphsPanel
 		fpsData = new Dataset();
 		charts = new ArrayList<>();
 
-		charts.add(new Chart(new Point(45, 200), ChartType.line, "Population", 80, Species.getColors(), Species.getColors()));
+		charts.add(new Chart(ChartType.line, new Point(45, 200), Align.center, "Population", 80, Species.getColors(), Species.getColors()));
 		charts.get(0).addDatasets(popData);
-		charts.add(new Chart(new Point(45, 350), ChartType.line, "Eating gene", 80, Species.getColors(), Species.getColors()));
+		charts.add(new Chart(ChartType.line, new Point(45, 350), Align.center, "Eating gene", 80, Species.getColors(), Species.getColors()));
 		charts.get(1).addDatasets(geneData);
-		charts.add(new Chart(new Point(45, 500), ChartType.line, "fps", 80, Color.orange));
+		charts.add(new Chart(ChartType.line, new Point(45, 500), Align.center, "fps", 80, Color.orange));
 		charts.get(2).addDataset(fpsData);
 	}
 

@@ -30,6 +30,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 import graphics.Align;
+import graphics.UtilAlignment;
 import utilities.Util;
 
 
@@ -322,9 +323,9 @@ public abstract class UtilG
 			return new Point();
 		}
 
-		Point offset = Util.offsetForAlignment(alignment, size);
+		Point offset = UtilAlignment.offsetForAlignment(alignment, size);
 
-		return Util.Translate(pos, offset.x, offset.y);
+		return Util.translate(pos, offset.x, offset.y);
 	}
 
 	public static int[] ArrayWithValuesGreaterThan(int[] OriginalArray, int MinValue)

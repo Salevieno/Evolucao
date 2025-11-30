@@ -10,6 +10,7 @@ import org.json.simple.JSONObject;
 
 import graphics.Canva;
 import graphics.DrawPrimitives;
+import main.Path;
 import main.UtilS;
 
 public class Food
@@ -25,7 +26,7 @@ public class Food
 
 	public static List<Food> load()
 	{
-		Object data = UtilS.ReadJson("Food.json");
+		Object data = UtilS.ReadJson(Path.DADOS + "Food.json");
 		JSONArray jsonArray = (JSONArray) data;
 
 		List<Food> food = new ArrayList<>();

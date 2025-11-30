@@ -14,6 +14,7 @@ import org.json.simple.JSONObject;
 import graphics.Align;
 import graphics.Canva;
 import graphics.DrawPrimitives;
+import main.Path;
 import main.UtilS;
 import panels.CanvaPanel;
 import utilities.Util;
@@ -240,7 +241,7 @@ public class Artro
 
 	public void move()
 	{
-		Point newPos = Util.Translate(pos, (int) (speed * Math.cos(direction)), (int) (speed * Math.sin(direction)));
+		Point newPos = Util.translate(pos, (int) (speed * Math.cos(direction)), (int) (speed * Math.sin(direction)));
 		if (isInsideCanvas(newPos))
 		{
 			pos = newPos;
@@ -369,7 +370,7 @@ public class Artro
 	public static List<Artro> load()
 	{
 		// read input file
-		Object data = UtilS.ReadJson("Artros.json");
+		Object data = UtilS.ReadJson(Path.DADOS + "Artros.json");
 
 		// convert Object to JSONArray
 		JSONArray jsonArray = (JSONArray) data;

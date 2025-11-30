@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import main.Path;
 import main.UtilS;
 import utilities.Util;
 
@@ -30,7 +31,7 @@ public class Species
 
 	static
 	{
-		images = new Image[] { UtilS.loadImage("Artro1.png"), UtilS.loadImage("Artro2.png") };
+		images = new Image[] { UtilS.loadImage(Path.ASSETS + "Artro1.png"), UtilS.loadImage(Path.ASSETS + "Artro2.png") };
 		all = new ArrayList<>();
 	}
 
@@ -49,7 +50,7 @@ public class Species
 
 	public static void load()
 	{
-		Object data = UtilS.ReadJson("Species.json");
+		Object data = UtilS.ReadJson(Path.DADOS + "Species.json");
 		JSONArray jsonArray = (JSONArray) data;
 
 		for (int i = 0; i <= jsonArray.size() - 1; i += 1)

@@ -31,8 +31,6 @@ public abstract class Evolution
 		FoodType.load();
 		food = Food.load();
 
-		Output.ClearFile();
-
 		foodRespawnTime = 20;
 		maxNumberFood = 200;
 		round = 0;

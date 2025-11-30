@@ -9,6 +9,7 @@ import java.util.List;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import main.Path;
 import main.UtilS;
 
 public class FoodType
@@ -39,7 +40,7 @@ public class FoodType
 	public static void load()
 	{
 		// read input file
-		Object data = UtilS.ReadJson("FoodTypes.json");
+		Object data = UtilS.ReadJson(Path.DADOS + "FoodTypes.json");
 
 		// convert Object to JSONArray
 		JSONArray jsonArray = (JSONArray) data;

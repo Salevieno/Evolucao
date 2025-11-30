@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 
 import main.Evolution;
 import main.Output;
+import main.Path;
 import main.UtilS;
 
 public class ButtonsPanel extends JPanel
@@ -19,9 +20,9 @@ public class ButtonsPanel extends JPanel
 	private static final Dimension STD_BUTTON_SIZE = new Dimension(30, 30);
 	private static final Color bgColor = new Color(50, 50, 50);
 
-	private static ImageIcon playIcon = new ImageIcon(".\\Icons\\PlayIcon.png");
-	private static ImageIcon graphsIcon = new ImageIcon(".\\Icons\\GraphsIcon.png");
-	private static ImageIcon displayCanvaIcon = new ImageIcon("Artro1.png");
+	private static ImageIcon playIcon = new ImageIcon(Path.ASSETS + "Icons/PlayIcon.png");
+	private static ImageIcon graphsIcon = new ImageIcon(Path.ASSETS + "Icons/GraphsIcon.png");
+	private static ImageIcon displayCanvaIcon = new ImageIcon(Path.ASSETS + "Artro1.png");
 
 	public ButtonsPanel(Dimension frameDimensions)
 	{
