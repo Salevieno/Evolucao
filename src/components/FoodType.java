@@ -2,7 +2,7 @@ package components;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +14,7 @@ import main.UtilS;
 
 public class FoodType
 {
-	public static final Point centerOfCreation;
+	public static final Point2D.Double centerOfCreation;
 	public static final Dimension rangeOfCreation;
 
 	private int size; // size of this type of fruit
@@ -26,7 +26,7 @@ public class FoodType
 	static
 	{
 		all = new ArrayList<>();
-		centerOfCreation = new Point(1000, 1000);
+		centerOfCreation = new Point2D.Double(1000, 1000);
 		rangeOfCreation = new Dimension(500, 500);
 	}
 

@@ -2,6 +2,7 @@ package components;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +23,7 @@ import utilities.Util;
 public class Artro
 {
 	private int life; // life points, if they reach 0, the artro dies
-	private Point pos; // current position of the artro
+	private Point2D.Double pos; // current position of the artro
 	private int age; // current age of the artro
 	private Species species; // species of the artro, determines its characteristics
 	private Map<ArtroChoices, Double> tendency; // tendency or chance (in %) of the artro choosing a certain behavior
@@ -40,7 +41,7 @@ public class Artro
 		all = new ArrayList<>();
 	}
 
-	public Artro(Point pos, Species species, Map<ArtroChoices, Double> tendency, int satiation, int sexWill)
+	public Artro(Point2D.Double pos, Species species, Map<ArtroChoices, Double> tendency, int satiation, int sexWill)
 	{
 		this.pos = pos;
 		this.species = species;
@@ -54,7 +55,7 @@ public class Artro
 		all.add(this);
 	}
 
-	public Artro(Point pos, Species species, Map<ArtroChoices, Double> tendency)
+	public Artro(Point2D.Double pos, Species species, Map<ArtroChoices, Double> tendency)
 	{
 		this(pos, species, tendency, species.getStomach(), 0);
 	}
@@ -118,10 +119,10 @@ public class Artro
 		}
 
 		Food closestFood = null;
-		double minDist = UtilS.dist(pos, allFood.get(0).getPos());
+		double minDist = pos.distance(allFood.get(0).getPos());
 		for (Food food : allFood)
 		{
-			double dist = UtilS.dist(pos, food.getPos());
+			double dist = pos.distance(food.getPos());
 			if (dist <= species.getVision() && dist <= minDist)
 			{
 				minDist = dist;
@@ -138,10 +139,10 @@ public class Artro
 		if (all.isEmpty()) { return null ;}
 
 		Artro closestMate = null;
-		double minDist = UtilS.dist(pos, all.get(0).getPos());
+		double minDist = pos.distance(all.get(0).getPos());
 		for (Artro artro : all)
 		{
-			double dist = UtilS.dist(pos, artro.getPos());
+			double dist = pos.distance(artro.getPos());
 			if (dist <= species.getVision() && species.equals(artro.species) && dist <= minDist && !this.equals(artro))
 			{
 				minDist = dist;
@@ -152,9 +153,9 @@ public class Artro
 		return closestMate;
 	}
 
-	public boolean isReachable(Point targetPos)
+	public boolean isReachable(Point2D.Double targetPos)
 	{
-		return UtilS.dist(pos, targetPos) <= avrSize();
+		return pos.distance(targetPos) <= avrSize();
 	}
 
 	public void dies()
@@ -207,7 +208,7 @@ public class Artro
 
 	public void mate(Artro mate)
 	{
-		Point newPos = new Point((pos.x + mate.getPos().x) / 2, (pos.y + mate.getPos().y) / 2);
+		Point2D.Double newPos = new Point2D.Double((pos.x + mate.getPos().x) / 2, (pos.y + mate.getPos().y) / 2);
 		Map<ArtroChoices, Double> newTendency = new HashMap<>();
 		for (ArtroChoices choice : ArtroChoices.values())
 		{
@@ -220,23 +221,24 @@ public class Artro
 		mate.setSexWill(0);
 	}
 
-	private boolean isInsideCanvas(Point newPos)
+	private boolean isInsideCanvas(Point2D.Double newPos)
 	{
-		return Util.isInside(newPos, new Point(0, 0), CanvaPanel.getCanvaDimension());
+		return Util.isInside(new Point((int) newPos.x, (int) newPos.y), new Point(0, 0), CanvaPanel.getCanvaDimension());
 	}
 
 	public void move()
 	{
-		Point newPos = Util.translate(pos, (int) (speed * Math.cos(direction)), (int) (speed * Math.sin(direction)));
+		Point2D.Double newPos = new Point2D.Double(pos.x + speed * Math.cos(direction), pos.y + speed * Math.sin(direction));
 		if (isInsideCanvas(newPos))
 		{
 			pos = newPos;
 		}
 	}
 
-	public void moveTowards(Point targetPos)
+	public void moveTowards(Point2D.Double targetPos)
 	{
-		direction = Util.calcAngle(pos, targetPos);
+		// direction = Util.calcAngle(pos, targetPos);
+		direction = Math.atan2(targetPos.y - pos.y, targetPos.x - pos.x);
 		move();
 	}
 
@@ -368,7 +370,7 @@ public class Artro
 			JSONObject jsonObject = (JSONObject) jsonArray.get(i);
 			JSONArray centerArray = (JSONArray) jsonObject.get("Center");
 			JSONArray rangeArray = (JSONArray) jsonObject.get("Range");
-			Point center = new Point((int) (long) centerArray.get(0), (int) (long) centerArray.get(1));
+			Point2D.Double center = new Point2D.Double((int) (long) centerArray.get(0), (int) (long) centerArray.get(1));
 			Dimension range = new Dimension((int) (long) rangeArray.get(0), (int) (long) rangeArray.get(1));
 			int numberArtros = (int) (long) jsonObject.get("Amount");
 			int speciesID = (int) (long) jsonObject.get("SpeciesID");
@@ -382,7 +384,7 @@ public class Artro
 			int minSexWill = (int) (long) jsonObject.get("MinSexWill");
 			for (int j = 0; j <= numberArtros - 1; j += 1)
 			{
-				Point pos = UtilS.RandomPosAroundPoint(center, range);
+				Point2D.Double pos = UtilS.RandomPosAroundPoint(center, range);
 				int satiation = (int) (minSatiation + (species.getStomach() - minSatiation) * Math.random());
 				int sexWill = (int) (minSexWill + (species.getMatePoint() - minSexWill) * Math.random());
 
@@ -405,7 +407,7 @@ public class Artro
 		return life;
 	}
 
-	public Point getPos()
+	public Point2D.Double getPos()
 	{
 		return pos;
 	}

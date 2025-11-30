@@ -1,6 +1,6 @@
 package main;
 
-import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.List;
 
 import components.Artro;
@@ -77,7 +77,7 @@ public abstract class Evolution
 
 	public static void CreateFood()
 	{
-		Point pos = UtilS.RandomPosAroundPoint(FoodType.centerOfCreation, FoodType.rangeOfCreation);
+		Point2D.Double pos = UtilS.RandomPosAroundPoint(FoodType.centerOfCreation, FoodType.rangeOfCreation);
 		FoodType type = FoodType.getAll().get(0);
 		food.add(new Food(pos, type));
 	}

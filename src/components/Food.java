@@ -2,6 +2,7 @@ package components;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,10 +16,10 @@ import main.UtilS;
 
 public class Food
 {
-	private Point pos;
+	private Point2D.Double pos;
 	private FoodType type;
 
-	public Food(Point pos, FoodType type)
+	public Food(Point2D.Double pos, FoodType type)
 	{
 		this.pos = pos;
 		this.type = type;
@@ -36,12 +37,12 @@ public class Food
 			JSONObject jsonObject = (JSONObject) jsonArray.get(i);
 			JSONArray centerArray = (JSONArray) jsonObject.get("Center");
 			JSONArray rangeArray = (JSONArray) jsonObject.get("Range");
-			Point center = new Point((int) (long) centerArray.get(0), (int) (long) centerArray.get(1));
+			Point2D.Double center = new Point2D.Double((Double) centerArray.get(0), (Double) centerArray.get(1));
 			Dimension range = new Dimension((int) (long) rangeArray.get(0), (int) (long) rangeArray.get(1));
 			int numberFood = (int) (long) jsonObject.get("Amount");
 			for (int j = 0; j <= numberFood - 1; j += 1)
 			{
-				Point pos = UtilS.RandomPosAroundPoint(center, range);
+				Point2D.Double pos = UtilS.RandomPosAroundPoint(center, range);
 				int typeID = (int) (long) jsonObject.get("TypeID");
 				FoodType type = FoodType.getAll().get(typeID);
 				food.add(new Food(pos, type));
@@ -57,7 +58,7 @@ public class Food
 		DP.drawCircle(drawingPos, type.getSize(), type.getColor(), type.getColor());
 	}
 
-	public Point getPos()
+	public Point2D.Double getPos()
 	{
 		return pos;
 	}
