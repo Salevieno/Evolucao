@@ -29,14 +29,6 @@ public abstract class UtilS
 		}
 	}
 
-	public static Point ConvertToDrawingCoords(Point2D.Double originalCoords, Point canvasPos, Dimension canvasSize,
-			Dimension canvasDim)
-	{
-		int xCoord = (int) (canvasPos.x + originalCoords.x * canvasSize.width / canvasDim.width);
-		int yCoord = (int) (canvasPos.y + canvasSize.height - originalCoords.y * canvasSize.height / canvasDim.height);
-		return new Point(xCoord, yCoord);
-	}
-
 	public static Point2D.Double RandomPosAroundPoint(Point2D.Double center, Dimension range)
 	{
 		// returns a point within a rectangle centered on the Point center with size 2 *

@@ -54,7 +54,7 @@ public class Food
 
 	public void display(Canva canva, DrawPrimitives DP)
 	{
-		Point drawingPos = UtilS.ConvertToDrawingCoords(pos, canva.getPos(), canva.getSize(), canva.getDimension());
+		Point drawingPos = canva.inDrawingCoords(pos);
 		DP.drawCircle(drawingPos, type.getSize(), type.getColor(), type.getColor());
 	}
 

@@ -351,7 +351,7 @@ public class Artro
 
 	public void display(Canva canva, DrawPrimitives DP)
 	{
-		Point drawingPos = UtilS.ConvertToDrawingCoords(pos, canva.getPos(), canva.getSize(), canva.getDimension());
+		Point drawingPos = canva.inDrawingCoords(pos);
 		DP.drawImage(species.getImage(), drawingPos, Align.center);
 	}
 
