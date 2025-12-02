@@ -77,7 +77,9 @@ public abstract class Evolution
 
 	public static void CreateFood()
 	{
-		Point2D.Double pos = UtilS.RandomPosAroundPoint(FoodType.centerOfCreation, FoodType.rangeOfCreation);
+		Point2D.Double pos = new Point2D.Double() ;
+		pos.x = FoodType.centerOfCreation.x + FoodType.rangeOfCreation.width * (Math.random() - Math.random()) ;
+		pos.y = FoodType.centerOfCreation.y + FoodType.rangeOfCreation.height * (Math.random() - Math.random()) ;
 		FoodType type = FoodType.getAll().get(0);
 		food.add(new Food(pos, type));
 	}

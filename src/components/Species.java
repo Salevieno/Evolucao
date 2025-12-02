@@ -3,16 +3,16 @@ package components;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.io.FileReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import main.Path;
-import main.UtilS;
 import utilities.Util;
 
 public class Species
@@ -48,77 +48,37 @@ public class Species
 		this.color = color;
 	}
 
+	public Species(SpeciesDTO dto)
+	{
+		this(dto.getMaxLife(), dto.getStep(), dto.getVision(), dto.getMatePoint(), dto.getStomach(), dto.getColor());
+	}
+
 	public static void load()
 	{
-		Object data = UtilS.ReadJson(Path.DADOS + "Species.json");
-		JSONArray jsonArray = (JSONArray) data;
-
-		for (int i = 0; i <= jsonArray.size() - 1; i += 1)
+		try
 		{
-			JSONObject jsonObject = (JSONObject) jsonArray.get(i);
-			long maxLife = (long) jsonObject.get("maxLife");
-			long step = (long) jsonObject.get("step");
-			long vision = (long) jsonObject.get("vision");
-			long matePoint = (long) jsonObject.get("matePoint");
-			long stomach = (long) jsonObject.get("stomach");
-			JSONArray colorArray = (JSONArray) jsonObject.get("color");
-			Color color = new Color((int) (long) colorArray.get(0), (int) (long) colorArray.get(1),
-					(int) (long) colorArray.get(2));
-
-			all.add(new Species((int) maxLife, (int) step, (int) vision, (int) matePoint, (int) stomach, color));
-		}
-
+            Gson gson = new Gson();
+            Type listType = new TypeToken<List<SpeciesDTO>>() {}.getType();
+            FileReader reader = new FileReader(Path.DADOS + "Species.json");
+            List<SpeciesDTO> speciesList = gson.fromJson(reader, listType);
+			speciesList.forEach(dto -> all.add(new Species(dto))) ;
+        }
+		catch (Exception e)
+		{
+            e.printStackTrace();
+        }
 	}
 
-	public int getMaxLife()
-	{
-		return maxLife;
-	}
-
-	public Dimension getSize()
-	{
-		return size;
-	}
-
-	public int getStep()
-	{
-		return step;
-	}
-
-	public int getVision()
-	{
-		return vision;
-	}
-
-	public int getMatePoint()
-	{
-		return matePoint;
-	}
-
-	public int getStomach()
-	{
-		return stomach;
-	}
-
-	public Color getColor()
-	{
-		return color;
-	}
-
-	public Image getImage()
-	{
-		return image;
-	}
-
-	public static List<Color> getColors()
-	{
-		return all.stream().map(species -> species.getColor()).collect(Collectors.toList());
-	}
-
-	public static List<Species> getAll()
-	{
-		return all;
-	}
+	public int getMaxLife() { return maxLife ;}
+	public Dimension getSize() { return size ;}
+	public int getStep() { return step ;}
+	public int getVision() { return vision ;}
+	public int getMatePoint() { return matePoint ;}
+	public int getStomach() { return stomach ;}
+	public Color getColor() { return color ;}
+	public Image getImage() { return image ;}
+	public static List<Species> getAll() { return all ;}
+	public static List<Color> getColors() { return all.stream().map(Species::getColor).toList() ;}
 
 	@Override
 	public int hashCode()

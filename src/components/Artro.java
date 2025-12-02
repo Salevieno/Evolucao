@@ -3,20 +3,20 @@ package components;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.geom.Point2D;
+import java.io.FileReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import graphics.Align;
 import graphics.Canva;
 import graphics.DrawPrimitives;
 import main.Path;
-import main.UtilS;
 import panels.CanvaPanel;
 import utilities.Util;
 
@@ -55,6 +55,18 @@ public class Artro
 		all.add(this);
 	}
 
+	public Artro(ArtroDTO dto)
+	{
+		this(new Point2D.Double(0, 0), Species.getAll().get(dto.getSpeciesID()), Map.of(
+			ArtroChoices.eat, dto.getTendencies()[0] / 100.0,
+			ArtroChoices.mate, dto.getTendencies()[1] / 100.0,
+			ArtroChoices.wander, dto.getTendencies()[2] / 100.0
+		), dto.getMinSatiation(), dto.getMinSexWill());
+		
+		this.pos.x = dto.getCenter()[0] + dto.getRange()[0] * (Math.random() - Math.random()) ;
+		this.pos.y = dto.getCenter()[1] + dto.getRange()[1] * (Math.random() - Math.random()) ;
+	}
+
 	public Artro(Point2D.Double pos, Species species, Map<ArtroChoices, Double> tendency)
 	{
 		this(pos, species, tendency, species.getStomach(), 0);
@@ -62,7 +74,7 @@ public class Artro
 
 	public static List<Artro> getAllOfSpecies(Species species)
 	{
-		return all.stream().filter(artro -> artro.getSpecies().equals(species)).collect(Collectors.toList());
+		return all.stream().filter(artro -> artro.getSpecies().equals(species)).toList();
 	}
 	
 	public void setSexWill(int newValue)
@@ -109,14 +121,8 @@ public class Artro
 
 	public Food FindClosestVisibleFood(List<Food> allFood)
 	{
-		if (allFood == null)
-		{
-			return null;
-		}
-		if (allFood.isEmpty())
-		{
-			return null;
-		}
+		if (allFood == null) { return null ;}
+		if (allFood.isEmpty()) { return null ;}
 
 		Food closestFood = null;
 		double minDist = pos.distance(allFood.get(0).getPos());
@@ -237,14 +243,13 @@ public class Artro
 
 	public void moveTowards(Point2D.Double targetPos)
 	{
-		// direction = Util.calcAngle(pos, targetPos);
 		direction = Math.atan2(targetPos.y - pos.y, targetPos.x - pos.x);
 		move();
 	}
 
 	public void wander()
 	{
-		if (UtilS.chance(0.1))
+		if (Math.random() <= 0.1)
 		{
 			direction = 360 * Math.random();
 		}
@@ -253,7 +258,7 @@ public class Artro
 
 	private boolean wantsTo(ArtroChoices action)
 	{
-		return UtilS.chance(tendency.get(action));
+		return Math.random() <= tendency.get(action);
 	}
 
 	public void thinks()
@@ -357,44 +362,27 @@ public class Artro
 
 	public static List<Artro> load()
 	{
-		// read input file
-		Object data = UtilS.ReadJson(Path.DADOS + "Artros.json");
-
-		// convert Object to JSONArray
-		JSONArray jsonArray = (JSONArray) data;
-
-		// create artros
-		List<Artro> artros = new ArrayList<>();
-		for (int i = 0; i <= jsonArray.size() - 1; i += 1)
+		try
 		{
-			JSONObject jsonObject = (JSONObject) jsonArray.get(i);
-			JSONArray centerArray = (JSONArray) jsonObject.get("Center");
-			JSONArray rangeArray = (JSONArray) jsonObject.get("Range");
-			Point2D.Double center = new Point2D.Double((int) (long) centerArray.get(0), (int) (long) centerArray.get(1));
-			Dimension range = new Dimension((int) (long) rangeArray.get(0), (int) (long) rangeArray.get(1));
-			int numberArtros = (int) (long) jsonObject.get("Amount");
-			int speciesID = (int) (long) jsonObject.get("SpeciesID");
-			int minSatiation = (int) (long) jsonObject.get("MinSatiation");
-			JSONArray tendArray = (JSONArray) jsonObject.get("Tendencies");
-			Map<ArtroChoices, Double> tendency = new HashMap<>();
-			tendency.put(ArtroChoices.eat, (int) (long) tendArray.get(0) / 100.0);
-			tendency.put(ArtroChoices.mate, (int) (long) tendArray.get(1) / 100.0);
-			tendency.put(ArtroChoices.wander, (int) (long) tendArray.get(2) / 100.0);
-			Species species = Species.getAll().get(speciesID);
-			int minSexWill = (int) (long) jsonObject.get("MinSexWill");
-			for (int j = 0; j <= numberArtros - 1; j += 1)
-			{
-				Point2D.Double pos = UtilS.RandomPosAroundPoint(center, range);
-				int satiation = (int) (minSatiation + (species.getStomach() - minSatiation) * Math.random());
-				int sexWill = (int) (minSexWill + (species.getMatePoint() - minSexWill) * Math.random());
-
-//    			Artro newArtro = new Artro(100, pos, 0, species, tendency, false, satiation, ArtroChoices.exist, sexWill, Directions.getRandom()) ;
-				Artro newArtro = new Artro(pos, species, tendency, satiation, sexWill);
-				artros.add(newArtro);
-			}
-		}
-
-		return artros;
+            Gson gson = new Gson();
+            Type listType = new TypeToken<List<ArtroDTO>>() {}.getType();
+            FileReader reader = new FileReader(Path.DADOS + "Artros.json");
+            List<ArtroDTO> artrosList = gson.fromJson(reader, listType);
+			List<Artro> artros = new ArrayList<>();
+			artrosList.forEach(dto -> {
+				for (int i = 0; i < dto.getAmount(); i++)
+				{
+					Artro newArtro = new Artro(dto) ;
+					artros.add(newArtro) ;
+				}
+			}) ;
+			return artros;
+        }
+		catch (Exception e)
+		{
+            e.printStackTrace();
+			return null;
+        }
 	}
 
 	private double avrSize()

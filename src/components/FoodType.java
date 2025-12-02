@@ -3,14 +3,15 @@ package components;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
+import java.io.FileReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import main.Path;
-import main.UtilS;
 
 public class FoodType
 {
@@ -35,47 +36,32 @@ public class FoodType
 		this.size = size;
 		this.value = value;
 		this.color = color;
+		all.add(this) ;
+	}
+
+	public FoodType(FoodTypeDTO dto)
+	{
+		this(dto.getSize(), dto.getValue(), dto.getColor()) ;
 	}
 
 	public static void load()
 	{
-		// read input file
-		Object data = UtilS.ReadJson(Path.DADOS + "FoodTypes.json");
-
-		// convert Object to JSONArray
-		JSONArray jsonArray = (JSONArray) data;
-
-		for (int i = 0; i <= jsonArray.size() - 1; i += 1)
+		try
 		{
-			JSONObject jsonObject = (JSONObject) jsonArray.get(i);
-			int size = (int) (long) jsonObject.get("Size");
-			int value = (int) (long) jsonObject.get("Value");
-			JSONArray colorArray = (JSONArray) jsonObject.get("Color");
-			Color color = new Color((int) (long) colorArray.get(0), (int) (long) colorArray.get(1),
-					(int) (long) colorArray.get(2));
-
-			all.add(new FoodType(size, value, color));
-		}
+            Gson gson = new Gson();
+            Type listType = new TypeToken<List<FoodTypeDTO>>() {}.getType();
+            FileReader reader = new FileReader(Path.DADOS + "FoodTypes.json");
+            List<FoodTypeDTO> foodTypesList = gson.fromJson(reader, listType);
+			foodTypesList.forEach(dto -> new FoodType(dto)) ;
+        }
+		catch (Exception e)
+		{
+            e.printStackTrace();
+        }
 	}
 
-	public int getSize()
-	{
-		return size;
-	}
-
-	public int getValue()
-	{
-		return value;
-	}
-
-	public Color getColor()
-	{
-		return color;
-	}
-
-	public static List<FoodType> getAll()
-	{
-		return all;
-	}
-
+	public int getSize() { return size ;}
+	public int getValue() { return value ;}
+	public Color getColor() { return color ;}
+	public static List<FoodType> getAll() { return all ;}
 }

@@ -1,18 +1,18 @@
 package components;
 
-import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.geom.Point2D;
+import java.io.FileReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import graphics.Canva;
 import graphics.DrawPrimitives;
 import main.Path;
-import main.UtilS;
 
 public class Food
 {
@@ -25,31 +25,61 @@ public class Food
 		this.type = type;
 	}
 
+	public Food(FoodDTO dto)
+	{
+		this(new Point2D.Double(0, 0), FoodType.getAll().get(dto.getTypeID())) ;
+		this.pos.x = dto.getCenter()[0] + dto.getRange()[0] * (Math.random() - Math.random()) ;
+		this.pos.y = dto.getCenter()[1] + dto.getRange()[1] * (Math.random() - Math.random()) ;
+	}
+
 	public static List<Food> load()
 	{
-		Object data = UtilS.ReadJson(Path.DADOS + "Food.json");
-		JSONArray jsonArray = (JSONArray) data;
-
-		List<Food> food = new ArrayList<>();
-
-		for (int i = 0; i <= jsonArray.size() - 1; i += 1)
+		try
 		{
-			JSONObject jsonObject = (JSONObject) jsonArray.get(i);
-			JSONArray centerArray = (JSONArray) jsonObject.get("Center");
-			JSONArray rangeArray = (JSONArray) jsonObject.get("Range");
-			Point2D.Double center = new Point2D.Double((Double) centerArray.get(0), (Double) centerArray.get(1));
-			Dimension range = new Dimension((int) (long) rangeArray.get(0), (int) (long) rangeArray.get(1));
-			int numberFood = (int) (long) jsonObject.get("Amount");
-			for (int j = 0; j <= numberFood - 1; j += 1)
-			{
-				Point2D.Double pos = UtilS.RandomPosAroundPoint(center, range);
-				int typeID = (int) (long) jsonObject.get("TypeID");
-				FoodType type = FoodType.getAll().get(typeID);
-				food.add(new Food(pos, type));
-			}
-		}
+            Gson gson = new Gson();
+            Type listType = new TypeToken<List<FoodDTO>>() {}.getType();
+            FileReader reader = new FileReader(Path.DADOS + "Food.json");
+            List<FoodDTO> foodList = gson.fromJson(reader, listType);
+			List<Food> food = new ArrayList<>();
+			foodList.forEach(dto -> {
+				for (int i = 0; i < dto.getAmount(); i++)
+				{
+					Food newFood = new Food(dto) ;
+					food.add(newFood) ;
+				}
+			}) ;
+			return food;
+        }
+		catch (Exception e)
+		{
+            e.printStackTrace();
+			return null;
+        }
 
-		return food;
+
+		// Object data = UtilS.ReadJson(Path.DADOS + "Food.json");
+		// JSONArray jsonArray = (JSONArray) data;
+
+		// List<Food> food = new ArrayList<>();
+
+		// for (int i = 0; i <= jsonArray.size() - 1; i += 1)
+		// {
+		// 	JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+		// 	JSONArray centerArray = (JSONArray) jsonObject.get("Center");
+		// 	JSONArray rangeArray = (JSONArray) jsonObject.get("Range");
+		// 	Point2D.Double center = new Point2D.Double((Double) centerArray.get(0), (Double) centerArray.get(1));
+		// 	Dimension range = new Dimension((int) (long) rangeArray.get(0), (int) (long) rangeArray.get(1));
+		// 	int numberFood = (int) (long) jsonObject.get("Amount");
+		// 	for (int j = 0; j <= numberFood - 1; j += 1)
+		// 	{
+		// 		Point2D.Double pos = UtilS.RandomPosAroundPoint(center, range);
+		// 		int typeID = (int) (long) jsonObject.get("TypeID");
+		// 		FoodType type = FoodType.getAll().get(typeID);
+		// 		food.add(new Food(pos, type));
+		// 	}
+		// }
+
+		// return food;
 	}
 
 	public void display(Canva canva, DrawPrimitives DP)
