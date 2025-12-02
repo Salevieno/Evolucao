@@ -156,11 +156,12 @@ public class CanvaPanel extends JPanel
 		DP.setGraphics((Graphics2D) g);
 
 		canva.display(DP);
+		
 		fps = 1.0 / (Math.pow(10, -9) * (System.nanoTime() - frameTime));
 		if (frameReady() && Evolution.isRunning())
 		{
 			frameTime = System.nanoTime();
-			Evolution.run();
+			Evolution.run(1.0 / fps);
 		}
 		if (displayCanva)
 		{

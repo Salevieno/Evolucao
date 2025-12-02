@@ -38,9 +38,9 @@ public abstract class Evolution
 
 	}
 
-	public static void run()
+	public static void run(double dt)
 	{
-		artrosAct();
+		artrosAct(dt);
 
 		if (round % foodRespawnTime == 0 & food.size() < maxNumberFood)
 		{
@@ -57,13 +57,13 @@ public abstract class Evolution
 
 	}
 
-	public static void artrosAct()
+	public static void artrosAct(double dt)
 	{
 		for (int i = 0; i <= artros.size() - 1; i += 1)
 		{
 			Artro artro = artros.get(i);
 			artro.thinks();
-			artro.acts(food);
+			artro.acts(food, dt);
 			artro.incHunger();
 			artro.incMateWill();
 
@@ -84,24 +84,8 @@ public abstract class Evolution
 		food.add(new Food(pos, type));
 	}
 
-	public static List<Artro> getArtros()
-	{
-		return artros;
-	}
-
-	public static List<Food> getFood()
-	{
-		return food;
-	}
-
-	public static boolean isRunning()
-	{
-		return isRunning;
-	}
-
-	public static void switchIsRunning()
-	{
-		isRunning = !isRunning;
-	}
-
+	public static void switchIsRunning() { isRunning = !isRunning ;}
+	public static List<Artro> getArtros() { return artros ;}
+	public static List<Food> getFood() { return food ;}
+	public static boolean isRunning() { return isRunning ;}
 }

@@ -55,31 +55,6 @@ public class Food
             e.printStackTrace();
 			return null;
         }
-
-
-		// Object data = UtilS.ReadJson(Path.DADOS + "Food.json");
-		// JSONArray jsonArray = (JSONArray) data;
-
-		// List<Food> food = new ArrayList<>();
-
-		// for (int i = 0; i <= jsonArray.size() - 1; i += 1)
-		// {
-		// 	JSONObject jsonObject = (JSONObject) jsonArray.get(i);
-		// 	JSONArray centerArray = (JSONArray) jsonObject.get("Center");
-		// 	JSONArray rangeArray = (JSONArray) jsonObject.get("Range");
-		// 	Point2D.Double center = new Point2D.Double((Double) centerArray.get(0), (Double) centerArray.get(1));
-		// 	Dimension range = new Dimension((int) (long) rangeArray.get(0), (int) (long) rangeArray.get(1));
-		// 	int numberFood = (int) (long) jsonObject.get("Amount");
-		// 	for (int j = 0; j <= numberFood - 1; j += 1)
-		// 	{
-		// 		Point2D.Double pos = UtilS.RandomPosAroundPoint(center, range);
-		// 		int typeID = (int) (long) jsonObject.get("TypeID");
-		// 		FoodType type = FoodType.getAll().get(typeID);
-		// 		food.add(new Food(pos, type));
-		// 	}
-		// }
-
-		// return food;
 	}
 
 	public void display(Canva canva, DrawPrimitives DP)
@@ -88,13 +63,6 @@ public class Food
 		DP.drawCircle(drawingPos, type.getSize(), type.getColor(), type.getColor());
 	}
 
-	public Point2D.Double getPos()
-	{
-		return pos;
-	}
-
-	public FoodType getType()
-	{
-		return type;
-	}
+	public Point2D.Double getPos() { return pos ;}
+	public FoodType getType() { return type ;}
 }

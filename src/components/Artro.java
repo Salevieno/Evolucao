@@ -31,7 +31,7 @@ public class Artro
 	private int satiation; // amount of food in the artro's stomach, if it reaches 0, the artro dies
 	private ArtroChoices will; // what the artro wants to do right now
 	private int sexWill; // lust of the artro, if it reaches a certain level, the artro will try to mate
-	private double speed = 3;
+	private double speed = 300;
 	private double direction; // angle counterclockwise
 
 	private static final List<Artro> all;
@@ -75,11 +75,6 @@ public class Artro
 	public static List<Artro> getAllOfSpecies(Species species)
 	{
 		return all.stream().filter(artro -> artro.getSpecies().equals(species)).toList();
-	}
-	
-	public void setSexWill(int newValue)
-	{
-		sexWill = newValue;
 	}
 
 	public Directions RandomDirection()
@@ -232,28 +227,28 @@ public class Artro
 		return Util.isInside(new Point((int) newPos.x, (int) newPos.y), new Point(0, 0), CanvaPanel.getCanvaDimension());
 	}
 
-	public void move()
+	public void move(double dt)
 	{
-		Point2D.Double newPos = new Point2D.Double(pos.x + speed * Math.cos(direction), pos.y + speed * Math.sin(direction));
+		Point2D.Double newPos = new Point2D.Double(pos.x + Math.cos(direction) * speed * dt, pos.y + Math.sin(direction) * speed * dt);
 		if (isInsideCanvas(newPos))
 		{
 			pos = newPos;
 		}
 	}
 
-	public void moveTowards(Point2D.Double targetPos)
+	public void moveTowards(Point2D.Double targetPos, double dt)
 	{
 		direction = Math.atan2(targetPos.y - pos.y, targetPos.x - pos.x);
-		move();
+		move(dt);
 	}
 
-	public void wander()
+	public void wander(double dt)
 	{
 		if (Math.random() <= 0.1)
 		{
 			direction = 360 * Math.random();
 		}
-		move();
+		move(dt);
 	}
 
 	private boolean wantsTo(ArtroChoices action)
@@ -300,7 +295,7 @@ public class Artro
 //        }	
 	}
 
-	public void acts(List<Food> allFood)
+	public void acts(List<Food> allFood, double dt)
 	{
 
 		switch (will)
@@ -309,7 +304,7 @@ public class Artro
 			Food food = FindClosestVisibleFood(allFood);
 			if (food != null)
 			{
-				moveTowards(food.getPos());
+				moveTowards(food.getPos(), dt);
 				if (isReachable(food.getPos()))
 				{
 					eats(food);
@@ -317,7 +312,7 @@ public class Artro
 				}
 			} else
 			{
-				wander();
+				wander(dt);
 				return;
 			}
 
@@ -327,20 +322,20 @@ public class Artro
 			Artro closestMate = findClosestVisibleMate();
 			if (closestMate != null)
 			{
-				moveTowards(closestMate.getPos());
+				moveTowards(closestMate.getPos(), dt);
 				if (isReachable(closestMate.getPos()))
 				{
 					mate(closestMate);
 				}
 			} else
 			{
-				wander();
+				wander(dt);
 			}
 
 			return;
 
 		case wander:
-			wander();
+			wander(dt);
 
 			return;
 
@@ -385,65 +380,19 @@ public class Artro
         }
 	}
 
-	private double avrSize()
-	{
-		return (species.getSize().getWidth() + species.getSize().getHeight()) / 2;
-	}
-
-	public int getLife()
-	{
-		return life;
-	}
-
-	public Point2D.Double getPos()
-	{
-		return pos;
-	}
-
-	public int getAge()
-	{
-		return age;
-	}
-
-	public Species getSpecies()
-	{
-		return species;
-	}
-
-	public Map<ArtroChoices, Double> getChoice()
-	{
-		return tendency;
-	}
-
-	public boolean getKeepChoice()
-	{
-		return keepChoice;
-	}
-
-	public int getSatiation()
-	{
-		return satiation;
-	}
-
-	public ArtroChoices getWill()
-	{
-		return will;
-	}
-
-	public int getSexWill()
-	{
-		return sexWill;
-	}
-
-	public double getDirection()
-	{
-		return direction;
-	}
-
-	public static List<Artro> getAll()
-	{
-		return all;
-	}
+	private double avrSize() { return (species.getSize().getWidth() + species.getSize().getHeight()) / 2 ;}
+	public int getLife() { return life ;}
+	public Point2D.Double getPos() { return pos ;}
+	public int getAge() { return age ;}
+	public Species getSpecies() { return species ;}
+	public Map<ArtroChoices, Double> getChoice() { return tendency ;}
+	public boolean getKeepChoice() { return keepChoice ;}
+	public int getSatiation() { return satiation ;}
+	public ArtroChoices getWill() { return will ;}
+	public int getSexWill() { return sexWill ;}	
+	public void setSexWill(int newValue) { sexWill = newValue ;}
+	public double getDirection() { return direction ;}
+	public static List<Artro> getAll() { return all ;}
 
 	@Override
 	public String toString()
