@@ -16,6 +16,7 @@ import com.google.gson.reflect.TypeToken;
 import graphics.Align;
 import graphics.Canva;
 import graphics.DrawPrimitives;
+import main.CustomTimer;
 import main.Path;
 import panels.CanvaPanel;
 import utilities.Util;
@@ -25,6 +26,7 @@ public class Artro
 	private int life; // life points, if they reach 0, the artro dies
 	private Point2D.Double pos; // current position of the artro
 	private int age; // current age of the artro
+	private CustomTimer ageTimer; // timer to track the age of the artro
 	private Species species; // species of the artro, determines its characteristics
 	private Map<ArtroChoices, Double> tendency; // tendency or chance (in %) of the artro choosing a certain behavior
 	private boolean keepChoice; // should the artro keep its current choice?
@@ -49,6 +51,8 @@ public class Artro
 		this.satiation = satiation;
 		this.sexWill = sexWill;
 		this.age = 0;
+		this.ageTimer = new CustomTimer(1.0);
+		this.ageTimer.start();
 		this.life = species.getMaxLife();
 		this.will = ArtroChoices.wander;
 		this.direction = 360 * Math.random();
@@ -236,6 +240,18 @@ public class Artro
 		}
 	}
 
+	public void age()
+	{
+		if (!ageTimer.hasFinished()) { return ;}
+
+		age += 1;
+		ageTimer.restart();
+		if (40 <= age)
+		{
+			dies();
+		}
+	}
+
 	public void moveTowards(Point2D.Double targetPos, double dt)
 	{
 		direction = Math.atan2(targetPos.y - pos.y, targetPos.x - pos.x);
@@ -397,8 +413,12 @@ public class Artro
 	@Override
 	public String toString()
 	{
-		return "Artro [life=" + life + ", pos=" + pos + ", age=" + age + ", species=" + species + ", tendency="
-				+ tendency + ", keepChoice=" + keepChoice + ", satiation=" + satiation + ", will=" + will + ", sexWill="
-				+ sexWill + ", direction=" + direction + "]";
+		// return "Artro [life=" + life + ", pos=" + pos + ", age=" + age + ", species=" + species + ", tendency="
+		// 		+ tendency + ", keepChoice=" + keepChoice + ", satiation=" + satiation + ", will=" + will + ", sexWill="
+		// 		+ sexWill + ", direction=" + direction + "]";
+
+		return "Artro: life=" + life + ", age=" + age + ", species=" + Species.getAll().indexOf(species) + ", tendency="
+				+ tendency + ", satiation=" + satiation + ", will=" + will + ", sexWill="
+				+ sexWill;
 	}
 }

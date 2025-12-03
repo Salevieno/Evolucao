@@ -7,8 +7,6 @@ import components.Artro;
 import components.Food;
 import components.FoodType;
 import components.Species;
-import panels.CanvaPanel;
-import panels.GraphsPanel;
 
 public abstract class Evolution
 {
@@ -47,8 +45,13 @@ public abstract class Evolution
 			CreateFood();
 		}
 
-		Records.updateFPS((int) CanvaPanel.getFPS());
-		GraphsPanel.updateRecords(artros);
+		CustomTimer.updateAll();
+
+		// System.out.println(artros.stream().filter(artro -> artro.getSpecies().equals(Species.getAll().get(0))).toList().size());
+		System.out.println(artros.get(0));
+
+		// Records.updateFPS((int) CanvaPanel.getFPS());
+		// GraphsPanel.updateRecords(artros);
 
 		if (isRunning)
 		{
@@ -64,6 +67,7 @@ public abstract class Evolution
 			Artro artro = artros.get(i);
 			artro.thinks();
 			artro.acts(food, dt);
+			artro.age();
 			artro.incHunger();
 			artro.incMateWill();
 
