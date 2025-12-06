@@ -28,7 +28,7 @@ public abstract class Evolution
 
 	public static void run(double dt)
 	{
-		artrosAct(dt);
+		Artro.updateAll(food, dt);
 
 		if ((int) currentTime % FoodType.spawnTime != 0 && (int) (currentTime + dt) % FoodType.spawnTime == 0 && food.size() < FoodType.maxQtd)
 		{
@@ -39,19 +39,6 @@ public abstract class Evolution
 		GraphsPanel.updateRecords(Artro.getAll(), dt);
 
 		currentTime += dt ;
-	}
-
-	public static void artrosAct(double dt)
-	{
-		for (int i = 0; i <= Artro.getAll().size() - 1; i += 1)
-		{
-			Artro artro = Artro.getAll().get(i);
-			artro.thinks();
-			artro.acts(food, dt);
-			artro.age(dt);
-			artro.incHunger(dt);
-			artro.incMateWill();
-		}
 	}
 
 	public static void CreateFood()

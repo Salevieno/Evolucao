@@ -308,6 +308,19 @@ public class Artro
 //        }	
 	}
 
+	public static void updateAll(List<Food> food, double dt)
+	{
+		all.forEach(artro ->
+			{
+				artro.thinks();
+				artro.acts(food, dt);
+				artro.age(dt);
+				artro.incHunger(dt);
+				artro.incMateWill();
+			}
+		);
+	}
+
 	public void acts(List<Food> allFood, double dt)
 	{
 
