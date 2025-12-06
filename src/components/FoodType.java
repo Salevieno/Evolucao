@@ -17,6 +17,8 @@ public class FoodType
 {
 	public static final Point2D.Double centerOfCreation;
 	public static final Dimension rangeOfCreation;
+	public static final int spawnTime; // number of rounds taken for the food to respawn
+	public static final int maxQtd; // maximum amount of food that can exist at a time
 
 	private int size; // size of this type of fruit
 	private int value; // amount of satiation this type of food restores
@@ -29,6 +31,8 @@ public class FoodType
 		all = new ArrayList<>();
 		centerOfCreation = new Point2D.Double(1000, 1000);
 		rangeOfCreation = new Dimension(500, 500);
+		spawnTime = 2;
+		maxQtd = 200;
 	}
 
 	public FoodType(int size, int value, Color color)

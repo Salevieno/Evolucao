@@ -7,75 +7,50 @@ import components.Artro;
 import components.Food;
 import components.FoodType;
 import components.Species;
+import panels.GraphsPanel;
 
 public abstract class Evolution
 {
-
-	private static int round; // number of the current iteration
-
-	private static int foodRespawnTime; // number of rounds taken for the food to respawn
-	private static int maxNumberFood; // maximum amount of food that can exist at a time
-
 	private static boolean isRunning;
-
-	private static List<Artro> artros;
+	private static double currentTime ;
 	private static List<Food> food;
 
 	public static void initialize()
 	{
-
 		Species.load();
-		artros = Artro.load();
+		Artro.load();
 		FoodType.load();
 		food = Food.load();
 
-		foodRespawnTime = 20;
-		maxNumberFood = 200;
-		round = 0;
+		currentTime = 0 ;
 		isRunning = true;
-
 	}
 
 	public static void run(double dt)
 	{
 		artrosAct(dt);
 
-		if (round % foodRespawnTime == 0 & food.size() < maxNumberFood)
+		if ((int) currentTime % FoodType.spawnTime != 0 && (int) (currentTime + dt) % FoodType.spawnTime == 0 && food.size() < FoodType.maxQtd)
 		{
 			CreateFood();
 		}
 
 		CustomTimer.updateAll();
+		GraphsPanel.updateRecords(Artro.getAll(), dt);
 
-		// System.out.println(artros.stream().filter(artro -> artro.getSpecies().equals(Species.getAll().get(0))).toList().size());
-		System.out.println(artros.get(0));
-
-		// Records.updateFPS((int) CanvaPanel.getFPS());
-		// GraphsPanel.updateRecords(artros);
-
-		if (isRunning)
-		{
-			round += 1;
-		}
-
+		currentTime += dt ;
 	}
 
 	public static void artrosAct(double dt)
 	{
-		for (int i = 0; i <= artros.size() - 1; i += 1)
+		for (int i = 0; i <= Artro.getAll().size() - 1; i += 1)
 		{
-			Artro artro = artros.get(i);
+			Artro artro = Artro.getAll().get(i);
 			artro.thinks();
 			artro.acts(food, dt);
-			artro.age();
-			artro.incHunger();
+			artro.age(dt);
+			artro.incHunger(dt);
 			artro.incMateWill();
-
-			if (artro.getLife() == 0)
-			{
-				artros.remove(artro);
-			}
-
 		}
 	}
 
@@ -89,7 +64,6 @@ public abstract class Evolution
 	}
 
 	public static void switchIsRunning() { isRunning = !isRunning ;}
-	public static List<Artro> getArtros() { return artros ;}
 	public static List<Food> getFood() { return food ;}
 	public static boolean isRunning() { return isRunning ;}
 }

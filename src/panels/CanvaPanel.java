@@ -166,7 +166,7 @@ public class CanvaPanel extends JPanel
 		if (displayCanva)
 		{
 			displayFood(Evolution.getFood());
-			displayArtros(Evolution.getArtros());
+			displayArtros(Artro.getAll());
 		}
 		repaint();
 	}

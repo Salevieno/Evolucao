@@ -25,12 +25,12 @@ public class Artro
 {
 	private int life; // life points, if they reach 0, the artro dies
 	private Point2D.Double pos; // current position of the artro
-	private int age; // current age of the artro
+	private double age; // current age of the artro
 	private CustomTimer ageTimer; // timer to track the age of the artro
 	private Species species; // species of the artro, determines its characteristics
 	private Map<ArtroChoices, Double> tendency; // tendency or chance (in %) of the artro choosing a certain behavior
 	private boolean keepChoice; // should the artro keep its current choice?
-	private int satiation; // amount of food in the artro's stomach, if it reaches 0, the artro dies
+	private double satiation; // amount of food in the artro's stomach, if it reaches 0, the artro dies
 	private ArtroChoices will; // what the artro wants to do right now
 	private int sexWill; // lust of the artro, if it reaches a certain level, the artro will try to mate
 	private double speed = 300;
@@ -173,9 +173,9 @@ public class Artro
 		return satiation <= (int) (0.6 * species.getStomach());
 	}
 
-	public void incHunger()
+	public void incHunger(double dt)
 	{
-		satiation += -1;
+		satiation += -dt;
 		if (satiation <= 0)
 		{
 			dies();
@@ -240,12 +240,9 @@ public class Artro
 		}
 	}
 
-	public void age()
+	public void age(double dt)
 	{
-		if (!ageTimer.hasFinished()) { return ;}
-
-		age += 1;
-		ageTimer.restart();
+		age += dt;
 		if (40 <= age)
 		{
 			dies();
@@ -399,11 +396,11 @@ public class Artro
 	private double avrSize() { return (species.getSize().getWidth() + species.getSize().getHeight()) / 2 ;}
 	public int getLife() { return life ;}
 	public Point2D.Double getPos() { return pos ;}
-	public int getAge() { return age ;}
+	public double getAge() { return age ;}
 	public Species getSpecies() { return species ;}
 	public Map<ArtroChoices, Double> getChoice() { return tendency ;}
 	public boolean getKeepChoice() { return keepChoice ;}
-	public int getSatiation() { return satiation ;}
+	public double getSatiation() { return satiation ;}
 	public ArtroChoices getWill() { return will ;}
 	public int getSexWill() { return sexWill ;}	
 	public void setSexWill(int newValue) { sexWill = newValue ;}

@@ -4,7 +4,7 @@
 		"range": [500, 500],
 		"amount": 10,
 		"speciesID": 0,
-		"minSatiation": 800,
+		"minSatiation": 10,
 		"tendencies": [ 100, 100, 30 ],
 		"minSexWill": 10
 	},
@@ -13,7 +13,7 @@
 		"range": [500, 500],
 		"amount": 20,
 		"speciesID": 1,
-		"minSatiation": 800,
+		"minSatiation": 10,
 		"tendencies": [ 80, 100, 50 ],
 		"minSexWill": 10
 	}

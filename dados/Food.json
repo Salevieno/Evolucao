@@ -2,13 +2,13 @@
 	{ 
 		"center": [1000.0, 1000.0],
 		"range": [1000, 1000],
-		"amount": 200,
+		"amount": 20,
 		"typeID": 0
 	},
 	{ 
 		"center": [1000.0, 1000.0],
 		"range": [1000, 1000],
-		"amount": 20,
+		"amount": 10,
 		"typeID": 1
 	}
 ]
