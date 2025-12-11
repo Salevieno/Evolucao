@@ -1,8 +1,5 @@
 package main;
 
-import java.awt.geom.Point2D;
-import java.util.List;
-
 import components.Artro;
 import components.Food;
 import components.FoodType;
@@ -13,14 +10,13 @@ public abstract class Evolution
 {
 	private static boolean isRunning;
 	private static double currentTime ;
-	private static List<Food> food;
 
 	public static void initialize()
 	{
 		Species.load();
 		Artro.load();
 		FoodType.load();
-		food = Food.load();
+		Food.load();
 
 		currentTime = 0 ;
 		isRunning = true;
@@ -28,12 +24,8 @@ public abstract class Evolution
 
 	public static void run(double dt)
 	{
-		Artro.updateAll(food, dt);
-
-		if ((int) currentTime % FoodType.spawnTime != 0 && (int) (currentTime + dt) % FoodType.spawnTime == 0 && food.size() < FoodType.maxQtd)
-		{
-			CreateFood();
-		}
+		Artro.updateAll(dt);
+		FoodType.spawnFoodIfNeeded(currentTime, dt);
 
 		CustomTimer.updateAll();
 		GraphsPanel.updateRecords(Artro.getAll(), dt);
@@ -41,16 +33,6 @@ public abstract class Evolution
 		currentTime += dt ;
 	}
 
-	public static void CreateFood()
-	{
-		Point2D.Double pos = new Point2D.Double() ;
-		pos.x = FoodType.centerOfCreation.x + FoodType.rangeOfCreation.width * (Math.random() - Math.random()) ;
-		pos.y = FoodType.centerOfCreation.y + FoodType.rangeOfCreation.height * (Math.random() - Math.random()) ;
-		FoodType type = FoodType.getAll().get(0);
-		food.add(new Food(pos, type));
-	}
-
 	public static void switchIsRunning() { isRunning = !isRunning ;}
-	public static List<Food> getFood() { return food ;}
 	public static boolean isRunning() { return isRunning ;}
 }

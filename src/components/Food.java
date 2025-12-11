@@ -19,10 +19,13 @@ public class Food
 	private Point2D.Double pos;
 	private FoodType type;
 
+	private static final List<Food> all = new ArrayList<>();
+
 	public Food(Point2D.Double pos, FoodType type)
 	{
 		this.pos = pos;
 		this.type = type;
+		all.add(this);
 	}
 
 	public Food(FoodDTO dto)
@@ -65,4 +68,5 @@ public class Food
 
 	public Point2D.Double getPos() { return pos ;}
 	public FoodType getType() { return type ;}
+	public static List<Food> getAll() { return all ;}
 }

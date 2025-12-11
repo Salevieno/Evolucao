@@ -17,11 +17,11 @@ public class FoodType
 {
 	public static final Point2D.Double centerOfCreation;
 	public static final Dimension rangeOfCreation;
-	public static final int spawnTime; // number of rounds taken for the food to respawn
 	public static final int maxQtd; // maximum amount of food that can exist at a time
-
+	
 	private int size; // size of this type of fruit
 	private int value; // amount of satiation this type of food restores
+	private int spawnTime; // number of rounds taken for the food to respawn
 	private Color color; // colors of this type of fruit
 
 	private static final List<FoodType> all;
@@ -31,21 +31,21 @@ public class FoodType
 		all = new ArrayList<>();
 		centerOfCreation = new Point2D.Double(1000, 1000);
 		rangeOfCreation = new Dimension(500, 500);
-		spawnTime = 2;
 		maxQtd = 200;
 	}
 
-	public FoodType(int size, int value, Color color)
+	public FoodType(int size, int value, int spawnTime, Color color)
 	{
 		this.size = size;
 		this.value = value;
+		this.spawnTime = spawnTime;
 		this.color = color;
 		all.add(this) ;
 	}
 
 	public FoodType(FoodTypeDTO dto)
 	{
-		this(dto.getSize(), dto.getValue(), dto.getColor()) ;
+		this(dto.getSize(), dto.getValue(), dto.getSpawnTime(), dto.getColor()) ;
 	}
 
 	public static void load()
@@ -62,6 +62,25 @@ public class FoodType
 		{
             e.printStackTrace();
         }
+	}
+
+	public static void spawnFoodIfNeeded(double currentTime, double dt)
+	{
+		for (FoodType type : all)
+		{
+			if ((int) currentTime % type.spawnTime != 0 && (int) (currentTime + dt) % type.spawnTime == 0 && Food.getAll().size() < maxQtd)
+			{
+				createFood(type);
+			}
+		}
+	}
+
+	private static void createFood(FoodType type)
+	{
+		Point2D.Double pos = new Point2D.Double() ;
+		pos.x = FoodType.centerOfCreation.x + FoodType.rangeOfCreation.width * (Math.random() - Math.random()) ;
+		pos.y = FoodType.centerOfCreation.y + FoodType.rangeOfCreation.height * (Math.random() - Math.random()) ;
+		new Food(pos, type) ;
 	}
 
 	public int getSize() { return size ;}
