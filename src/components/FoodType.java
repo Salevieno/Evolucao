@@ -21,7 +21,7 @@ public class FoodType
 	
 	private int size; // size of this type of fruit
 	private int value; // amount of satiation this type of food restores
-	private int spawnTime; // number of rounds taken for the food to respawn
+	private double spawnTime; // number of rounds taken for the food to respawn
 	private Color color; // colors of this type of fruit
 
 	private static final List<FoodType> all;
@@ -30,11 +30,11 @@ public class FoodType
 	{
 		all = new ArrayList<>();
 		centerOfCreation = new Point2D.Double(1000, 1000);
-		rangeOfCreation = new Dimension(500, 500);
+		rangeOfCreation = new Dimension(2000, 2000);
 		maxQtd = 200;
 	}
 
-	public FoodType(int size, int value, int spawnTime, Color color)
+	public FoodType(int size, int value, double spawnTime, Color color)
 	{
 		this.size = size;
 		this.value = value;
@@ -68,7 +68,7 @@ public class FoodType
 	{
 		for (FoodType type : all)
 		{
-			if ((int) currentTime % type.spawnTime != 0 && (int) (currentTime + dt) % type.spawnTime == 0 && Food.getAll().size() < maxQtd)
+			if ((int) (currentTime / type.spawnTime) < (int) ((currentTime + dt) / type.spawnTime) && Food.getAll().size() < maxQtd)
 			{
 				createFood(type);
 			}
@@ -78,8 +78,8 @@ public class FoodType
 	private static void createFood(FoodType type)
 	{
 		Point2D.Double pos = new Point2D.Double() ;
-		pos.x = FoodType.centerOfCreation.x + FoodType.rangeOfCreation.width * (Math.random() - Math.random()) ;
-		pos.y = FoodType.centerOfCreation.y + FoodType.rangeOfCreation.height * (Math.random() - Math.random()) ;
+		pos.x = 0 + FoodType.rangeOfCreation.width * Math.random() ;
+		pos.y = 0 + FoodType.rangeOfCreation.height * Math.random() ;
 		new Food(pos, type) ;
 	}
 

@@ -83,6 +83,20 @@ public class Artro
 		return all.stream().filter(artro -> artro.getSpecies().equals(species)).toList();
 	}
 
+	public static double getAverageGene(Species species, ArtroChoices choice)
+	{
+		List<Artro> artrosOfSpecies = getAllOfSpecies(species);
+		if (artrosOfSpecies.isEmpty()) { return 0 ;}
+
+		double totalGene = 0 ;
+		for (Artro artro : artrosOfSpecies)
+		{
+			totalGene += artro.getChoice().get(choice) ;
+		}
+
+		return totalGene / artrosOfSpecies.size() ;
+	}
+
 	public static void updateAll(double dt)
 	{
 		for (Artro artro : new ArrayList<>(all))
@@ -253,6 +267,7 @@ public class Artro
 
 	private void mate(Artro mate)
 	{
+		System.out.println("mating!");
 		Point2D.Double newPos = new Point2D.Double((pos.x + mate.getPos().x) / 2, (pos.y + mate.getPos().y) / 2);
 		Map<ArtroChoices, Double> newTendency = new HashMap<>();
 		for (ArtroChoices choice : ArtroChoices.values())
@@ -283,7 +298,7 @@ public class Artro
 	private void age(double dt)
 	{
 		age += dt;
-		if (40 <= age)
+		if (100 <= age)
 		{
 			dies();
 		}
@@ -368,7 +383,7 @@ public class Artro
 	{
 		Point drawingPos = canva.inDrawingCoords(pos);
 		DP.drawImage(species.getImage(), drawingPos, Align.center);
-		DP.drawText(new Point(drawingPos.x, drawingPos.y + 10), Align.center, will.toString(), Color.cyan);
+		// DP.drawText(new Point(drawingPos.x, drawingPos.y + 10), Align.center, will.toString(), Color.cyan);
 	}
 
 	private double avrSize() { return (species.getSize().getWidth() + species.getSize().getHeight()) / 2 ;}

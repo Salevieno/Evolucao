@@ -31,8 +31,8 @@ public class Food
 	public Food(FoodDTO dto)
 	{
 		this(new Point2D.Double(0, 0), FoodType.getAll().get(dto.getTypeID())) ;
-		this.pos.x = dto.getCenter()[0] + dto.getRange()[0] * (Math.random() - Math.random()) ;
-		this.pos.y = dto.getCenter()[1] + dto.getRange()[1] * (Math.random() - Math.random()) ;
+		this.pos.x = 0 + dto.getRange()[0] * Math.random() ;
+		this.pos.y = 0 + dto.getRange()[1] * Math.random() ;
 	}
 
 	public static List<Food> load()

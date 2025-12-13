@@ -14,6 +14,7 @@ import charts.Chart;
 import charts.ChartType;
 import charts.Dataset;
 import components.Artro;
+import components.ArtroChoices;
 import components.Species;
 import graphics.Align;
 import graphics.DrawPrimitives;
@@ -25,8 +26,8 @@ public abstract class GraphsPanel
 	private static final List<Chart> charts;
 	private static final Chart popChart;
 	private static final List<Dataset> popData;
+	private static final Chart geneChart;
 	private static final List<Dataset> geneData;
-	private static final Dataset fpsData;
 	private static final DrawPrimitives DP;
 	
 	private static double elapsedTime;
@@ -66,16 +67,15 @@ public abstract class GraphsPanel
 		geneData = new ArrayList<>();
 		Species.getAll().forEach(species -> popData.add(new Dataset()));
 		Species.getAll().forEach(species -> geneData.add(new Dataset()));
-		fpsData = new Dataset();
 		charts = new ArrayList<>();
 
 		popChart = new Chart(ChartType.line, new Point(80, 200), Align.center, "Population", 80, Species.getColors(), Species.getColors());
 		popChart.addDatasets(popData);
 		charts.add(popChart);
-		charts.add(new Chart(ChartType.line, new Point(80, 350), Align.center, "Eating gene", 80, Species.getColors(), Species.getColors()));
-		charts.get(1).addDatasets(geneData);
-		charts.add(new Chart(ChartType.line, new Point(80, 500), Align.center, "fps", 80, Color.orange));
-		charts.get(2).addDataset(fpsData);
+		geneChart = new Chart(ChartType.line, new Point(80, 350), Align.center, "Eating gene", 80, Species.getColors(), Species.getColors());
+		geneChart.addDatasets(geneData);
+		geneChart.setMaxY(100) ;
+		charts.add(geneChart);
 	}
 
 	public static JPanel getPanel()
@@ -91,26 +91,30 @@ public abstract class GraphsPanel
 	public static void updateRecords(List<Artro> artros, double dt)
 	{
 		elapsedTime += dt;
-		for (Species specie : Species.getAll())
+		for (Species species : Species.getAll())
 		{
-			popChart.setMaxX(elapsedTime);
-			int population = Artro.getAllOfSpecies(specie).size();
-			popData.get(Species.getAll().indexOf(specie)).addPointUpToSize((int) elapsedTime, population, 1000);
+			// popChart.setMaxX(elapsedTime);
+			int population = Artro.getAllOfSpecies(species).size();
+			popData.get(Species.getAll().indexOf(species)).addPointUpToSize((int) elapsedTime, population, 1000);
 			popChart.updateMaxY();
+			if (1000 <= popData.get(0).size())
+			{
+				popChart.setMinX(popData.get(0).getX().get(0));
+			}
+			popChart.setMaxX(popData.get(0).getX().get(popData.get(0).size() - 1));
 		}
-		// for (int i = 0; i <= Species.getAll().size() - 1; i += 1)
-		// {
-		// 	Species species = Species.getAll().get(i);
-		// 	popData.get(i).addYDataUpToSize(Artro.getAllOfSpecies(species).size(), 200);
-		// 	OptionalDouble geneYData = Artro.getAllOfSpecies(species).stream()
-		// 									.mapToDouble(artro -> artro.getChoice().get(ArtroChoices.eat))
-		// 									.average() ;
-		// 	if (geneYData.isPresent())
-		// 	{
-		// 		geneData.get(i).addYDataUpToSize(geneYData.getAsDouble(), 200);
-		// 	}
-		// }
-		// fpsData.addYDataUpToSize(Records.fpsList.get(Records.fpsList.size() - 1), 100);
+
+		
+		for (Species species : Species.getAll())
+		{
+			double averageEatGene = Artro.getAverageGene(species, ArtroChoices.eat) ;
+			geneData.get(Species.getAll().indexOf(species)).addPointUpToSize((int) elapsedTime, (int) (100 * averageEatGene), 1000);
+			if (1000 <= geneData.get(Species.getAll().indexOf(species)).size())
+			{
+				geneChart.setMinX(geneData.get(0).getX().get(0));
+			}
+			geneChart.setMaxX(geneData.get(0).getX().get(geneData.get(0).size() - 1));
+		}
 
 		panel.repaint();
 	}

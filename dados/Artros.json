@@ -2,19 +2,19 @@
 	{ 
 		"center": [1000, 1000],
 		"range": [500, 500],
-		"amount": 10,
+		"amount": 20,
 		"speciesID": 0,
 		"minSatiation": 10,
-		"tendencies": [ 100, 100, 30 ],
+		"tendencies": [ 80, 100, 30 ],
 		"minSexWill": 10
 	},
 	{ 
 		"center": [1000, 1000],
 		"range": [500, 500],
-		"amount": 20,
+		"amount": 30,
 		"speciesID": 1,
 		"minSatiation": 10,
-		"tendencies": [ 80, 100, 50 ],
+		"tendencies": [ 60, 100, 50 ],
 		"minSexWill": 10
 	}
 ]
